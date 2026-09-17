@@ -114,7 +114,7 @@ const painters = {
       img.data[i * 4 + 3] = 255;
     }
     ctx.putImageData(img, 0, 0);
-  }
+  },
 };
 
 export function getTexture(name) {
