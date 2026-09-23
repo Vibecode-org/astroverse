@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { createBlackHoleMesh } from './meshes/blackHoleMesh.js';
 import { createNebulaMesh } from './meshes/nebulaMesh.js';
 import { createClusterMesh } from './meshes/clusterMesh.js';
@@ -10,7 +9,6 @@ export function createBodyMesh(obj) {
   const isNebula = obj.kind === 'nebula';
   const isCluster = obj.kind === 'cluster';
   const isGalaxy = obj.kind === 'galaxy';
-  const isStar = obj.kind === 'star';
 
   if (isBlackHole) {
     return createBlackHoleMesh(obj);

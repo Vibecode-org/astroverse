@@ -4,12 +4,15 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     restart: unless-stopped
+    environment:
+      ASTROVERSE_CATALOG_MODE: ${ASTROVERSE_CATALOG_MODE:-offline}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 5s
+      # Online builds can wait for several NASA requests and retries.
+      start_period: 300s
 
   frontend:
     build:

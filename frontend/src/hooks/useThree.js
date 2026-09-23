@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { makeMilkyWay, equatorialXYZ, galacticXYZ, SUN_GALACTIC } from '../galaxy.js';
-import { createBodyMesh, makeOrbit, makeAsteroidBelt, makeKuiperBelt, makeStarField, makeLabel, kindLabel, objectScale, getSolarDistance, getSolarSpeed, getMoonOrbitDistance } from '../bodies/index.js';
+import { makeMilkyWay, equatorialXYZ, galacticXYZ } from '../galaxy.js';
+import { createBodyMesh, makeOrbit, makeAsteroidBelt, makeKuiperBelt, makeStarField, makeLabel, objectScale, getSolarDistance, getMoonOrbitDistance } from '../bodies/index.js';
 
-export function useThree({ objects, view, setView, selected, setSelected, follow, setFollow, appRef, simDate, setSimDate, isPaused, timeMultiplier, setErrorDetails }) {
+export function useThree({ objects, view, setView, selected, setSelected, follow, setFollow, appRef, simDate, setErrorDetails }) {
   const mountRef = useRef(null);
 
   useEffect(() => {
@@ -88,7 +88,6 @@ export function useThree({ objects, view, setView, selected, setSelected, follow
         const mesh = createBodyMesh(obj);
         const dist = getSolarDistance(obj);
         mesh.userData.calculatedDistance = dist;
-        mesh.userData.calculatedSpeed = getSolarSpeed(obj);
         mesh.userData.initialAngle = [...obj.id].reduce((angle, char) => angle + char.charCodeAt(0), 0) % 360 * Math.PI / 180;
         mesh.userData.currentAngle = mesh.userData.initialAngle;
 

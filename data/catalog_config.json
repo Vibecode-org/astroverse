@@ -1,0 +1,31 @@
+{
+  "seed": "catalog_seed.json",
+  "http": {
+    "timeout_seconds": 30,
+    "retries": 2,
+    "user_agent": "Astroverse/3.0 (educational catalog builder)"
+  },
+  "sources": {
+    "exoplanets": {
+      "url": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",
+      "limit": 1500
+    },
+    "asteroids": {
+      "url": "https://ssd-api.jpl.nasa.gov/sbdb_query.api",
+      "limit": 400
+    },
+    "comets": {
+      "url": "https://ssd-api.jpl.nasa.gov/sbdb_query.api",
+      "limit": 80
+    },
+    "wikipedia": {
+      "url": "https://ru.wikipedia.org/api/rest_v1/page/summary/"
+    }
+  },
+  "display": {
+    "star": {"radius": 0.35, "color": "#ffd36a"},
+    "exoplanet": {"radius": 0.16, "color": "#4f83ff"},
+    "asteroid": {"radius": 0.2, "color": "#8f8b85", "texture": "rocky"},
+    "comet": {"radius": 0.08, "color": "#9ec5d8", "texture": "ice"}
+  }
+}

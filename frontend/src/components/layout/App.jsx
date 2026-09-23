@@ -15,16 +15,10 @@ import FactsTab from '../tabs/FactsTab.jsx';
 import { formatLy, formatNum, formatPeriod } from '../../utils/formatUtils.js';
 import { objectScale } from '../../bodies/utils/celestialUtils.js';
 
-const VIEWS = [
-  { id: 'solar', label: 'Солнечная система', icon: '☼' },
-  { id: 'local', label: 'Окрестности Солнца', icon: '✦' },
-  { id: 'galaxy', label: 'Млечный Путь', icon: '◌' },
-];
-
 function App() {
   const {
-    objects, setObjects, selected, setSelected, query, setQuery,
-    view, setView, follow, setFollow, loading, setLoading,
+    objects, selected, setSelected, query, setQuery,
+    view, setView, follow, setFollow, loading,
     errorDetails, setErrorDetails, panelTab, setPanelTab,
     appRef,
   } = useObjectData();
@@ -33,7 +27,7 @@ function App() {
 
   const { mountRef } = useThree({
     objects, view, setView, selected, setSelected, follow, setFollow,
-    appRef, simDate, setSimDate, isPaused, timeMultiplier, setErrorDetails,
+    appRef, simDate, setErrorDetails,
   });
 
   const filtered = useMemo(() => {
@@ -80,7 +74,6 @@ function App() {
           <div><b>ASTROVERSE</b><small>ORBITAL TIME EXPLORER</small></div>
         </div>
         <TimeControls
-          simDate={simDate}
           setSimDate={setSimDate}
           isPaused={isPaused}
           setIsPaused={setIsPaused}

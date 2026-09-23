@@ -30,13 +30,6 @@ export function getSolarDistance(obj) {
   return obj.distance || 12;
 }
 
-export function getSolarSpeed(obj) {
-  if (obj.au != null) {
-    return 1.0 / Math.sqrt(obj.au);
-  }
-  return obj.speed || 0.1;
-}
-
 export function getMoonOrbitDistance(obj, parentRadius = 1.0) {
   if (obj.id === 'moon') return parentRadius * 3.4;
   if (obj.id === 'phobos') return parentRadius * 1.5;

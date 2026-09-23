@@ -14,13 +14,13 @@ Frontend и его API должны быть уже запущены, катал
 ```sh
 python3 -m venv /tmp/astroverse-smoke-env
 /tmp/astroverse-smoke-env/bin/python -m pip install playwright
-/tmp/astroverse-smoke-env/bin/python frontend/tests/browser_smoke.py
+/tmp/astroverse-smoke-env/bin/python tests/browser_smoke.py
 ```
 
 По умолчанию Chrome headless. Для видимого окна:
 
 ```sh
-SMOKE_HEADED=1 /tmp/astroverse-smoke-env/bin/python frontend/tests/browser_smoke.py
+SMOKE_HEADED=1 /tmp/astroverse-smoke-env/bin/python tests/browser_smoke.py
 ```
 
 Один сценарий можно выбрать аргументом, например

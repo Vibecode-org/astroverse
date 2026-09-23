@@ -1,17 +1,25 @@
-from pathlib import Path
+import csv
 import json
-import re
-import urllib.request
+import math
+import sys
 import urllib.parse
+import urllib.request
 from datetime import datetime, timezone
-from fastapi import FastAPI, HTTPException
+from pathlib import Path
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_PATH = ROOT / "data" / "objects.json"
+# Support `uvicorn app:app` from backend/ both locally and in Docker.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-with DATA_PATH.open("r", encoding="utf-8") as f:
-    CATALOG = json.load(f)
+from data.catalog import catalog_path, load_catalog
+
+DATA_PATH = catalog_path()
+# Loaded once: restart the backend after catalog or environment changes.
+CATALOG = load_catalog(DATA_PATH)
 
 app = FastAPI(title="Astroverse API", version="0.4.0")
 app.add_middleware(
@@ -22,18 +30,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Коды тел в базе NASA JPL Horizons (199 = Меркурий, 299 = Венера ... 999 = Плутон)
-JPL_COMMANDS = {
-    "mercury": "199",
-    "venus": "299",
-    "earth": "399",
-    "mars": "499",
-    "jupiter": "599",
-    "saturn": "699",
-    "uranus": "799",
-    "neptune": "899",
-    "pluto": "999",
-}
 
 EPHEMERIS_CACHE = {
     "timestamp": None,
@@ -55,7 +51,11 @@ def fetch_jpl_vector(cmd: str):
         "START_TIME": f"'{now_str}'",
         "STOP_TIME": f"'{now_str} 00:01'",
         "STEP_SIZE": "'1d'",
-        "CSV_FORMAT": "YES"
+        "CSV_FORMAT": "YES",
+        "OUT_UNITS": "AU-D",
+        "VEC_TABLE": "2",
+        "VEC_CORR": "NONE",
+        "REF_PLANE": "ECLIPTIC",
     }
     url = f"{base_url}?{urllib.parse.urlencode(params)}"
     req = urllib.request.Request(url, headers={'User-Agent': 'Astroverse/1.0'})
@@ -63,17 +63,25 @@ def fetch_jpl_vector(cmd: str):
     with urllib.request.urlopen(req, timeout=10) as resp:
         res = json.loads(resp.read().decode('utf-8'))
         text = res.get("result", "")
-        # Извлекаем X, Y, Z между маркерами $$SOE и $$EOE
-        match = re.search(r"\$\$SOE.*?\n(.*?),.*?\n\$\$EOE", text, re.DOTALL)
-        if match:
-            line = match.group(1).split(",")
-            if len(line) >= 5:
-                # line[2]=X, line[3]=Y, line[4]=Z (в астрономических единицах)
-                return {
-                    "x": float(line[2].strip()),
-                    "y": float(line[4].strip()),  # В Three.js вертикальная ось — Y (в JPL это Z)
-                    "z": float(line[3].strip()),
-                }
+        if not isinstance(text, str):
+            return None
+        _, start, remainder = text.partition("$$SOE")
+        block, end, _ = remainder.partition("$$EOE")
+        if not start or not end:
+            return None
+        line = next((line for line in block.splitlines() if line.strip()), None)
+        if line is None:
+            return None
+        try:
+            fields = next(csv.reader([line]))
+            if len(fields) < 5:
+                return None
+            x, y, z = (float(value.strip()) for value in fields[2:5])
+        except (ValueError, csv.Error):
+            return None
+        if all(math.isfinite(value) for value in (x, y, z)):
+            # Three.js uses Y as the vertical axis; JPL uses Z.
+            return {"x": x, "y": z, "z": y}
     return None
 
 @app.get("/api/health")
@@ -85,7 +93,11 @@ def objects(q: str | None = None, kind: str | None = None):
     items = CATALOG
     if q:
         ql = q.lower()
-        items = [x for x in items if ql in f"{x.get('name','')} {x.get('latin','')} {x.get('description','')}".lower()]
+        fields = ("name", "latin", "description", "facts", "mythology", "history")
+        items = [
+            item for item in items
+            if any(ql in str(item.get(field) or "").lower() for field in fields)
+        ]
     if kind:
         items = [x for x in items if x["kind"] == kind]
     return items
@@ -100,7 +112,11 @@ def live_ephemeris():
         return {"timestamp": EPHEMERIS_CACHE["timestamp"].isoformat(), "positions": EPHEMERIS_CACHE["data"], "source": "NASA JPL Horizons (cached)"}
 
     positions = {}
-    for planet_id, cmd in JPL_COMMANDS.items():
+    for item in CATALOG:
+        cmd = item.get("jpl_command")
+        if item["scale"] != "solar" or not cmd:
+            continue
+        planet_id = item["id"]
         try:
             vec = fetch_jpl_vector(cmd)
             if vec:

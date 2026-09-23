@@ -1,1 +1,12 @@
-(empty)
+# Local dependencies and build output
+**/.venv/
+**/node_modules/
+**/dist/
+
+# Generated catalog: built automatically inside the container
+data/objects.json
+
+# Python and OS artifacts
+**/__pycache__/
+*.py[cod]
+.DS_Store

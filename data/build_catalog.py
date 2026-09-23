@@ -1,217 +1,290 @@
+"""Build a catalog from an independent snapshot and optional live NASA sources."""
+
+import argparse
+import copy
 import json
-import urllib.request
+import logging
+import math
+import re
+import time
+import urllib.error
 import urllib.parse
-import http.client
+import urllib.request
 from pathlib import Path
 
+if __package__:
+    from .catalog import catalog_path, load_catalog, validate_catalog, write_catalog
+else:
+    from catalog import catalog_path, load_catalog, validate_catalog, write_catalog
+
 DATA_DIR = Path(__file__).resolve().parent
-OUTPUT_FILE = DATA_DIR / "objects.json"
+DEFAULT_CONFIG = DATA_DIR / "catalog_config.json"
+PARSEC_TO_LIGHT_YEARS = 3.261563777
+NASA_ARCHIVE = "NASA Exoplanet Archive"
+JPL_SBDB = "NASA JPL SBDB"
+LOG = logging.getLogger(__name__)
 
-# ==============================================================================
-# БАЗА МИФОЛОГИИ, ИСТОРИИ И КУЛЬТУРНОГО НАСЛЕДИЯ
-# ==============================================================================
-LORE_DATABASE = {
-    # Солнечная система
-    "sun": {
-        "mythology": "В древнегреческой мифологии — Гелиос, ежедневно проносящийся по небу на золотой колеснице, запряженной четверкой огнедышащих коней. В Египте — верховный бог Ра, в славянском пантеоне — Ярило и Даждьбог.",
-        "history": "Аристарх Самосский в III веке до н.э. первым предложил гелиоцентрическую модель. В 1610 году Галилео Галилей открыл солнечные пятна, доказав несовершенство 'небесной тверди'."
-    },
-    "mercury": {
-        "mythology": "Назван в честь римского быстроногого бога торговли и вестника богов (в Греции — Гермес) из-за самого стремительного движения по ночному небу среди всех планет.",
-        "history": "Аномальная прецессия перигелия Меркурия не укладывалась в законы Ньютона и стала первым триумфальным доказательством Общей теории относительности Эйнштейна в 1915 году."
-    },
-    "venus": {
-        "mythology": "Римская богиня любви, красоты и страсти (Афродита). Древние греки считали её двумя разными светилами: Фосфор (Утренняя звезда) и Геспер (Вечерняя звезда), пока Пифагор не доказал их идентичность.",
-        "history": "В 1761 году Михаил Ломоносов при наблюдении прохождения Венеры по диску Солнца открыл наличие у неё плотной атмосферы («световой ободок Ломоносова»)."
-    },
-    "earth": {
-        "mythology": "Гея в греческой мифологии — первозданная богиня Земли, мать Неба (Урана) и Моря (Понта), породившая всё живое.",
-        "history": "В 1968 году экипаж «Аполлона-8» сделал снимок 'Earthrise' (Восход Земли над Луной), который кардинально изменил самосознание человечества и положил начало глобальному экологическому движению."
-    },
-    "moon": {
-        "mythology": "Селена в Греции, Диана у римлян, Чанъэ в Китае. Олицетворение ночной тишины, женского начала, мистицизма и покровительница лунных календарей древности.",
-        "history": "20 июля 1969 года Нил Армстронг и Базз Олдрин стали первыми людьми, ступившими на другое небесное тело: 'Это один маленький шаг для человека, но гигантский скачок для всего человечества'."
-    },
-    "mars": {
-        "mythology": "Римский бог войны (Арес). Кроваво-красный оттенок планеты ассоциировался у древних цивилизаций с кровью и битвами. Его спутники названы Фобос («Страх») и Деймос («Ужас») — кони колесницы бога войны.",
-        "history": "В 1877 году Джованни Скиапарелли объявил об открытии 'марсианских каналов', что вызвало полувековой бум веры в разумную марсианскую цивилизацию (от Персиваля Лоуэлла до «Войны миров» Герберта Уэллса)."
-    },
-    "jupiter": {
-        "mythology": "Верховный бог римского пантеона, владыка неба, громовержец (в Греции — Зевс). Четыре крупнейших спутника (Ио, Европа, Ганимед, Каллисто) названы именами возлюбленных Зевса.",
-        "history": "Открытие Галилеем четырех спутников Юпитера в 1610 году сокрушило геоцентрическую модель Птолемея: впервые было доказано, что не все небесные тела вращаются вокруг Земли."
-    },
-    "saturn": {
-        "mythology": "Кронос (Сатурн) — титан времени, отец Зевса/Юпитера. Символизировал неумолимый ход времени, земледелие и золотой век в мифологии.",
-        "history": "В 1655 году Христиан Гюйгенс первым разгадал загадку Сатурна, поняв, что загадочные 'ушки', виденные Галилеем, являются тонким плоским кольцом, нигде не касающимся планеты."
-    },
-    "pluto": {
-        "mythology": "Владыка подземного царства мертвых (Аид). Имя предложила 11-летняя британская школьница Венеция Берни, посчитав, что темный далекий мир заслуживает имени бога преисподней.",
-        "history": "Открыт в 1930 году Клайдом Томбо. Часть праха астронома находится на борту космического аппарата New Horizons, пронесшегося мимо Плутона в 2015 году."
-    },
-    "ceres": {
-        "mythology": "Церера (Деметра) — римская богиня плодородия, урожая и материнской любви. От её имени происходит английское слово 'cereal' (злаки).",
-        "history": "Открыта Джузеппе Пиацци в новогоднюю ночь 1801 года. Первоначально считалась недостающей планетой между Марсом и Юпитером согласно правилу Тициуса-Боде."
-    },
-    "sedna": {
-        "mythology": "Названа в честь эскимосской богини Седны — владычицы морских глубин и создательницы арктических тюленей и китов, обитающей на дне холодного океана.",
-        "history": "Ее открытие в 2003 году поставило перед астрономами загадку: орбита Седны настолько вытянута (перигелий 76 а.е., афелий 937 а.е.), что её существование может объясняться только гравитацией гипотетической Девятой планеты."
-    },
-    "apophis": {
-        "mythology": "Апоп (Апофис) — древнеегипетский змей хаоса и тьмы, извечный враг бога солнца Ра, пытающийся поглотить солнечную ладью во время её ночного плавания.",
-        "history": "После открытия в 2004 году имел рекордный 4-й уровень по Туринской шкале опасности столкновения. В апреле 2029 года пролетит всего в 31 000 км от Земли (ближе орбит геостационарных спутников связи!)."
-    },
-    "psyche": {
-        "mythology": "Психея — олицетворение человеческой души и дыхания в греческой мифологии, возлюбленная Эрота (Купидона), преодолевшая тяжелейшие испытания ради вечной любви.",
-        "history": "Уникальный металлический астероид (90% железа и никеля). Стоимость содержащихся в нем металлов оценивается в $10 000 квадриллионов. В 2023 году к нему запущен зонд NASA Psyche."
-    },
 
-    # Звёзды
-    "sirius": {
-        "mythology": "«Собачья звезда» (созвездие Большого Пса). В Древнем Египте называлась Сотис: утренний восход Сириуса знаменовал разлив Нила и начало нового года. В Греции от его имени произошло слово 'каникулы' (caniculares — собачьи дни зноя).",
-        "history": "В 1844 году Фридрих Бессель по волнообразному движению Сириуса вычислил наличие невидимого массивного спутника. Сириус B стал первым открытым белым карликом в истории."
-    },
-    "betelgeuse": {
-        "mythology": "Название восходит к арабскому 'Ибт аль-Джауза' (إبط الجوزاء) — «Рука/подмышка Центрального Великана» (Ориона). В арабской астрономии Орион представлялся могучей женщиной-воительницей.",
-        "history": "В конце 2019 года звезда внезапно потускнела более чем в 2.5 раза. Мир замер в ожидании сверхновой, однако телескоп «Хаббл» показал, что гигант выбросил облако плазмы, временно затенившее звезду пылью."
-    },
-    "arcturus": {
-        "mythology": "От греческого 'Арктофилакс' — «Страж Медведицы» (созвездие Волопаса). Считалось, что великан вечно следует за Большой Медведицей по кругу небесного полюса, охраняя её.",
-        "history": "В 1933 году свет от Арктура (считалось, что он летел ровно 40 лет с предыдущей ярмарки 1893 года) сфокусировали через телескопы на фотоэлементы, чтобы торжественно включить иллюминацию Всемирной выставки в Чикаго."
-    },
-    "rigel": {
-        "mythology": "От арабского 'Риджль аль-Джауза' (رجل الجوزاء) — «Левая нога Великана». Ослепительный голубой сверхгигант, сияющий как 120 000 наших Солнц.",
-        "history": "Освещает знаменитую туманность «Голова Ведьмы» (IC 2118), придавая ей зловещий призрачно-голубой свет за счет рассеяния коротковолновых фотонов."
-    },
-    "aldebaran": {
-        "mythology": "От арабского 'Аль-Дабаран' (الدبران) — «Последователь», поскольку на ночном небе эта яркая звезда неотступно следует за звездным скоплением Плеяд.",
-        "history": "Глаз Тельца. В 1972 году космический аппарат Pioneer 10 отправился в межзвездный полет с золотой пластинкой человечества по направлению к Альдебарану (долетит через 2 млн лет)."
-    },
-    "polaris": {
-        "mythology": "В славянской культуре — Прикол-звезда (золотой кол, вокруг которого на привязи ходят кони-созвездия). У викингов — путеводный гвоздь бога Тора.",
-        "history": "Главный ориентир мореплавателей северного полушария. Является пульсирующей переменной звездой (цефеидой), по колебаниям яркости которой астрономы калибруют космическую шкалу расстояний."
-    }
-}
+class SourceError(RuntimeError):
+    """A required upstream source could not be read or normalized."""
 
-# ==============================================================================
-# ФУНКЦИЯ ЗАПРОСА РУССКОЙ ВИКИПЕДИИ (WIKIPEDIA API)
-# ==============================================================================
-def fetch_wikipedia_summary(title):
-    """Запрашивает официальный REST API Википедии для получения красивого очерка"""
-    encoded_title = urllib.parse.quote(title)
-    url = f"https://ru.wikipedia.org/api/rest_v1/page/summary/{encoded_title}"
-    req = urllib.request.Request(url, headers={'User-Agent': 'AstroverseApp/2.0 (education space project)'})
+
+class JsonClient:
+    def __init__(self, settings):
+        self.timeout = settings["timeout_seconds"]
+        self.retries = settings["retries"]
+        self.user_agent = settings["user_agent"]
+
+    def get(self, url, params=None):
+        if params:
+            url += "?" + urllib.parse.urlencode(params)
+        request = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
+        for attempt in range(self.retries + 1):
+            try:
+                with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                    return json.load(response)
+            except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+                retryable = not isinstance(exc, urllib.error.HTTPError) or exc.code == 429 or exc.code >= 500
+                if not retryable or attempt == self.retries:
+                    raise SourceError(f"Cannot read {url}: {exc}") from exc
+                time.sleep(2 ** attempt)
+        raise AssertionError("unreachable")
+
+
+def number(value):
+    """Missing/nonfinite measurements stay unknown; never synthesize physics."""
+    if value is None or isinstance(value, bool):
+        return None
     try:
-        with urllib.request.urlopen(req, timeout=4) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
-            extract = data.get('extract')
-            if extract and len(extract) > 80:
-                return extract
-    except Exception:
-        pass
-    return None
+        result = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return result if math.isfinite(result) else None
 
-# ==============================================================================
-# ИНТЕЛЛЕКТУАЛЬНЫЙ ГЕНЕРАТОР ЭКЗОПЛАНЕТ (SCI-FI И ФИЗИЧЕСКИЕ АНОМАЛИИ)
-# ==============================================================================
-def synthesize_exoplanet_lore(pl_name, host, eqt, rade, masse, period):
-    """Генерирует захватывающее описание климата и феноменов экзопланеты"""
-    stories = []
 
-    # Режимы климата
-    if eqt > 1500:
-        stories.append(f"Атмосферный ад: температура на освещенной стороне превышает {eqt} K. Здесь испаряются металлы и базальтовые породы, образуя облака из газообразного железа, выпадающие металлическими дождями на ночной стороне.")
-    elif eqt > 600:
-        stories.append(f"Раскаленный мир-пустыня: планета находится в зоне жесткой радиации своего светила. Атмосфера сдувается звёздным ветром, образуя за планетой кометный газовый хвост длиной в миллионы километров.")
-    elif 210 <= eqt <= 320:
-        stories.append(f"Зона потенциальной жизни: планета получает оптимальное количество тепла, допуская существование жидких океанов и умеренной гидросферы. При наличии защитной атмосферы мир может являться обитаемым кандидатом.")
-    else:
-        stories.append(f"Криогенный ледяной гигант: на планете царит вечный холод ({eqt} K). Океаны из метана и аммиака скованы многокилометровой корой азотного и водяного льда.")
+def measurement(value, *, positive=False):
+    value = number(value)
+    if value is None or value < 0 or (positive and value == 0):
+        return None
+    return value
 
-    # Резонансы и гравитация
-    if period and period < 5.0:
-        stories.append("Планета находится в состоянии спин-орбитального приливного захвата: она всегда обращена к своей звезде одной стороной. Одно полушарие погружено в вечный день, другое — в вечную ледяную тьму, а умеренный климат возможен лишь в узкой сумеречной зоне терминатора.")
 
-    if masse and rade and (masse / (rade**2)) > 2.5:
-        stories.append(f"Колоссальная гравитация: сила тяжести здесь в {round(masse/(rade**2), 1)} раз выше земной. Атмосфера сплюснута в плотный сверхкритический слой, а рельеф представляет собой абсолютно плоские базальтовые равнины без высоких гор.")
+def slug(name):
+    value = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+    if not value:
+        raise SourceError(f"Cannot create an ID for {name!r}")
+    return value
 
-    return " ".join(stories)
 
-# ==============================================================================
-# ПАРСИНГ NASA И СБОРКА КАТАЛОГА
-# ==============================================================================
-def build_enriched_catalog():
-    print("🚀 СТАРТ СБОРКИ ЭНЦИКЛОПЕДИИ (МИФОЛОГИЯ + ВИКИПЕДИЯ + NASA API)...")
-    catalog = []
+def identity_index(seed):
+    index = {}
+    for item in seed:
+        for name in (item["name"], item.get("latin")):
+            if name:
+                index[(item["kind"], name.casefold())] = item
+    return index
 
-    # 1. Солнечная система
-    with open(DATA_DIR / "objects.json", "r", encoding="utf-8") as f:
-        old_data = json.load(f)
 
-    solar_base = [x for x in old_data if x.get("scale") == "solar" or x.get("kind") == "black_hole"]
+def make_object(kind, name, scale, config, identities):
+    previous = identities.get((kind, name.casefold()), {})
+    item = {"id": previous.get("id", slug(name)), "name": previous.get("name", name),
+            "latin": name, "kind": kind, "scale": scale, "facts": []}
+    item.update(config["display"][kind])
+    # Visual/editorial overrides are not measurements from the new source.
+    for field in ("radius", "color", "texture", "rings", "atmosphere"):
+        if field in previous:
+            item[field] = copy.deepcopy(previous[field])
+    return item
 
-    print(f"📖 Обогащение описаний {len(solar_base)} тел Солнечной системы и чёрных дыр...")
-    for obj in solar_base:
-        oid = obj["id"]
-        # Добавляем мифологию и историю
-        if oid in LORE_DATABASE:
-            obj["mythology"] = LORE_DATABASE[oid].get("mythology")
-            obj["history"] = LORE_DATABASE[oid].get("history")
-            # Если есть в Википедии — добавляем расширенную статью
-            wiki_text = fetch_wikipedia_summary(obj["name"])
-            if wiki_text:
-                obj["description"] = f"{wiki_text}\n\n🏛️ Мифология: {obj['mythology']}\n\n📜 История: {obj['history']}"
 
-        catalog.append(obj)
+def coordinates(row):
+    ra, dec = number(row.get("ra")), number(row.get("dec"))
+    if ra is not None and not 0 <= ra <= 360:
+        raise SourceError(f"Invalid right ascension: {ra}")
+    if dec is not None and not -90 <= dec <= 90:
+        raise SourceError(f"Invalid declination: {dec}")
+    distance = measurement(row.get("sy_dist"))
+    return {"ra": (ra / 15) % 24 if ra is not None else None,
+            "dec": dec, "distance_ly": distance * PARSEC_TO_LIGHT_YEARS if distance is not None else None}
 
-    # 2. Астероиды и кометы NASA JPL
-    print("☄️ Обогащение астероидов NASA JPL...")
-    asteroids = [x for x in old_data if x.get("kind") in ["asteroid", "comet"]]
-    for ast in asteroids:
-        aid = ast["id"].split("_")[-1] # ищем имя астероида (например, vesta)
-        if aid in LORE_DATABASE:
-            ast["mythology"] = LORE_DATABASE[aid].get("mythology")
-            ast["history"] = LORE_DATABASE[aid].get("history")
-            ast["description"] += f"\n\n🏛️ Мифологическое имя: {ast['mythology']}"
-        catalog.append(ast)
 
-    # 3. Экзопланеты NASA
-    print("🔭 Синтез уникальных историй для сотен экзопланет NASA...")
-    exoplanets = [x for x in old_data if x.get("kind") == "exoplanet"]
-    for exo in exoplanets:
-        eqt = exo.get("temperature_k") or 300
-        rade = exo.get("radius_earth") or 1.5
-        masse = exo.get("mass_earth") or 3.0
-        period = exo.get("period_days") or 10.0
+def fetch_exoplanets(client, config, identities, limit):
+    fields = ("pl_name,hostname,ra,dec,sy_dist,pl_rade,pl_bmasse,pl_orbper,"
+              "pl_eqt,pl_orbsmax,discoverymethod,disc_year,st_teff,st_mass,st_spectype")
+    query = f"select top {limit} {fields} from pscomppars order by sy_dist asc,pl_name asc"
+    rows = client.get(config["sources"]["exoplanets"]["url"], {"query": query, "format": "json"})
+    if not isinstance(rows, list) or not rows:
+        raise SourceError("NASA Exoplanet Archive returned no records")
+    stars, planets = {}, []
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get("pl_name"), str) or not isinstance(row.get("hostname"), str):
+            raise SourceError("NASA record is missing pl_name/hostname")
+        host, name = row["hostname"].strip(), row["pl_name"].strip()
+        if not host or not name:
+            raise SourceError("NASA record has an empty name")
+        star = make_object("star", host, "local", config, identities)
+        star.update(coordinates(row))
+        star.update({"source": NASA_ARCHIVE, "source_url": config["sources"]["exoplanets"]["url"],
+                     "temperature_k": measurement(row.get("st_teff"), positive=True),
+                     "mass_sun": measurement(row.get("st_mass"), positive=True),
+                     "spectral_type": row.get("st_spectype"), "description": f"Звезда — хозяин планетной системы {host}."})
+        if star["id"] in stars:
+            existing = stars[star["id"]]
+            if existing["latin"] != host:
+                raise SourceError(f"Star ID collision: {host}")
+            for key, value in star.items():
+                if existing.get(key) is None:
+                    existing[key] = value
+        else:
+            stars[star["id"]] = star
+        planet = make_object("exoplanet", name, "local", config, identities)
+        planet.update(coordinates(row))
+        planet.update({"parent": star["id"], "source": NASA_ARCHIVE,
+                       "source_url": config["sources"]["exoplanets"]["url"],
+                       "radius_earth": measurement(row.get("pl_rade"), positive=True),
+                       "mass_earth": measurement(row.get("pl_bmasse"), positive=True),
+                       "period_days": measurement(row.get("pl_orbper"), positive=True),
+                       "temperature_k": measurement(row.get("pl_eqt"), positive=True),
+                       "au": measurement(row.get("pl_orbsmax"), positive=True),
+                       "description": f"Экзопланета в системе {host}."})
+        if row.get("discoverymethod"):
+            planet["facts"].append(f"Метод открытия: {row['discoverymethod']}")
+        if row.get("disc_year"):
+            planet["facts"].append(f"Год открытия: {row['disc_year']}")
+        if planet["temperature_k"] is not None:
+            planet["facts"].append("Указана равновесная температура, а не измеренная температура поверхности.")
+        planets.append(planet)
+    return list(stars.values()) + planets
 
-        lore_story = synthesize_exoplanet_lore(exo["name"], exo.get("parent", "Star"), eqt, rade, masse, period)
-        exo["description"] = f"{exo.get('description', '')}\n\n🪐 Условия и феномены мира:\n{lore_story}"
-        exo["facts"].append("Особенности климата рассчитаны по телеметрии NASA")
-        catalog.append(exo)
 
-    # 4. Звезды и Мессье
-    print("✨ Добавление звезд и каталога глубокого космоса...")
-    stars_and_deep = [x for x in old_data if x.get("kind") in ["star", "cluster", "nebula", "galaxy"] and x["id"] != "sun"]
-    for s in stars_and_deep:
-        sid = s["id"]
-        if sid in LORE_DATABASE:
-            s["mythology"] = LORE_DATABASE[sid].get("mythology")
-            s["history"] = LORE_DATABASE[sid].get("history")
-            s["description"] += f"\n\n🏛️ Мифология и происхождение: {s['mythology']}\n\n📜 В истории: {s['history']}"
-        catalog.append(s)
+def fetch_small_bodies(client, config, identities, kind, limit):
+    source = config["sources"]["asteroids" if kind == "asteroid" else "comets"]
+    fields = ["full_name", "pdes", "a", "per", "diameter"]
+    payload = client.get(source["url"], {"fields": ",".join(fields), "sb-kind": "a" if kind == "asteroid" else "c",
+                                        "sort": "pdes", "limit": limit})
+    if not isinstance(payload, dict) or not payload.get("data") or not isinstance(payload.get("fields"), list):
+        raise SourceError(f"JPL SBDB returned no {kind} records")
+    if not set(fields) <= set(payload["fields"]):
+        raise SourceError("JPL SBDB response is missing required fields")
+    items = []
+    for values in payload["data"]:
+        if not isinstance(values, list) or len(values) != len(payload["fields"]):
+            raise SourceError("Malformed JPL SBDB row")
+        row = dict(zip(payload["fields"], values))
+        if not isinstance(row["full_name"], str) or not row["full_name"].strip() or not row["pdes"]:
+            raise SourceError("JPL SBDB row is missing name/designation")
+        # Named asteroids include an extra provisional designation, e.g.
+        # "1 Ceres (A801 AA)"; retain the existing catalog identity "1 Ceres".
+        full_name = row["full_name"].strip()
+        name = re.sub(r"\s+\([^)]*\)$", "", full_name)
+        if re.fullmatch(r"\d+", name):
+            name = full_name
+        name = re.sub(r"[()]", "", name).strip()
+        item = make_object(kind, name, "solar", config, identities)
+        diameter = measurement(row["diameter"], positive=True)
+        item.update({"parent": "sun", "au": measurement(row["a"], positive=True),
+                     "period_days": measurement(row["per"], positive=True),
+                     "radius_km": diameter / 2 if diameter is not None else None,
+                     "source": JPL_SBDB, "source_url": source["url"], "source_id": str(row["pdes"]),
+                     "description": f"{'Астероид' if kind == 'asteroid' else 'Комета'} из базы малых тел NASA JPL SBDB."})
+        # Do not opt hundreds of small bodies into synchronous live Horizons requests.
+        items.append(item)
+    return items
 
-    # Удаляем дубликаты по id
-    unique_catalog = []
-    seen = set()
-    for item in catalog:
-        if item["id"] not in seen:
-            seen.add(item["id"])
-            unique_catalog.append(item)
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(unique_catalog, f, ensure_ascii=False, indent=2)
+def enrich_wikipedia(items, client, config):
+    for item in items:
+        # Explicit article titles avoid ambiguous name lookups and unbounded requests.
+        title = item.get("wikipedia_title")
+        if not title:
+            continue
+        url = config["sources"]["wikipedia"]["url"] + urllib.parse.quote(title, safe="")
+        try:
+            response = client.get(url)
+            if not isinstance(response, dict) or response.get("type") == "disambiguation":
+                raise SourceError("Ambiguous or malformed Wikipedia summary")
+            extract = response.get("extract")
+            if not isinstance(extract, str) or not extract.strip():
+                raise SourceError("Empty Wikipedia summary")
+            item["description"] = extract.strip()
+            item["description_source"] = url
+        except SourceError as exc:
+            LOG.warning("Wikipedia enrichment skipped for %s: %s", item["id"], exc)
 
-    print(f"\n🎉 ГОТОВО! Собрано {len(unique_catalog)} тел с мифологией, историей и статьями!")
-    print(f"📁 База сохранена в: {OUTPUT_FILE}")
+
+def load_config(path):
+    with Path(path).open(encoding="utf-8") as stream:
+        config = json.load(stream)
+    http = config["http"]
+    if not isinstance(http["retries"], int) or isinstance(http["retries"], bool) or http["retries"] < 0:
+        raise ValueError("http.retries must be a nonnegative integer")
+    if measurement(http["timeout_seconds"], positive=True) is None:
+        raise ValueError("http.timeout_seconds must be positive")
+    for name in ("exoplanets", "asteroids", "comets"):
+        positive_limit(config["sources"][name]["limit"])
+    return config
+
+
+def positive_limit(value):
+    if isinstance(value, bool) or str(value) != str(int(value)) or int(value) <= 0:
+        raise ValueError("source limit must be a positive integer")
+    return int(value)
+
+
+def build_enriched_catalog(config_path=DEFAULT_CONFIG, output=None, *, offline=False, wikipedia=False,
+                           limits=None, client=None):
+    config_path = Path(config_path).resolve()
+    config = load_config(config_path)
+    seed_path = (config_path.parent / config["seed"]).resolve()
+    output = Path(output) if output is not None else catalog_path()
+    if output.resolve() in (seed_path, config_path):
+        raise ValueError("Output must not overwrite the input snapshot or configuration")
+    if offline and wikipedia:
+        raise ValueError("--offline cannot be combined with --wikipedia")
+    seed = load_catalog(seed_path)
+    items = copy.deepcopy(seed)
+    if not offline:
+        client = client or JsonClient(config["http"])
+        identities = identity_index(seed)
+        limits = limits or {}
+        imported = []
+        for source in ("exoplanets", "asteroids", "comets"):
+            limit = positive_limit(limits.get(source, config["sources"][source]["limit"]))
+            LOG.info("Loading %s (limit %s)", source, limit)
+            if source == "exoplanets":
+                imported.extend(fetch_exoplanets(client, config, identities, limit))
+            else:
+                imported.extend(fetch_small_bodies(client, config, identities,
+                                                   "asteroid" if source == "asteroids" else "comet", limit))
+        items = [item for item in items if not (
+            (item.get("source") == NASA_ARCHIVE and item["kind"] in {"star", "exoplanet"})
+            or item["kind"] in {"asteroid", "comet"})]
+        items.extend(imported)
+        if wikipedia:
+            enrich_wikipedia(items, client, config)
+    validate_catalog(items)
+    write_catalog(output, items)
+    LOG.info("Saved %s objects to %s (%s)", len(items), output, "offline snapshot" if offline else "NASA refreshed")
+    return items
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument("--output", type=Path, help="Defaults to ASTROVERSE_CATALOG_PATH or data/objects.json")
+    parser.add_argument("--offline", action="store_true", help="Rebuild only from the independent input snapshot")
+    parser.add_argument("--wikipedia", action="store_true", help="Refresh descriptions with explicit wikipedia_title")
+    for source in ("exoplanets", "asteroids", "comets"):
+        parser.add_argument(f"--{source}-limit", type=int)
+    args = parser.parse_args()
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    limits = {source: getattr(args, f"{source}_limit") for source in ("exoplanets", "asteroids", "comets")
+              if getattr(args, f"{source}_limit") is not None}
+    try:
+        build_enriched_catalog(args.config, args.output, offline=args.offline, wikipedia=args.wikipedia, limits=limits)
+    except (SourceError, ValueError, OSError, KeyError, TypeError) as exc:
+        parser.exit(1, f"Catalog build failed; output was not replaced: {exc}\n")
+
 
 if __name__ == "__main__":
-    build_enriched_catalog()
+    main()

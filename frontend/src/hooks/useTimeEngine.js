@@ -4,7 +4,7 @@ const DAY_MS = 86400000;
 const UPDATE_INTERVAL_MS = 100;
 const MAX_FRAME_GAP_MS = 1000;
 
-export function useTimeEngine(appRef) {
+export function useTimeEngine() {
   const [simDate, setSimDate] = useState(() => new Date());
   const [timeMultiplier, setTimeMultiplier] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
