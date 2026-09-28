@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { sharedMaterial, sharedTexture } from '../resources.js';
 
 const starPointTexture = (() => {
   const canvas = document.createElement('canvas');
@@ -15,7 +16,7 @@ const starPointTexture = (() => {
   return new THREE.CanvasTexture(canvas);
 })();
 
-export function makeStarCorona(colorHex, scale = 4.5) {
+function buildCoronaTexture(colorHex) {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
@@ -48,13 +49,21 @@ export function makeStarCorona(colorHex, scale = 4.5) {
   ctx.fillRect(0, 0, 256, 256);
 
   const tex = new THREE.CanvasTexture(canvas);
-  const mat = new THREE.SpriteMaterial({
-    map: tex,
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+export function makeStarCorona(colorHex, scale = 4.5) {
+  // The catalog has ~1.2k stars but only a handful of colors; one texture and
+  // one material per color keeps this at a few MB instead of a few hundred.
+  const map = sharedTexture(`corona:${colorHex}`, () => buildCoronaTexture(colorHex));
+  const material = sharedMaterial(`corona:${colorHex}`, () => new THREE.SpriteMaterial({
+    map,
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-  });
-  const sprite = new THREE.Sprite(mat);
+  }));
+  const sprite = new THREE.Sprite(material);
   sprite.scale.setScalar(scale);
   return sprite;
 }

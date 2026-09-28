@@ -3,6 +3,9 @@
 **/node_modules/
 **/dist/
 
+# Local agent memory: not part of the project, never commit
+.agent/
+
 # Generated catalog: built automatically inside the container
 data/objects.json
 

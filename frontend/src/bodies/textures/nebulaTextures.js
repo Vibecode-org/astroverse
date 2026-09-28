@@ -1,7 +1,23 @@
 import * as THREE from 'three';
+import { sharedMaterial, sharedTexture } from '../resources.js';
 
+/** mulberry32: cached textures are painted once, so their noise must be
+ * reproducible — otherwise the same key would yield a different image per load. */
+function rng(seed) {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
-export function makeNebulaCloudSprite(colorHex, scale = 5.0) {
+function colorSeed(colorHex) {
+  return parseInt(String(colorHex).replace('#', ''), 16) || 1;
+}
+
+function buildNebulaCloudTexture(colorHex) {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
@@ -20,18 +36,24 @@ export function makeNebulaCloudSprite(colorHex, scale = 5.0) {
   ctx.fillRect(0, 0, 256, 256);
 
   const tex = new THREE.CanvasTexture(canvas);
-  const mat = new THREE.SpriteMaterial({
-    map: tex,
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+export function makeNebulaCloudSprite(colorHex, scale = 5.0) {
+  const map = sharedTexture(`cloud:${colorHex}`, () => buildNebulaCloudTexture(colorHex));
+  const material = sharedMaterial(`cloud:${colorHex}`, () => new THREE.SpriteMaterial({
+    map,
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-  });
-  const sprite = new THREE.Sprite(mat);
+  }));
+  const sprite = new THREE.Sprite(material);
   sprite.scale.setScalar(scale);
   return sprite;
 }
 
-export function makeSpiralGalaxyTexture(colorHex = '#99ccff') {
+function buildSpiralGalaxyTexture(colorHex = '#99ccff') {
   const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -39,6 +61,7 @@ export function makeSpiralGalaxyTexture(colorHex = '#99ccff') {
   const ctx = canvas.getContext('2d');
   const cx = size / 2;
   const cy = size / 2;
+  const rand = rng(colorSeed(colorHex));
 
   const bulge = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.22);
   bulge.addColorStop(0, 'rgba(255, 250, 230, 1.0)');
@@ -56,19 +79,19 @@ export function makeSpiralGalaxyTexture(colorHex = '#99ccff') {
     for (let t = 0; t < 220; t++) {
       const theta = offset + (t / 220) * Math.PI * 2.7;
       const r = 20 + Math.pow(t / 220, 1.35) * (size * 0.42);
-      const x = cx + Math.cos(theta) * r + (Math.random() - 0.5) * 14;
-      const y = cy + Math.sin(theta) * r + (Math.random() - 0.5) * 14;
+      const x = cx + Math.cos(theta) * r + (rand() - 0.5) * 14;
+      const y = cy + Math.sin(theta) * r + (rand() - 0.5) * 14;
       const alpha = (1 - (t / 220) * 0.65) * 0.35;
 
       ctx.fillStyle = `rgba(${armCol}, ${alpha})`;
       ctx.beginPath();
-      ctx.arc(x, y, 5 + Math.random() * 10, 0, Math.PI * 2);
+      ctx.arc(x, y, 5 + rand() * 10, 0, Math.PI * 2);
       ctx.fill();
 
-      if (Math.random() < 0.2) {
+      if (rand() < 0.2) {
         ctx.fillStyle = `rgba(180, 220, 255, ${alpha * 1.6})`;
         ctx.beginPath();
-        ctx.arc(x, y, 2 + Math.random() * 3, 0, Math.PI * 2);
+        ctx.arc(x, y, 2 + rand() * 3, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -85,7 +108,11 @@ export function makeSpiralGalaxyTexture(colorHex = '#99ccff') {
   return tex;
 }
 
-function makeAccretionDiskTexture(innerRatio = 0.32) {
+export function makeSpiralGalaxyTexture(colorHex = '#99ccff') {
+  return sharedTexture(`spiral:${colorHex}`, () => buildSpiralGalaxyTexture(colorHex));
+}
+
+function buildAccretionDiskTexture(innerRatio = 0.32) {
   const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -140,7 +167,7 @@ function makeAccretionDiskTexture(innerRatio = 0.32) {
   return tex;
 }
 
-function makePhotonRingTexture() {
+function buildPhotonRingTexture() {
   const size = 256;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -161,4 +188,10 @@ function makePhotonRingTexture() {
   return tex;
 }
 
-export { makeAccretionDiskTexture, makePhotonRingTexture };
+export function makeAccretionDiskTexture(innerRatio = 0.32) {
+  return sharedTexture(`accretion:${innerRatio}`, () => buildAccretionDiskTexture(innerRatio));
+}
+
+export function makePhotonRingTexture() {
+  return sharedTexture('photon-ring', () => buildPhotonRingTexture());
+}

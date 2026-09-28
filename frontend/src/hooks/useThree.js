@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { makeMilkyWay, equatorialXYZ, galacticXYZ } from '../galaxy.js';
 import { createBodyMesh, makeOrbit, makeAsteroidBelt, makeKuiperBelt, makeStarField, makeLabel, objectScale, getSolarDistance, getMoonOrbitDistance } from '../bodies/index.js';
+import { disposeSceneResources } from '../bodies/resources.js';
 
 export function useThree({ objects, view, setView, selected, setSelected, follow, setFollow, appRef, simDate, setErrorDetails }) {
   const mountRef = useRef(null);
@@ -14,12 +15,13 @@ export function useThree({ objects, view, setView, selected, setSelected, follow
     let raf;
     let renderer;
     let controls;
+    let scene;
 
     try {
       const width = el.clientWidth || window.innerWidth;
       const height = el.clientHeight || window.innerHeight;
 
-      const scene = new THREE.Scene();
+      scene = new THREE.Scene();
       scene.background = new THREE.Color(0x010206);
 
       const camera = new THREE.PerspectiveCamera(50, width / height, 0.05, 100000);
@@ -302,19 +304,17 @@ export function useThree({ objects, view, setView, selected, setSelected, follow
             el.removeChild(renderer.domElement);
           }
         }
-        controls.dispose();
-        scene.traverse(object => {
-          object.geometry?.dispose();
-          const materials = Array.isArray(object.material) ? object.material : [object.material];
-          materials.forEach(material => material?.dispose());
-        });
+        controls?.dispose();
+        disposeSceneResources(scene);
         renderer?.dispose();
         appRef.current = {};
       };
     } catch (err) {
       cancelAnimationFrame(raf);
       controls?.dispose();
-      renderer?.domElement.remove();
+      // The renderer may not exist yet, so guard the DOM handle as well.
+      renderer?.domElement?.remove();
+      if (scene) disposeSceneResources(scene);
       renderer?.dispose();
       appRef.current = {};
       console.error("Three.js Init Error:", err);
