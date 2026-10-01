@@ -9,6 +9,10 @@ export function useObjectData() {
   const [loading, setLoading] = useState(true);
   const [errorDetails, setErrorDetails] = useState(null);
   const [panelTab, setPanelTab] = useState('overview');
+  // По умолчанию реальный масштаб Солнечной системы: расстояния линейны по
+  // а.е., размеры — настоящие радиусы Земли. Планеты при этом становятся
+  // точками, и чтобы разглядеть систему, нужно подлететь к нужной.
+  const [solarScale, setSolarScale] = useState('real');
   const appRef = useRef({});
 
   useEffect(() => {
@@ -29,6 +33,6 @@ export function useObjectData() {
     objects, setObjects, selected, setSelected, query, setQuery,
     view, setView, follow, setFollow, loading, setLoading,
     errorDetails, setErrorDetails, panelTab, setPanelTab,
-    appRef,
+    appRef, solarScale, setSolarScale,
   };
 }

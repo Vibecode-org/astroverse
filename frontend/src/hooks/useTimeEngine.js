@@ -6,6 +6,9 @@ const MAX_FRAME_GAP_MS = 1000;
 
 export function useTimeEngine() {
   const [simDate, setSimDate] = useState(() => new Date());
+  // Скорость = симулированных СЕКУНД за реальную секунду. Раньше множитель
+  // означал «дней за секунду», из-за чего ×1 был суточным ускорением, а
+  // реального времени в приложении не существовало вовсе.
   const [timeMultiplier, setTimeMultiplier] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const clockRef = useRef(null);
@@ -34,7 +37,10 @@ export function useTimeEngine() {
       lastTime = now;
       // Ignore suspended frames, but retain the full elapsed time of normal frames.
       if (paused || hidden || elapsed < 0 || elapsed > MAX_FRAME_GAP_MS) return;
-      pendingSimulationMs += elapsed * multiplier * DAY_MS / 1000;
+      // elapsed — миллисекунды реального времени, multiplier — сколько
+      // симулированных секунд проходит за одну реальную, поэтому итог
+      // сразу в миллисекундах без пересчёта на сутки.
+      pendingSimulationMs += elapsed * multiplier;
       elapsedSinceUpdate += elapsed;
       if (elapsedSinceUpdate >= UPDATE_INTERVAL_MS) flush();
     };

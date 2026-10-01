@@ -1,4 +1,13 @@
 import * as THREE from 'three';
+import { starPointTexture } from '../textures/starTextures.js';
+import { SUN_GALACTIC } from '../utils/coordinates.js';
+
+/** The Milky Way model: an edge-on barred spiral rendered as point clouds.
+ *
+ * Every random draw goes through the seeded generator below, so the galaxy is
+ * byte-for-byte identical on each scene rebuild — a `Math.random()` here would
+ * make the whole sky shimmer on every re-mount.
+ */
 
 function rng(seed) {
   return function () {
@@ -9,29 +18,10 @@ function rng(seed) {
   };
 }
 
-export const GALAXY_SCALE = 0.0058;
-export const SUN_GALACTIC = { x: 78, y: 1.2, z: -18 };
-
-const starPointTexture = (() => {
-  const canvas = document.createElement('canvas');
-  canvas.width = 64;
-  canvas.height = 64;
-  const ctx = canvas.getContext('2d');
-  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-  g.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  g.addColorStop(0.3, 'rgba(255, 235, 190, 0.8)');
-  g.addColorStop(0.7, 'rgba(255, 190, 140, 0.15)');
-  g.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 64, 64);
-  return new THREE.CanvasTexture(canvas);
-})();
-
-function addPoints(group, positions, colors, sizes, opts) {
+function addPoints(group, positions, colors, opts) {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  if (sizes) geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
   const mat = new THREE.PointsMaterial({
     size: opts.size,
     map: starPointTexture,
@@ -42,14 +32,11 @@ function addPoints(group, positions, colors, sizes, opts) {
     blending: opts.additive ? THREE.AdditiveBlending : THREE.NormalBlending,
     sizeAttenuation: true,
   });
-  const points = new THREE.Points(geo, mat);
-  group.add(points);
+  group.add(new THREE.Points(geo, mat));
 }
 
-export function makeMilkyWay() {
-  const group = new THREE.Group();
-  const rand = rng(260413);
-
+/** Build the star field: bulge, four spiral arms plus the Orion Spur, halo. */
+function addStarField(group, rand) {
   const starCount = 48000;
   const pos = new Float32Array(starCount * 3);
   const col = new Float32Array(starCount * 3);
@@ -63,8 +50,8 @@ export function makeMilkyWay() {
   ];
 
   let i = 0;
-  const bulge = 7000;
   // Просвет в самом центре для Стрельца A* (r начинается с 4.5)
+  const bulge = 7000;
   for (; i < bulge; i++) {
     const a = rand() * Math.PI * 2;
     const r = 4.5 + Math.pow(rand(), 0.6) * 18;
@@ -128,9 +115,11 @@ export function makeMilkyWay() {
     col[i * 3 + 2] = 1;
   }
 
-  addPoints(group, pos, col, null, { size: 0.85, opacity: 0.85, additive: true });
+  addPoints(group, pos, col, { size: 0.85, opacity: 0.85, additive: true });
+}
 
-  // Космическая пыль
+/** Interstellar dust: dark, non-additive points that occlude the arms. */
+function addDust(group) {
   const dustN = 7000;
   const dpos = new Float32Array(dustN * 3);
   const dcol = new Float32Array(dustN * 3);
@@ -146,22 +135,7 @@ export function makeMilkyWay() {
     dcol[d * 3 + 1] = 0.03;
     dcol[d * 3 + 2] = 0.02;
   }
-  addPoints(group, dpos, dcol, null, { size: 1.6, opacity: 0.2, additive: false });
-
-  // Мягкое свечение плоскости диска
-  const glow = makeDiskGlow();
-  glow.rotation.x = -Math.PI / 2;
-  group.add(glow);
-
-  // Метка Солнца
-  const sun = new THREE.Mesh(
-    new THREE.SphereGeometry(1.0, 16, 12),
-    new THREE.MeshBasicMaterial({ color: 0x9ad0ff })
-  );
-  sun.position.set(SUN_GALACTIC.x, SUN_GALACTIC.y, SUN_GALACTIC.z);
-  group.add(sun);
-
-  return { group, sunPosition: sun.position.clone() };
+  addPoints(group, dpos, dcol, { size: 1.6, opacity: 0.2, additive: false });
 }
 
 function makeDiskGlow() {
@@ -187,26 +161,25 @@ function makeDiskGlow() {
   return new THREE.Mesh(new THREE.PlaneGeometry(300, 300), mat);
 }
 
-export function galacticXYZ(obj) {
-  if (obj.gx != null) return new THREE.Vector3(obj.gx, obj.gy || 0, obj.gz || 0);
-  const l = ((obj.galactic_l || 0) * Math.PI) / 180;
-  const b = ((obj.galactic_b || 0) * Math.PI) / 180;
-  const r = (obj.distance_ly || 1000) * GALAXY_SCALE;
-  return new THREE.Vector3(
-    SUN_GALACTIC.x + r * Math.cos(b) * Math.cos(l),
-    SUN_GALACTIC.y + r * Math.sin(b),
-    SUN_GALACTIC.z + r * Math.cos(b) * Math.sin(l),
-  );
-}
+/** Assemble the galaxy group and the Sun marker inside it. */
+export function makeMilkyWay() {
+  const group = new THREE.Group();
 
-export function equatorialXYZ(obj, scale = 0.9) {
-  const ra = ((obj.ra || 0) * 15 * Math.PI) / 180;
-  const dec = ((obj.dec || 0) * Math.PI) / 180;
-  const dist = Math.max(obj.distance_ly || 4, 0.1);
-  const r = Math.min(dist, 40) * scale + Math.max(0, Math.log10(dist / 40 + 1)) * 18;
-  return new THREE.Vector3(
-    r * Math.cos(dec) * Math.cos(ra),
-    r * Math.sin(dec),
-    r * Math.cos(dec) * Math.sin(ra),
+  addStarField(group, rng(260413));
+  addDust(group);
+
+  // Мягкое свечение плоскости диска
+  const glow = makeDiskGlow();
+  glow.rotation.x = -Math.PI / 2;
+  group.add(glow);
+
+  // Метка Солнца
+  const sun = new THREE.Mesh(
+    new THREE.SphereGeometry(1.0, 16, 12),
+    new THREE.MeshBasicMaterial({ color: 0x9ad0ff })
   );
+  sun.position.set(SUN_GALACTIC.x, SUN_GALACTIC.y, SUN_GALACTIC.z);
+  group.add(sun);
+
+  return { group, sunPosition: sun.position.clone() };
 }

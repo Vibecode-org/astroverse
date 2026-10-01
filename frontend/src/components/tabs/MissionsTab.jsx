@@ -1,13 +1,16 @@
 import React from 'react';
 
 const MissionsTab = ({ missions }) => {
+  // missions может отсутствовать или прийти не-массивом: раньше здесь был
+  // голый missions.map() без защиты, и один битый объект глушил всё приложение.
+  const items = Array.isArray(missions) ? missions : [];
   return (
     <div className="tabContent">
       <div className="missionList">
-        {missions.map((m, idx) => (
+        {items.map((m, idx) => (
           <div key={idx} className="missionCard">
-            <b>{m.name || m}</b>
-            {m.desc && <p>{m.desc}</p>}
+            <b>{typeof m === 'string' ? m : m?.name}</b>
+            {typeof m === 'object' && m?.desc && <p>{m.desc}</p>}
           </div>
         ))}
       </div>

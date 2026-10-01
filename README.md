@@ -86,25 +86,42 @@ docker compose build
 docker compose run --rm --no-deps -w /app backend python -m unittest discover -s tests -t . -v
 ```
 
+Флаг `-w /app` обязателен: рабочий каталог в образе бэкенда — `/app/backend`, а тесты лежат в `/app/tests`, поэтому без него импорт `data` падает с `ModuleNotFoundError`.
+
 Разовые команды (`python`, тесты, ручная сборка) entrypoint запускает без автоматической пересборки; подготовка выполняется для команды `uvicorn`.
 
 Тесты источников работают с подменёнными HTTP-ответами, без доступа к NASA. Сквозной тест создаёт временный каталог, поднимает ограниченный по времени локальный HTTP-сервер и сравнивает весь ответ `/api/objects` с результатом сборки. Ему требуется разрешение на локальный порт.
 
 ## Тесты
 
-Браузерные smoke-тесты (Playwright + локальный Chrome) — см. [frontend/tests/README.md](frontend/tests/README.md).
+Браузерные smoke-тесты (Playwright + локальный Chrome) — см. [tests/README.md](tests/README.md).
 
 ## Архитектура
 
 ```text
 Astroverse
-├── frontend  React + Three.js + Vite (src/bodies — меши и текстуры,
-│             src/hooks — three/время/данные, src/components — UI)
+├── frontend  React + Three.js + Vite
+│   ├── src/bodies   меши (meshes/), текстуры (textures/), общие GPU-ресурсы
+│   ├── src/scene    сборка сцены из useThree: stage, buildSolarSystem,
+│   │                buildDeepSky, picking, animation, viewState
+│   ├── src/hooks    three/время/данные
+│   ├── src/components  UI (layout, controls, tabs, ui, ErrorBoundary)
+│   └── src/styles   стили по зонам интерфейса (styles.css — только @import)
 ├── backend   FastAPI (отдаёт каталог, проксирует JPL Horizons)
 └── data      JSON-каталог объектов + скрипт сборки
 ```
 
+`useThree` только связывает React с `src/scene`: сама сцена строится один раз
+на пару (каталог, режим масштаба), а переключение вида, выбор объекта и слежение
+меняют состояние сцены на месте. Благодаря этому 10-герцевый движок времени не
+перестраивает 3471 меш на каждом тике.
+
 Масштабы визуализации сжаты (иначе Юпитер и галактика не умещаются в одном кадре). Числа в карточках — справочные, по NASA / Gaia / IAU.
+
+`validate_catalog` проверяет не только физические поля, но и презентационные
+(`color`, `tilt`, `rings`, `facts`, `description`): одно битое значение в каталоге
+раньше роняло всю сцену Three.js, и вместо приложения оставалась красная плашка
+на пустом canvas.
 
 ## Следующий этап
 

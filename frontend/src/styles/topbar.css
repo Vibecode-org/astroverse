@@ -1,0 +1,62 @@
+/* Верхняя панель: бренд и статус подключения */
+.topbar {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  padding: 0 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(2, 4, 10, 0.95), rgba(2, 4, 10, 0.14), transparent);
+  pointer-events: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  font-size: 30px;
+  color: #b5c3ff;
+  text-shadow: 0 0 24px #7389ff;
+}
+
+.brand b {
+  display: block;
+  font-size: 14px;
+  letter-spacing: 0.16em;
+}
+
+.brand small {
+  display: block;
+  margin-top: 3px;
+  color: #74809a;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+}
+
+.topmeta {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: #69758e;
+}
+
+.liveDot {
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  border-radius: 50%;
+  background: #63e69d;
+  box-shadow: 0 0 12px #63e69d;
+  margin-right: 6px;
+}
+
+.sep {
+  margin: 0 8px;
+  color: #31394d;
+}

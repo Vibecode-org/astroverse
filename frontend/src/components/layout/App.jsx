@@ -20,26 +20,35 @@ function App() {
     objects, selected, setSelected, query, setQuery,
     view, setView, follow, setFollow, loading,
     errorDetails, setErrorDetails, panelTab, setPanelTab,
-    appRef,
+    appRef, solarScale, setSolarScale,
   } = useObjectData();
 
   const { simDate, setSimDate, timeMultiplier, setTimeMultiplier, isPaused, setIsPaused } = useTimeEngine();
 
   const { mountRef } = useThree({
     objects, view, setView, selected, setSelected, follow, setFollow,
-    appRef, simDate, setErrorDetails,
+    appRef, simDate, setErrorDetails, solarScale,
   });
 
+  // Список пересчитывается только при смене запроса или масштаба. Раньше
+  // displayObjects считался на каждом рендере, а useTimeEngine ререндерит App
+  // 10 раз в секунду — 500 кнопок пересоздавались дважды за кадр.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return objects.filter((o) => {
       if (!q) return true;
-      const blob = [o.name, o.latin, o.description, o.constellation, o.spectral_type, ...(o.facts || [])].join(' ').toLowerCase();
+      // facts/missions валидируются как список строк, но клиент не должен
+      // падать, даже если придёт старый или битый каталог.
+      const blob = [o.name, o.latin, o.description, o.constellation, o.spectral_type,
+        ...(Array.isArray(o.facts) ? o.facts : [])].join(' ').toLowerCase();
       return blob.includes(q);
     });
   }, [objects, query]);
 
-  const displayObjects = filtered.filter((o) => objectScale(o) === view);
+  const displayObjects = useMemo(
+    () => filtered.filter((o) => objectScale(o) === view),
+    [filtered, view],
+  );
 
   const changeView = (nextView) => {
     if (nextView === view) return;
@@ -87,7 +96,7 @@ function App() {
 
       <aside className="sidebar glass">
         <SearchBar query={query} setQuery={setQuery} />
-        <ViewControls view={view} setView={changeView} />
+        <ViewControls view={view} setView={changeView} solarScale={solarScale} setSolarScale={setSolarScale} />
         <ObjectList displayObjects={displayObjects} loading={loading} selected={selected} setSelected={selectObject} />
         <div className="controlBlock">
           <label className="followToggle">

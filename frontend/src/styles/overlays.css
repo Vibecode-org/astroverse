@@ -1,0 +1,68 @@
+/* Наложения поверх сцены: подсказка, масштаб, легенда галактики */
+.hint {
+  position: absolute;
+  z-index: 7;
+  right: 18px;
+  bottom: 16px;
+  border-radius: 9px;
+  padding: 8px 10px;
+  color: #67738b;
+  font-size: 9px;
+}
+
+.scaleBadge {
+  position: absolute;
+  z-index: 7;
+  right: 18px;
+  bottom: 58px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+
+.scaleIcon {
+  font-size: 20px;
+  color: #9aabff;
+}
+
+.scaleBadge small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  color: #65718b;
+}
+
+.scaleBadge b {
+  display: block;
+  font-size: 10px;
+  color: #d6dbeb;
+  margin-top: 2px;
+}
+
+.galaxyLegend {
+  position: absolute;
+  z-index: 7;
+  left: 345px;
+  bottom: 18px;
+  border-radius: 12px;
+  padding: 12px 15px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  color: #8190aa;
+  font-size: 9px;
+}
+
+.galaxyLegend b {
+  color: #e0e5f4;
+  letter-spacing: 0.16em;
+}
+
+/* .muted — утилита боковой панели; оставлена здесь ради исходного порядка каскада. */
+.muted {
+  color: #626d84;
+  font-size: 10px;
+  padding: 12px 6px;
+}

@@ -14,12 +14,12 @@ import unittest
 import urllib.request
 from unittest.mock import patch
 
-from data import build_catalog as builder
-from data.catalog import load_catalog
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+from data import build_catalog as builder
+from data.catalog import load_catalog
 
 
 class FakeClient:

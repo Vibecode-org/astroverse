@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { makeAccretionDiskTexture, makePhotonRingTexture } from '../textures/nebulaTextures.js';
 import { makeStarCorona } from '../textures/starTextures.js';
 import { sharedGeometry, sharedMaterial } from '../resources.js';
+import { safeColor } from '../utils/colorUtils.js';
 
 const DISK_SEGMENTS = 96;
 const DISK_RINGS = 16;
@@ -75,7 +76,7 @@ export function createBlackHoleMesh(obj) {
     group.add(jetNorth, jetSouth);
   }
 
-  group.add(makeStarCorona(obj.color || '#ff8833', radius * 4.8));
+  group.add(makeStarCorona(safeColor(obj.color, '#ff8833'), radius * 4.8));
   // The render loop reads the animated sub-meshes back out of userData.
   group.userData = { ...obj, isBlackHole: true, disk, lensHalo, photonRing };
   return group;

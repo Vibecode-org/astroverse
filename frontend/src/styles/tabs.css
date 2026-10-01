@@ -1,0 +1,92 @@
+/* Стили вкладок информационной панели */
+.panelHeader { margin-bottom: 12px; }
+.panelTabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.tabBtn {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: #8c9bb7;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 4px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tabBtn.on {
+  background: rgba(139, 157, 255, 0.2);
+  color: #ffffff;
+}
+.mainDesc {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #d1d9ec;
+  margin-bottom: 14px;
+}
+.subBlock {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.subBlock h4 {
+  margin: 0 0 6px 0;
+  font-size: 11px;
+  color: #9cb2ff;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.subBlock p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #bac4dc;
+}
+.compTag {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: monospace;
+  font-size: 11px !important;
+}
+.missionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.missionCard {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px;
+  border-radius: 10px;
+}
+.missionCard b {
+  display: block;
+  font-size: 11px;
+  color: #8bb2ff;
+  margin-bottom: 4px;
+}
+.missionCard p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #b0bcd8;
+}
+.factsList {
+  margin: 0;
+  padding-left: 18px;
+}
+.factsList li {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #cbd5ed;
+  margin-bottom: 8px;
+}

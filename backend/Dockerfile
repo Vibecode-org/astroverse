@@ -2,6 +2,8 @@ FROM python:3.12-slim
 
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
+# Логи пишем без буферизации, иначе они теряются при падении контейнера.
+ENV PYTHONUNBUFFERED=1
 
 COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt

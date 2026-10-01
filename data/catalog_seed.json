@@ -319,7 +319,8 @@
     "color": "#c5c5c8",
     "texture": "moon",
     "description": "Луна́ — единственный естественный спутник Земли. Самый близкий к Солнцу спутник планеты, так как у ближайших к Солнцу планет их нет. Второй по яркости объект на земном небосводе после Солнца и пятый по величине естественный спутник планеты Солнечной системы. Среднее расстояние между центрами Земли и Луны — 384 467 км.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 384400
   },
   {
     "id": "phobos",
@@ -333,7 +334,8 @@
     "color": "#8a7b70",
     "texture": "rocky",
     "description": "Внутренний спутник Марса.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 9376
   },
   {
     "id": "deimos",
@@ -347,7 +349,8 @@
     "color": "#9a8c80",
     "texture": "rocky",
     "description": "Внешний спутник Марса.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 23463
   },
   {
     "id": "io",
@@ -361,7 +364,8 @@
     "color": "#e8c44a",
     "texture": "io",
     "description": "Вулканический мир серы.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 421700
   },
   {
     "id": "europa",
@@ -375,7 +379,8 @@
     "color": "#d5e4ea",
     "texture": "europa",
     "description": "Океан под ледяным щитом.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 671100
   },
   {
     "id": "ganymede",
@@ -389,7 +394,8 @@
     "color": "#b6a48c",
     "texture": "ganymede",
     "description": "Крупнейший спутник системы.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 1070400
   },
   {
     "id": "callisto",
@@ -403,7 +409,8 @@
     "color": "#7a7368",
     "texture": "callisto",
     "description": "Древний кратерированный спутник.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 1882700
   },
   {
     "id": "amalthea",
@@ -417,7 +424,8 @@
     "color": "#c45544",
     "texture": "rocky",
     "description": "Красная луна Юпитера.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 181400
   },
   {
     "id": "mimas",
@@ -431,7 +439,8 @@
     "color": "#e0e0e0",
     "texture": "ice",
     "description": "Спутник с кратером Гершель.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 185500
   },
   {
     "id": "enceladus",
@@ -445,7 +454,8 @@
     "color": "#f2f6fa",
     "texture": "enceladus",
     "description": "Гейзеры теплого океана.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 238000
   },
   {
     "id": "tethys",
@@ -459,7 +469,8 @@
     "color": "#eaeaea",
     "texture": "ice",
     "description": "Ледяной спутник Сатурна.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 294700
   },
   {
     "id": "dione",
@@ -473,7 +484,8 @@
     "color": "#dcdcdc",
     "texture": "ice",
     "description": "Спутник с ледяными обрывами.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 377400
   },
   {
     "id": "rhea",
@@ -487,7 +499,8 @@
     "color": "#cccccc",
     "texture": "ice",
     "description": "Ледяной спутник Сатурна.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 527100
   },
   {
     "id": "titan",
@@ -501,7 +514,8 @@
     "color": "#d29a4a",
     "texture": "titan",
     "description": "Метановые моря и атмосфера.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 1221900
   },
   {
     "id": "iapetus",
@@ -515,7 +529,8 @@
     "color": "#5a4a3a",
     "texture": "rocky",
     "description": "Черно-белый спутник Сатурна.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 3560800
   },
   {
     "id": "miranda",
@@ -529,7 +544,8 @@
     "color": "#d0d8dc",
     "texture": "ice",
     "description": "Утес Верона высотой 20 км.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 129400
   },
   {
     "id": "ariel",
@@ -543,7 +559,8 @@
     "color": "#d8e0e4",
     "texture": "ice",
     "description": "Светлый спутник Урана.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 191000
   },
   {
     "id": "titania",
@@ -557,7 +574,8 @@
     "color": "#cfd7da",
     "texture": "ice",
     "description": "Крупнейший спутник Урана.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 435900
   },
   {
     "id": "triton",
@@ -571,7 +589,8 @@
     "color": "#d8c8d4",
     "texture": "triton",
     "description": "Криовулканы и азотные гейзеры.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 354800
   },
   {
     "id": "charon",
@@ -585,7 +604,8 @@
     "color": "#8c8380",
     "texture": "rocky",
     "description": "Спутник Плутона с пятном Мордор.",
-    "facts": []
+    "facts": [],
+    "moon_distance_km": 19591
   },
   {
     "id": "1_ceres",

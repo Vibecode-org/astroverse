@@ -282,7 +282,7 @@ def main():
               if getattr(args, f"{source}_limit") is not None}
     try:
         build_enriched_catalog(args.config, args.output, offline=args.offline, wikipedia=args.wikipedia, limits=limits)
-    except (SourceError, ValueError, OSError, KeyError, TypeError) as exc:
+    except (SourceError, ValueError, OSError, KeyError, TypeError, OverflowError) as exc:
         parser.exit(1, f"Catalog build failed; output was not replaced: {exc}\n")
 
 

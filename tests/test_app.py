@@ -107,6 +107,64 @@ class CatalogTests(unittest.TestCase):
                     catalog.validate_catalog([body(**{field: value})])
         catalog.validate_catalog([body(gx=-1, gy=-1, gz=-1, galactic_b=-45)])
 
+    def test_optional_color_field(self):
+        # The frontend parses this with parseInt(hex.slice(1), 16) before addColorStop.
+        catalog.validate_catalog([body()])
+        for value in (None, "#fff", "#0f0", "#ffff", "#ffb74d", "#FFB74DFF", "#ffb74dcc"):
+            with self.subTest(field="color", valid=value):
+                catalog.validate_catalog([body(color=value)])
+        for value in ("red", "rgb(1,2,3)", "url(body.png)", "#ff", "#ggg", "#123456789",
+                      "#ffb74d ", "", 0xFFB74D, 16711680, True, ["#fff"], {"hex": "#fff"}):
+            with self.subTest(field="color", invalid=value), self.assertRaises(ValueError):
+                catalog.validate_catalog([body(color=value)])
+
+    def test_optional_tilt_field(self):
+        # A non-numeric tilt becomes NaN in the mesh rotation and silently breaks the camera.
+        catalog.validate_catalog([body()])
+        for value in (None, 0, 23.4, -23.4, 90, 1e9, -1e9):
+            with self.subTest(field="tilt", valid=value):
+                catalog.validate_catalog([body(tilt=value)])
+        for value in (True, False, "23.4", "23,4°", "", [], {}, [23.4], {"deg": 23.4},
+                      float("nan"), float("inf"), float("-inf"), 10 ** 400):
+            with self.subTest(field="tilt", invalid=value), self.assertRaises(ValueError):
+                catalog.validate_catalog([body(tilt=value)])
+
+    def test_optional_rings_field(self):
+        catalog.validate_catalog([body()])
+        for value in (None, {"inner": 1.35, "outer": 2.35}, {"inner": 1, "outer": 2},
+                      {"inner": 1.35, "outer": 2.35, "color": "#e2d2a8"}):
+            with self.subTest(field="rings", valid=value):
+                catalog.validate_catalog([body(rings=value)])
+        for value in ([], [1.35, 2.35], "1.35-2.35", 1.35, True, {}, {"inner": 1.35},
+                      {"inner": 1.35, "outer": None}, {"inner": 1.35, "outer": 0},
+                      {"inner": 1.35, "outer": -2.35}, {"inner": 0, "outer": 2.35},
+                      {"inner": "1.35", "outer": "2.35"}, {"inner": True, "outer": 2.35},
+                      {"inner": float("nan"), "outer": 2.35}, {"inner": 1.35, "outer": float("inf")}):
+            with self.subTest(field="rings", invalid=value), self.assertRaises(ValueError):
+                catalog.validate_catalog([body(rings=value)])
+
+    def test_optional_list_fields(self):
+        for field in ("facts", "missions"):
+            with self.subTest(field=field, absent=True):
+                catalog.validate_catalog([body()])
+            for value in (None, [], ["Факт"], ["a", "b"]):
+                with self.subTest(field=field, valid=value):
+                    catalog.validate_catalog([body(**{field: value})])
+            for value in ("Факт", {"name": "Факт"}, ["Факт", 1], [None], [["Факт"]], True, 5):
+                with self.subTest(field=field, invalid=value), self.assertRaises(ValueError):
+                    catalog.validate_catalog([body(**{field: value})])
+
+    def test_optional_string_fields(self):
+        for field in ("description", "structure", "composition", "spectral_type"):
+            with self.subTest(field=field, absent=True):
+                catalog.validate_catalog([body()])
+            for value in (None, "", "Жёлтый карлик типа G2V"):
+                with self.subTest(field=field, valid=value):
+                    catalog.validate_catalog([body(**{field: value})])
+            for value in ({}, [], 0, 1, True, ["text"], {"text": "value"}):
+                with self.subTest(field=field, invalid=value), self.assertRaises(ValueError):
+                    catalog.validate_catalog([body(**{field: value})])
+
     def test_legacy_display_fields_and_ra_load_without_rewriting(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "catalog.json"

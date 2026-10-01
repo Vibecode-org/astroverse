@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { rgba } from '../utils/colorUtils.js';
 
 const CDN_MAP = {
   sun: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/sunmap.jpg',
@@ -35,52 +36,81 @@ function canvasTexture(size, paint) {
   return tex;
 }
 
-// НАСТОЯЩИЕ ЗВЁЗДНЫЕ ФОТОСФЕРЫ: ПОТЕМНЕНИЕ К КРАЮ (LIMB DARKENING) + КИПЯЩАЯ ПЛАЗМА
-function makePhotosphere(ctx, s, centerCol, edgeCol, spotCol) {
-  const cx = s / 2;
-  const cy = s / 2;
+// Градиент рисуется с зеркальным повтором у левого/правого края, иначе элемент,
+// попавший на шов сферы, обрезается и seam становится видимым.
+function wrappedRadial(ctx, s, x, y, r, stops) {
+  const paint = (cx) => {
+    const g = ctx.createRadialGradient(cx, y, 0, cx, y, r);
+    for (const [offset, color] of stops) g.addColorStop(offset, color);
+    ctx.fillStyle = g;
+    ctx.fillRect(cx - r, y - r, r * 2, r * 2);
+  };
+  paint(x);
+  if (x - r < 0) paint(x + s);
+  if (x + r > s) paint(x - s);
+}
 
-  // 1. Физическое потемнение к краю (Limb Darkening)
-  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cx);
-  g.addColorStop(0, centerCol);
-  g.addColorStop(0.65, centerCol);
-  g.addColorStop(0.9, edgeCol);
-  g.addColorStop(1.0, '#110500');
-  ctx.fillStyle = g;
+/** Фотосфера звезды.
+ *
+ * Сфера использует equirect-развёртку, поэтому крупный градиент в пространстве
+ * текстуры превращается в жёсткий терминатор и вращается вместе с мешем. Текстура
+ * поэтому несёт только поверхностную деталь — равномерную грануляцию и мягкие
+ * пятна, — а потемнение к краю считается отдельно, в пространстве вида
+ * (см. applyLimbDarkening в bodies/meshes/starPlanetMesh.js).
+ */
+function makePhotosphere(ctx, s, baseCol, grainCol, spotCol) {
+  ctx.fillStyle = baseCol;
   ctx.fillRect(0, 0, s, s);
 
-  // 2. Кипящие конвективные ячейки (грануляция)
+  // Кипящие конвективные ячейки: шум попиксельный, поэтому сам по себе бесшовный.
   const img = ctx.getImageData(0, 0, s, s);
+  const d = img.data;
   for (let i = 0; i < s * s; i++) {
-    const noise = (Math.random() - 0.5) * 22;
-    img.data[i * 4] = Math.max(0, Math.min(255, img.data[i * 4] + noise));
-    img.data[i * 4 + 1] = Math.max(0, Math.min(255, img.data[i * 4 + 1] + noise * 0.8));
-    img.data[i * 4 + 2] = Math.max(0, Math.min(255, img.data[i * 4 + 2] + noise * 0.5));
+    const grain = (Math.random() - 0.5) * 24;
+    const p = i * 4;
+    d[p] = Math.max(0, Math.min(255, d[p] + grain));
+    d[p + 1] = Math.max(0, Math.min(255, d[p + 1] + grain * 0.85));
+    d[p + 2] = Math.max(0, Math.min(255, d[p + 2] + grain * 0.6));
   }
   ctx.putImageData(img, 0, 0);
 
-  // 3. Звёздные пятна
+  // Светлые гранулы — мягкие пятна, без резких краёв.
+  for (let i = 0; i < 110; i++) {
+    const x = Math.random() * s;
+    const y = Math.random() * s;
+    const r = 3 + Math.random() * 9;
+    wrappedRadial(ctx, s, x, y, r, [
+      [0, rgba(grainCol, 0.30)],
+      [1, rgba(grainCol, 0)],
+    ]);
+  }
+
+  // Звёздные пятна — тоже мягкие и низкоконтрастные.
   if (spotCol) {
-    ctx.fillStyle = spotCol;
-    for (let i = 0; i < 16; i++) {
-      ctx.beginPath();
-      ctx.arc(Math.random() * s, Math.random() * s, 2 + Math.random() * 8, 0, Math.PI * 2);
-      ctx.fill();
+    for (let i = 0; i < 5; i++) {
+      const x = Math.random() * s;
+      const y = s * (0.2 + Math.random() * 0.6);
+      const r = 6 + Math.random() * 14;
+      wrappedRadial(ctx, s, x, y, r, [
+        [0, rgba(spotCol, 0.34)],
+        [0.55, rgba(spotCol, 0.16)],
+        [1, rgba(spotCol, 0)],
+      ]);
     }
   }
 }
 
 const painters = {
   // O/B Голубые сверхгиганты (Ригель, Спика)
-  star_blue: (ctx, s) => makePhotosphere(ctx, s, '#ffffff', '#5599ff', 'rgba(0, 60, 180, 0.4)'),
+  star_blue: (ctx, s) => makePhotosphere(ctx, s, '#bcd8ff', '#eaf4ff', '#1e46a0'),
   // A Белые звезды (Сириус, Вега)
-  star_white: (ctx, s) => makePhotosphere(ctx, s, '#ffffff', '#c5dcff', null),
+  star_white: (ctx, s) => makePhotosphere(ctx, s, '#ffffff', '#ffffff', null),
   // F/G Желтые звезды (Солнце, Альфа Центавра)
-  star_yellow: (ctx, s) => makePhotosphere(ctx, s, '#ffffff', '#ff8800', '#772200'),
+  star_yellow: (ctx, s) => makePhotosphere(ctx, s, '#ffe08a', '#fff3c4', '#96460a'),
   // K Оранжевые гиганты (Арктур, Альдебаран)
-  star_orange: (ctx, s) => makePhotosphere(ctx, s, '#ffe8aa', '#b83800', '#4a1100'),
+  star_orange: (ctx, s) => makePhotosphere(ctx, s, '#ffb45e', '#ffd8a0', '#782800'),
   // M Красные сверхгиганты (Бетельгейзе, Антарес)
-  star_red: (ctx, s) => makePhotosphere(ctx, s, '#ff7744', '#550800', '#220000'),
+  star_red: (ctx, s) => makePhotosphere(ctx, s, '#ff7a4a', '#ffab7a', '#5a0f00'),
 
   exoplanet_habitable: (ctx, s) => {
     ctx.fillStyle = '#0e3870';
@@ -111,6 +141,22 @@ const painters = {
       img.data[i * 4] = v;
       img.data[i * 4 + 1] = v;
       img.data[i * 4 + 2] = v + 4;
+      img.data[i * 4 + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  },
+  // Лёд комет и ледяных карликовых. Раньше painter'а не было, поэтому все 80
+  // комет молча попадали в rocky и были неотличимы от астероидов.
+  ice: (ctx, s) => {
+    const img = ctx.createImageData(s, s);
+    for (let i = 0; i < s * s; i++) {
+      const grain = Math.random();
+      // Тёмные включения пыли на светлой ледяной поверхности.
+      const dust = grain < 0.22 ? 0.45 : 1;
+      const v = Math.floor((170 + grain * 70) * dust);
+      img.data[i * 4] = v * 0.82;
+      img.data[i * 4 + 1] = v * 0.93;
+      img.data[i * 4 + 2] = v;
       img.data[i * 4 + 3] = 255;
     }
     ctx.putImageData(img, 0, 0);

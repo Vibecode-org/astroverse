@@ -22,18 +22,7 @@ export function objectScale(obj) {
   return 'galaxy';
 }
 
-export function getSolarDistance(obj) {
-  if (obj.id === 'sun') return 0;
-  if (obj.au != null) {
-    return 14.0 * Math.pow(obj.au, 0.72);
-  }
-  return obj.distance || 12;
-}
-
-export function getMoonOrbitDistance(obj, parentRadius = 1.0) {
-  if (obj.id === 'moon') return parentRadius * 3.4;
-  if (obj.id === 'phobos') return parentRadius * 1.5;
-  if (obj.id === 'deimos') return parentRadius * 2.3;
-  if (obj.moon_distance) return parentRadius * (1.6 + obj.moon_distance * 0.45);
-  return parentRadius * 2.8;
-}
+// Расстояния, размеры и орбиты спутников считаются в solarLayout.js: там они
+// считаются для всей системы сразу, поэтому соблюдаются зазоры между телами.
+// Раньше эти функции жили здесь и считались независимо для каждого объекта,
+// из-за чего орбита Луны оказывалась больше промежутка Земля—Венера.

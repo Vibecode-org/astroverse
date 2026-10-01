@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { makeSpiralGalaxyTexture } from '../textures/nebulaTextures.js';
 import { sharedGeometry, sharedMaterial } from '../resources.js';
+import { safeColor } from '../utils/colorUtils.js';
 
 function sombreroCore(radius) {
   const geometry = sharedGeometry(`m104:core:${radius}`, () => new THREE.SphereGeometry(radius * 0.75, 32, 24));
@@ -51,7 +52,7 @@ export function createGalaxyMesh(obj) {
     group.add(sombreroRing(radius, 0.82, 1.05, 'lane', 0x110e0a, 1));
   } else {
     // Обычная спиральная галактика
-    group.add(spiralDisk(radius, obj.color || '#99ccff'));
+    group.add(spiralDisk(radius, safeColor(obj.color, '#99ccff')));
   }
 
   group.userData = obj;

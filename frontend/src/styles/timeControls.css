@@ -1,0 +1,91 @@
+/* Виджет управления временем в шапке */
+.timeControlBar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 12px;
+}
+.timeBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #dbe4ff;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.timeBtn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.timeBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.timeBtn:disabled:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.timeSelect {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #dbe4ff;
+  font-size: 11px;
+  font-family: inherit;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timeSelect:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.timeSelect option {
+  background: #0d1220;
+  color: #dbe4ff;
+}
+.timeBtn.active {
+  background: #ff5555;
+  border-color: #ff7777;
+  color: white;
+}
+.datePicker {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #63e69d;
+  font-family: monospace;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+}
+.speedPresets {
+  display: flex;
+  gap: 4px;
+}
+.speedChip {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #8c9cb8;
+  font-size: 10px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.speedChip:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+.speedChip.active {
+  background: rgba(139, 157, 255, 0.25);
+  border-color: rgba(139, 157, 255, 0.45);
+  color: #ffffff;
+}

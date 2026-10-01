@@ -33,7 +33,10 @@ def main():
                 LOG.info("Using validated existing catalog")
             else:
                 raise ValueError("ASTROVERSE_CATALOG_MODE must be offline, online or existing")
-        except (SourceError, ValueError, OSError, KeyError, TypeError) as exc:
+        # OverflowError обязателен: positive_limit(1e400) даёт int(inf) ->
+        # OverflowError, а не ValueError. Без него внятный LOG.error
+        # превращался в traceback из PID 1.
+        except (SourceError, ValueError, OSError, KeyError, TypeError, OverflowError) as exc:
             LOG.error("Catalog preparation failed; API will not start: %s", exc)
             return 1
 

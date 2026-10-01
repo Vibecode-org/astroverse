@@ -1,0 +1,112 @@
+/* Информационная панель выбранного объекта */
+.infoPanel {
+  position: absolute;
+  z-index: 9;
+  right: 18px;
+  top: 82px;
+  width: 350px;
+  border-radius: 18px;
+  padding: 24px;
+  max-height: calc(100vh - 110px);
+  overflow: auto;
+}
+
+.close {
+  position: absolute;
+  right: 11px;
+  top: 8px;
+  border: 0;
+  background: none;
+  color: #8d98ae;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #8397ec;
+}
+
+.infoPanel h1 {
+  font-size: 32px;
+  margin: 6px 0 3px;
+}
+
+.latin {
+  color: #8d9abb;
+  font-size: 11px;
+  margin-bottom: 10px;
+  letter-spacing: 0.04em;
+}
+
+.distance {
+  color: #8d9abb;
+  font-size: 11px;
+  margin-bottom: 13px;
+}
+
+.infoPanel p {
+  font-size: 12px;
+  line-height: 1.55;
+  color: #aeb7cb;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+
+.stats div {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 8px 9px;
+}
+
+.stats small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: #6d7890;
+  text-transform: uppercase;
+}
+
+.stats b {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: #e8edf8;
+}
+
+/* .objectRow.on — правило боковой панели; оставлено здесь ради исходного порядка
+   каскада: специфичность равна .objectRow:hover, и более позднее правило выигрывает. */
+.objectRow.on {
+  background: rgba(139, 157, 255, 0.12);
+}
+
+.infoPanel h3 {
+  font-size: 11px;
+  margin: 18px 0 8px;
+  color: #dde3f5;
+}
+
+.infoPanel ul {
+  margin: 0;
+  padding-left: 17px;
+}
+
+.infoPanel li {
+  font-size: 11px;
+  color: #cbd2e3;
+  line-height: 1.5;
+  margin: 7px 0;
+}
+
+.source {
+  margin-top: 17px;
+  color: #5e6a83;
+  font-size: 9px;
+}

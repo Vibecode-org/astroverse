@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { makeNebulaCloudSprite } from '../textures/nebulaTextures.js';
 import { sharedGeometry, sharedMaterial } from '../resources.js';
+import { safeColor } from '../utils/colorUtils.js';
 
 const PLEIADES_STARS = [[0.15,0.05,0], [-0.35,0.25,0.1], [-0.65,-0.2,-0.1], [-0.12,0.45,0], [-0.25,-0.42,0.1], [-0.52,0.32,-0.1], [0.35,0.12,0]];
 const CLUSTER_STARS = 280;
@@ -37,7 +38,7 @@ function pleiadesMaterial() {
 function clusterGeometry(colorHex) {
   const positions = new Float32Array(CLUSTER_STARS * 3);
   const colors = new Float32Array(CLUSTER_STARS * 3);
-  const baseCol = new THREE.Color(colorHex);
+  const baseCol = new THREE.Color(safeColor(colorHex, '#ffe0a8'));
   const scratch = new THREE.Color();
 
   for (let i = 0; i < CLUSTER_STARS; i++) {
@@ -88,7 +89,7 @@ export function createClusterMesh(obj) {
     group.add(makeNebulaCloudSprite('#3388ff', radius * 1.2));
   } else {
     // Обычное звездное скопление
-    const color = obj.color || '#ffe0a8';
+    const color = safeColor(obj.color, '#ffe0a8');
     const field = new THREE.Points(clusterGeometry(color), clusterMaterial());
     field.scale.setScalar(radius);
     group.add(field);

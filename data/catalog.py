@@ -7,6 +7,7 @@ or changing ASTROVERSE_CATALOG_PATH. Unknown metadata fields are preserved.
 import json
 import math
 import os
+import re
 import tempfile
 from pathlib import Path
 
@@ -21,8 +22,16 @@ NONNEGATIVE_FIELDS = frozenset({
     "au", "distance", "distance_ly", "moon_distance", "mass_earth", "mass_sun",
     "temperature_k", "gravity", "escape_velocity",
 })
-POSITIVE_FIELDS = frozenset({"period_days", "radius_km", "radius_earth"})
+POSITIVE_FIELDS = frozenset({"period_days", "radius_km", "radius_earth", "moon_distance_km"})
 SIGNED_FIELDS = frozenset({"ra", "dec", "galactic_l", "galactic_b", "gx", "gy", "gz"})
+# Presentation fields are read straight off the object by the Three.js frontend, where a
+# wrong type throws inside the scene build and leaves a permanently blank canvas.
+LIST_FIELDS = frozenset({"facts", "missions"})
+STRING_FIELDS = frozenset({"description", "structure", "composition", "spectral_type"})
+RING_FIELDS = ("inner", "outer")
+# Only the real CSS hex lengths: 3/4/6/8 digits. A bare {3,8} would also admit
+# 5- and 7-digit values, which parse in JS but are not valid colors.
+COLOR_PATTERN = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
 
 
 def catalog_path() -> Path:
@@ -40,12 +49,18 @@ def _finite_number(value) -> bool:
         return False
 
 
+def _hex_color(value) -> bool:
+    # A named colour or url(...) payload here throws from canvas.addColorStop.
+    return isinstance(value, str) and COLOR_PATTERN.match(value) is not None
+
+
 def validate_catalog(items) -> list:
     """Validate without modifying items and return the same list; raise ValueError.
 
     Optional physical measurements may be null; gravity and escape_velocity also
     accept formatted display strings. The display radius, when supplied, must always
-    be positive. Parent IDs form an acyclic graph within this catalog.
+    be positive. Presentation fields must match the shapes the frontend renders.
+    Parent IDs form an acyclic graph within this catalog.
     """
     if not isinstance(items, list):
         raise ValueError("catalog must be a list of objects")
@@ -92,6 +107,28 @@ def validate_catalog(items) -> list:
                 raise ValueError(f"{label}.jpl_command must be a nonempty string")
             if item["scale"] != "solar":
                 raise ValueError(f"{label}.jpl_command is only allowed for solar objects")
+
+        if item.get("color") is not None and not _hex_color(item["color"]):
+            raise ValueError(f"{label}.color must be a hex string like #ffb74d or null")
+        if item.get("tilt") is not None and not _finite_number(item["tilt"]):
+            raise ValueError(f"{label}.tilt must be a finite number or null")
+        rings = item.get("rings")
+        if rings is not None:
+            if not isinstance(rings, dict):
+                raise ValueError(f"{label}.rings must be an object with inner and outer or null")
+            for field in RING_FIELDS:
+                edge = rings.get(field)
+                if not _finite_number(edge) or edge <= 0:
+                    raise ValueError(f"{label}.rings.{field} must be a finite positive number")
+        for field in LIST_FIELDS:
+            value = item.get(field)
+            if value is not None and (not isinstance(value, list)
+                                      or not all(isinstance(entry, str) for entry in value)):
+                raise ValueError(f"{label}.{field} must be a list of strings or null")
+        for field in STRING_FIELDS:
+            value = item.get(field)
+            if value is not None and not isinstance(value, str):
+                raise ValueError(f"{label}.{field} must be a string or null")
 
     for object_id, item in by_id.items():
         parent = item.get("parent")

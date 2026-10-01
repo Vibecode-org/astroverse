@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { sharedMaterial, sharedTexture } from '../resources.js';
+import { colorSeed, safeColor } from '../utils/colorUtils.js';
 
 /** mulberry32: cached textures are painted once, so their noise must be
  * reproducible — otherwise the same key would yield a different image per load. */
@@ -13,16 +14,14 @@ function rng(seed) {
   };
 }
 
-function colorSeed(colorHex) {
-  return parseInt(String(colorHex).replace('#', ''), 16) || 1;
-}
-
 function buildNebulaCloudTexture(colorHex) {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
   const ctx = canvas.getContext('2d');
-  const baseCol = new THREE.Color(colorHex);
+  // THREE.Color throws on an unparseable string; safeColor keeps a single bad
+  // catalog value from aborting the whole scene build.
+  const baseCol = new THREE.Color(safeColor(colorHex, '#ff8cb0'));
   const r = Math.round(baseCol.r * 255);
   const g = Math.round(baseCol.g * 255);
   const b = Math.round(baseCol.b * 255);
@@ -71,7 +70,7 @@ function buildSpiralGalaxyTexture(colorHex = '#99ccff') {
   ctx.fillStyle = bulge;
   ctx.fillRect(0, 0, size, size);
 
-  const baseCol = new THREE.Color(colorHex);
+  const baseCol = new THREE.Color(safeColor(colorHex, '#99ccff'));
   const armCol = `${Math.round(baseCol.r * 255)}, ${Math.round(baseCol.g * 255)}, ${Math.round(baseCol.b * 255)}`;
 
   for (let arm = 0; arm < 2; arm++) {
