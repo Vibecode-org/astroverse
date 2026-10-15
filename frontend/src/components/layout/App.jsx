@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useObjectData } from '../../hooks/useObjectData.js';
 import { useTimeEngine } from '../../hooks/useTimeEngine.js';
 import { useThree } from '../../hooks/useThree.js';
@@ -15,6 +15,16 @@ import FactsTab from '../tabs/FactsTab.jsx';
 import { formatLy, formatNum, formatPeriod } from '../../utils/formatUtils.js';
 import { objectScale } from '../../bodies/utils/celestialUtils.js';
 
+// Debounce hook for search input
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 function App() {
   const {
     objects, selected, setSelected, query, setQuery,
@@ -30,11 +40,14 @@ function App() {
     appRef, simDate, setErrorDetails, solarScale,
   });
 
-  // Список пересчитывается только при смене запроса или масштаба. Раньше
-  // displayObjects считался на каждом рендере, а useTimeEngine ререндерит App
-  // 10 раз в секунду — 500 кнопок пересоздавались дважды за кадр.
+  // Debounce search query to avoid filtering on every keystroke
+  const debouncedQuery = useDebounce(query, 300);
+
+  // Список пересчитывается только при смене debounced-запроса или масштаба.
+  // useTimeEngine ререндерит App 10 раз в секунду — без debounce фильтр
+  // срабатывал на каждом рендере.
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return objects.filter((o) => {
       if (!q) return true;
       // facts/missions валидируются как список строк, но клиент не должен
@@ -43,7 +56,7 @@ function App() {
         ...(Array.isArray(o.facts) ? o.facts : [])].join(' ').toLowerCase();
       return blob.includes(q);
     });
-  }, [objects, query]);
+  }, [objects, debouncedQuery]);
 
   const displayObjects = useMemo(
     () => filtered.filter((o) => objectScale(o) === view),
@@ -90,7 +103,7 @@ function App() {
           setTimeMultiplier={setTimeMultiplier}
         />
         <div className="topmeta">
-          <span className="liveDot" /> NASA JPL LIVE <span className="sep">/</span> {objects.length} ТЕЛ
+          <span className="liveDot" /> {objects.length} ТЕЛ
         </div>
       </header>
 

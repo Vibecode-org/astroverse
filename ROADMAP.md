@@ -51,18 +51,21 @@
 
 Эти проблемы **необходимо закрыть до начала Фазы 1**, иначе LOD-рендер будет нестабильным или упадёт на старте.
 
-| # | Проблема | Файл | Эффект | Решение (1–2 часа) |
+| # | Проблема | Файл | Эффект | Статус |
 |---|---|---|---|---|
-| **H-1** | 514 меток = 72 МБ GPU ради 14 видимых | `useThree.js:107-111` | OOM на слабых GPU, фризы | Создавать `CanvasTexture` только для `kind ∈ {planet, dwarf_planet}` |
-| **H-2** | `color` не валидируется → `DOMException` в шейдере | `catalog.py::validate_catalog`, `starTextures.js:45-46` | Вся сцена не достраивается, красная плашка | Добавить regex `^#[0-9a-fA-F]{3,8}$` + `try/catch` в `makeStarCorona` |
-| **H-3** | `facts`/`description`/`missions` не того типа → краш React | `App.jsx:37`, `FactsTab.jsx:7`, `OverviewTab.jsx:6`, `MissionsTab.jsx:7` | Падение при поиске/вкладках | Валидировать типы в `catalog.py` + **Error Boundary** вокруг `<App/>` |
-| **H-4** | `tilt` объектом → `NaN` в камере | `starPlanetMesh.js:81` | Сцена «жива», но камера сломана без ошибки | Валидировать `tilt` как конечное число |
-| **H-5** | `rings` не валидируется | `catalog.py`, `starPlanetMesh.js` | Молчаливая деградация колец | Валидировать объект с `inner`/`outer` > 0 |
-| **M-1** | `/api/live-ephemeris` мёртв, UI врёт "NASA JPL LIVE" | `app.py:105`, `App.jsx:84` | Обман пользователя | Подключить к рендеру ИЛИ убрать бейдж |
-| **M-3** | `npm install` без lock-файла → невоспроизводимая сборка | `frontend/Dockerfile:6` | Каждый билд тянет свежие версии | `package-lock.json` + `npm ci` |
-| **M-7** | Клиентский поиск без debounce дублирует серверный | `App.jsx:33-40` | 3471 `join().toLowerCase()` на каждый keystroke | Debounce + `useMemo` ИЛИ только серверный `?q=` |
+| **H-1** | 514 меток = 72 МБ GPU ради 14 видимых | `buildSolarSystem.js:57-66` | OOM на слабых GPU, фризы | ✅ **Готово** — метки создаются только для `planet`/`dwarf_planet` |
+| **H-2** | `color` не валидируется → `DOMException` в шейдере | `catalog.py:111-112`, `starTextures.js` | Вся сцена не достраивается, красная плашка | ✅ **Готово** — regex `^#[0-9a-fA-F]{3,8}$` + `safeColor`/`rgba` в `colorUtils.js` |
+| **H-3** | `facts`/`description`/`missions` не того типа → краш React | `catalog.py:123-131`, `main.jsx` | Падение при поиске/вкладках | ✅ **Готово** — валидация типов + **Error Boundary** вокруг `<App/>` |
+| **H-4** | `tilt` объектом → `NaN` в камере | `catalog.py:113-114`, `starPlanetMesh.js:117` | Сцена «жива», но камера сломана без ошибки | ✅ **Готово** — валидация конечного числа + guard в меше |
+| **H-5** | `rings` не валидируется | `catalog.py:115-122`, `starPlanetMesh.js` | Молчаливая деградация колец | ✅ **Готово** — валидация `inner`/`outer` > 0 |
+| **M-1** | `/api/live-ephemeris` мёртв, UI врёт "NASA JPL LIVE" | `App.jsx:106` | Обман пользователя | ✅ **Готово** — бейдж убран |
+| **M-3** | `npm install` без lock-файла → невоспроизводимая сборка | `frontend/package.json`, `frontend/Dockerfile` | Каждый билд тянет свежие версии | ✅ **Готово** — зафиксированы версии, `npm ci` при наличии lock-файла |
+| **M-5** | Crash-loop против NASA при недоступности API | `entrypoint.py`, `docker-compose.yml` | Часы запросов к NASA без backoff | ✅ **Готово** — fallback на offline при ошибке online-сборки |
+| **M-7** | Клиентский поиск без debounce дублирует серверный | `App.jsx:43-59` | 3471 `join().toLowerCase()` на каждый keystroke | ✅ **Готово** — `useDebounce(300ms)` + `useMemo` |
 
 > **H-2…H-5 — один класс проблемы:** валидатор проверяет физику, но не презентационный контракт. Все пять закрываются ~25 строками в `data/catalog.py`. Значения латентны (в текущем снапшоте их нет), но `build_catalog.py:94-96` копирует `color` из снапшота **без санитизации**, поэтому плохое значение переживёт пересборку.
+
+> **Все блокеры закрыты.** Проект готов к старту Фазы 1.
 
 ---
 

@@ -37,8 +37,19 @@ def main():
         # OverflowError, а не ValueError. Без него внятный LOG.error
         # превращался в traceback из PID 1.
         except (SourceError, ValueError, OSError, KeyError, TypeError, OverflowError) as exc:
-            LOG.error("Catalog preparation failed; API will not start: %s", exc)
-            return 1
+            # In online mode, fall back to offline instead of crashing to avoid
+            # restart loops against NASA APIs (M-5).
+            if mode == "online":
+                LOG.warning("Online catalog build failed, falling back to offline: %s", exc)
+                try:
+                    build_enriched_catalog(offline=True)
+                    LOG.info("Offline fallback succeeded")
+                except (SourceError, ValueError, OSError, KeyError, TypeError, OverflowError) as fallback_exc:
+                    LOG.error("Offline fallback also failed; API will not start: %s", fallback_exc)
+                    return 1
+            else:
+                LOG.error("Catalog preparation failed; API will not start: %s", exc)
+                return 1
 
     # Replace the entrypoint so Uvicorn receives Docker stop signals directly.
     os.execvp(command[0], command)

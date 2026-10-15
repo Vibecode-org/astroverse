@@ -3,7 +3,8 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm install --legacy-peer-deps --no-audit
+# Use npm ci for reproducible builds when lockfile exists; fallback to npm install
+RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps --no-audit; else npm install --legacy-peer-deps --no-audit; fi
 
 COPY . .
 
