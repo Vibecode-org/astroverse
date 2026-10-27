@@ -9,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from data.build_catalog import SourceError, build_enriched_catalog
+from data.sources import SourceError
+from data.build_catalog import build_enriched_catalog
 from data.catalog import load_catalog
 
 LOG = logging.getLogger(__name__)

@@ -78,6 +78,26 @@ class EntrypointTests(unittest.TestCase):
             self.assertEqual(entrypoint.main(), 1)
         self.exec.assert_not_called()
 
+    def test_online_falls_back_to_offline(self):
+        os.environ["ASTROVERSE_CATALOG_MODE"] = "online"
+        # First call (online) fails, second (offline fallback) succeeds
+        self.build.side_effect = [
+            entrypoint.SourceError("NASA down"),
+            None,
+        ]
+        self.exec.side_effect = lambda *_: None
+        entrypoint.main()
+        self.exec.assert_called_once()
+        self.build.assert_any_call(offline=False)
+        self.build.assert_any_call(offline=True)
+
+    def test_online_and_offline_both_fail(self):
+        os.environ["ASTROVERSE_CATALOG_MODE"] = "online"
+        self.build.side_effect = entrypoint.SourceError("NASA down")
+        with self.assertLogs(entrypoint.LOG, level="ERROR"):
+            self.assertEqual(entrypoint.main(), 1)
+        self.exec.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

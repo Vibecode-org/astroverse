@@ -70,7 +70,7 @@ export function buildSolarSystem(scaledObjects, system, scene) {
     const parent = planets[obj.parent];
     const mesh = createBodyMesh(obj);
     const place = solarLayout.get(obj.id) || {};
-    const moonDist = place.moonOrbit || (parent ? parent.userData.displayRadius * 2.5 : 1);
+    const moonDist = place.moonOrbit !== undefined ? place.moonOrbit : (parent ? parent.userData.displayRadius * 2.5 : 1);
 
     const pivot = new THREE.Group();
     pivot.position.copy(parent ? parent.position : new THREE.Vector3());

@@ -112,7 +112,7 @@ export function createStarPlanetMesh(obj) {
   // оформления и может быть произвольным. Наклон берётся только у числа:
   // объект в tilt даёт NaN в rotation, и NaN расходится дальше — в
   // controls.target и camera.position, — уже без всякой ошибки в консоли.
-  const radius = obj.id === 'phobos' ? 0.38 : obj.id === 'deimos' ? 0.026 : (obj.displayRadius ?? obj.radius ?? 0.4);
+  const radius = obj.displayRadius ?? obj.radius ?? 0.4;
   const isStar = obj.kind === 'star';
   const tilt = typeof obj.tilt === 'number' && Number.isFinite(obj.tilt) ? obj.tilt : 0;
 
@@ -130,7 +130,7 @@ export function createStarPlanetMesh(obj) {
     }
   }
 
-  const mesh = new THREE.Mesh(shellGeometry(radius), shellMaterial(isStar, texName, GAS_GIANTS.includes(obj.texture)));
+  const mesh = new THREE.Mesh(shellGeometry(radius), shellMaterial(isStar, texName, GAS_GIANTS.includes(obj.id)));
   mesh.userData = obj;
   if (tilt) mesh.rotation.z = (tilt * Math.PI) / 180;
 

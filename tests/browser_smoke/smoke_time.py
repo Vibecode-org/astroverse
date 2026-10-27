@@ -67,15 +67,22 @@ class TestTime:
             assert math.dist(state["earth"], fixed["earth"]) < 1e-5
         assert page.evaluate("() => window.__astroverseSmoke().frame") > fixed["frame"]
 
-        # Speed controls
+        # Speed controls: ▶▶ increases rate, ◀◀ decreases rate
         chip = page.locator(".speedChip")
         chip.wait_for(state="visible", timeout=5000)
         assert chip.text_content() == "Скорость: ×1"
-        for button, speed in (("×1.5", "1.5"), ("×1.5", "2.25"), ("÷2", "1.125")):
-            page.get_by_role("button", name=button, exact=True).click()
-            chip.wait_for(
-                lambda el: el.text_content() == f"Скорость: ×{speed}", timeout=5000
-            )
+
+        # Speed up: ×1 → 1 мин/с → 1 час/с
+        page.get_by_role("button", name="▶▶", exact=True).click()
+        chip.wait_for(lambda el: el.text_content() == "Скорость: ×1 мин/с", timeout=5000)
+        page.get_by_role("button", name="▶▶", exact=True).click()
+        chip.wait_for(lambda el: el.text_content() == "Скорость: ×1 ч/с", timeout=5000)
+
+        # Slow down: 1 час/с → 1 мин/с → ×1
+        page.get_by_role("button", name="◀◀", exact=True).click()
+        chip.wait_for(lambda el: el.text_content() == "Скорость: ×1 мин/с", timeout=5000)
+        page.get_by_role("button", name="◀◀", exact=True).click()
+        chip.wait_for(lambda el: el.text_content() == "Скорость: ×1", timeout=5000)
 
         # Resume and verify time advances
         page.get_by_role("button", name="Продолжить", exact=True).click()

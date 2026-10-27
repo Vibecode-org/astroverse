@@ -20,6 +20,10 @@ if str(ROOT) not in sys.path:
 
 from data import build_catalog as builder
 from data.catalog import load_catalog
+from data.sources import SourceError, fetch_small_bodies
+from data.enrichment import enrich_wikipedia
+from data.normalizers import identity_index
+from data.build_catalog import load_config
 
 
 class FakeClient:
@@ -68,17 +72,17 @@ class BuilderTests(unittest.TestCase):
 
     def test_jpl_provisional_suffix_preserves_existing_id(self):
         config = builder.load_config(builder.DEFAULT_CONFIG)
-        identities = builder.identity_index(load_catalog(ROOT / "data" / "catalog_seed.json"))
+        identities = identity_index(load_catalog(ROOT / "data" / "catalog_seed.json"))
         response = {"fields": ["full_name", "pdes", "a", "per", "diameter"],
                     "data": [["1 Ceres (A801 AA)", "1", "2.766", "1680", "939.4"]]}
         with patch.object(FakeClient, "get", return_value=response):
-            items = builder.fetch_small_bodies(FakeClient(), config, identities, "asteroid", 1)
+            items = fetch_small_bodies(FakeClient(), config, identities, "asteroid", 1)
         self.assertEqual(items[0]["id"], "1_ceres")
 
     def test_failed_source_keeps_output(self):
         self.output.write_text("previous contents", encoding="utf-8")
-        with patch.object(FakeClient, "get", side_effect=builder.SourceError("offline")):
-            with self.assertRaises(builder.SourceError):
+        with patch.object(FakeClient, "get", side_effect=SourceError("offline")):
+            with self.assertRaises(SourceError):
                 builder.build_enriched_catalog(output=self.output, client=FakeClient())
         self.assertEqual(self.output.read_text(), "previous contents")
 
@@ -106,11 +110,11 @@ class BuilderTests(unittest.TestCase):
 
     def test_wikipedia_replaces_not_appends(self):
         items = [{"id": "earth", "wikipedia_title": "Земля", "description": "old"}]
-        config = builder.load_config(builder.DEFAULT_CONFIG)
+        config = load_config(builder.DEFAULT_CONFIG)
         with patch.object(FakeClient, "get", return_value={"extract": "A sourced description"}):
-            builder.enrich_wikipedia(items, FakeClient(), config)
+            enrich_wikipedia(items, FakeClient(), config)
             first = copy.deepcopy(items)
-            builder.enrich_wikipedia(items, FakeClient(), config)
+            enrich_wikipedia(items, FakeClient(), config)
         self.assertEqual(items, first)
         self.assertEqual(items[0]["description"], "A sourced description")
 
@@ -152,6 +156,61 @@ class BuilderTests(unittest.TestCase):
             thread.join(timeout=10)
             sock.close()
         self.assertFalse(thread.is_alive(), "Backend did not stop")
+
+
+class ConfigTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.output = Path(self.temp.name) / "objects.json"
+
+    def test_load_config_invalid_retries(self):
+        import tempfile, json
+        from pathlib import Path
+        tmp = tempfile.TemporaryDirectory()
+        config_path = Path(tmp.name) / "config.json"
+        config = {
+            "seed": "catalog_seed.json",
+            "http": {"timeout_seconds": 30, "retries": -1, "user_agent": "test"},
+            "sources": {
+                "exoplanets": {"url": "http://example.com", "limit": 10},
+                "asteroids": {"url": "http://example.com", "limit": 10},
+                "comets": {"url": "http://example.com", "limit": 10},
+            },
+        }
+        config_path.write_text(json.dumps(config))
+        with self.assertRaisesRegex(ValueError, "nonnegative integer"):
+            builder.load_config(config_path)
+
+    def test_load_config_invalid_timeout(self):
+        import tempfile, json
+        from pathlib import Path
+        tmp = tempfile.TemporaryDirectory()
+        config_path = Path(tmp.name) / "config.json"
+        config = {
+            "seed": "catalog_seed.json",
+            "http": {"timeout_seconds": 0, "retries": 2, "user_agent": "test"},
+            "sources": {
+                "exoplanets": {"url": "http://example.com", "limit": 10},
+                "asteroids": {"url": "http://example.com", "limit": 10},
+                "comets": {"url": "http://example.com", "limit": 10},
+            },
+        }
+        config_path.write_text(json.dumps(config))
+        with self.assertRaisesRegex(ValueError, "positive"):
+            builder.load_config(config_path)
+
+    def test_offline_and_wikipedia_cannot_combine(self):
+        with self.assertRaisesRegex(ValueError, "cannot be combined"):
+            builder.build_enriched_catalog(output=self.output, offline=True, wikipedia=True)
+
+    def test_output_cannot_be_seed(self):
+        with self.assertRaisesRegex(ValueError, "Output must not overwrite"):
+            builder.build_enriched_catalog(output=ROOT / "data" / "catalog_seed.json", offline=True)
+
+    def test_output_cannot_be_config(self):
+        with self.assertRaisesRegex(ValueError, "Output must not overwrite"):
+            builder.build_enriched_catalog(output=builder.DEFAULT_CONFIG, offline=True)
 
 
 if __name__ == "__main__":

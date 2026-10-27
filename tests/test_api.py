@@ -166,6 +166,81 @@ class AppTests(unittest.TestCase):
                     importlib.reload(data.catalog)
                     data.catalog.load_catalog()
 
+    # ---- /api/objects edge cases ----
+
+    def test_objects_empty_catalog(self):
+        empty_app = isolated_app([])
+        client = TestClient(empty_app)
+        resp = client.get("/api/objects")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), [])
+
+    def test_objects_search_no_matches(self):
+        resp = self.client.get("/api/objects?q=zzznonexistent")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), [])
+
+    def test_objects_search_case_insensitive(self):
+        resp = self.client.get("/api/objects?q=ЗЕМЛЯ")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["id"], "earth")
+
+    def test_objects_kind_no_matches(self):
+        resp = self.client.get("/api/objects?kind=black_hole")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), [])
+
+    def test_objects_q_and_kind_combined(self):
+        resp = self.client.get("/api/objects?q=earth&kind=planet")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["id"], "earth")
+
+    def test_objects_q_and_kind_no_overlap(self):
+        resp = self.client.get("/api/objects?q=earth&kind=star")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), [])
+
+    # ---- /api/live-ephemeris edge cases ----
+
+    def test_live_ephemeris_empty_catalog(self):
+        empty_app = isolated_app([])
+        client = TestClient(empty_app)
+        resp = client.get("/api/live-ephemeris")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data["positions"], {})
+
+    def test_live_ephemeris_no_solar_objects(self):
+        catalog = [
+            {"id": "proxima", "name": "Proxima", "kind": "star", "scale": "local",
+             "jpl_command": None, "name_latin": "", "description": "near",
+             "facts": [], "mythology": "", "history": ""},
+        ]
+        app_no_solar = isolated_app(catalog)
+        client = TestClient(app_no_solar)
+        resp = client.get("/api/live-ephemeris")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()["positions"], {})
+
+    def test_live_ephemeris_cache_expires_after_hour(self):
+        vec = {"x": 1.0, "y": 2.0, "z": 3.0}
+        with patch.object(app_module, "fetch_jpl_vector", return_value=vec):
+            resp = self.client.get("/api/live-ephemeris")
+            first = resp.json()["timestamp"]
+
+        import datetime as dt
+        fake_now = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=2)
+
+        with patch.object(app_module.datetime, "now", return_value=fake_now):
+            with patch.object(app_module, "fetch_jpl_vector", return_value={"x": 9.0, "y": 9.0, "z": 9.0}) as mock_fetch:
+                resp2 = self.client.get("/api/live-ephemeris")
+                self.assertEqual(resp2.json()["positions"]["earth"], {"x": 9.0, "y": 9.0, "z": 9.0})
+                mock_fetch.assert_called()
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
