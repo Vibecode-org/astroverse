@@ -6,7 +6,7 @@ import { objectScale } from '../bodies/index.js';
  * Returns a `detach()` that removes every listener it added — the caller wires
  * that into the effect cleanup, alongside renderer teardown.
  */
-export function attachPicking({ domElement, camera, meshes, catalogByMesh, onPick }) {
+export function attachPicking({ domElement, camera, meshes, catalogByMesh, onPick, lod, objects }) {
   const raycaster = new THREE.Raycaster();
   raycaster.params.Points = { threshold: 1.2 };
   const pointer = new THREE.Vector2();
@@ -48,6 +48,16 @@ export function attachPicking({ domElement, camera, meshes, catalogByMesh, onPic
       let parent = m.parent;
       while (parent) { visible = visible && parent.visible; parent = parent.parent; }
       if (visible) candidates.push(m);
+    }
+
+    // LOD-пикинг (Фаза 1): пробуем все три уровня.
+    if (lod) {
+      const hitId = lod.pick(raycaster, event.clientX, event.clientY);
+      if (hitId !== null) {
+        const obj = objects.find((o) => o.id === hitId);
+        if (obj) onPick(obj, objectScale(obj));
+        return;
+      }
     }
 
     const hit = raycaster.intersectObjects(candidates, true)[0];

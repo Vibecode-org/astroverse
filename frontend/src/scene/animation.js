@@ -7,7 +7,7 @@ import { placeOnOrbit } from '../bodies/index.js';
  * textures are shared across the whole catalog (see `bodies/resources.js`) and
  * must never be mutated or disposed from here.
  */
-export function startAnimationLoop({ state, camera, controls, renderer, scene, solar, meshes, moons, localOrbits, blackHolesList, labels }) {
+export function startAnimationLoop({ state, camera, controls, renderer, scene, solar, meshes, moons, localOrbits, blackHolesList, labels, lod }) {
   let raf;
 
   // Переиспользуемые векторы: пока они создавались внутри цикла, на кадр
@@ -17,6 +17,10 @@ export function startAnimationLoop({ state, camera, controls, renderer, scene, s
   const followPos = new THREE.Vector3();
   const labelOffset = new THREE.Vector3();
   const followDelta = new THREE.Vector3();
+
+  // Метрики рендера: фиксируем draw calls и треугольники раз в 60 кадров.
+  let frameCount = 0;
+  const METRICS_INTERVAL = 60;
 
   const animate = () => {
     raf = requestAnimationFrame(animate);
@@ -109,8 +113,18 @@ export function startAnimationLoop({ state, camera, controls, renderer, scene, s
       state.lastFollowPos = null;
     }
 
+    // LOD обновление (Фаза 1).
+    if (lod) lod.update();
+
     controls.update();
     renderer.render(scene, camera);
+
+    // --- Метрики LOD (шаг 1.1) ---
+    frameCount++;
+    if (frameCount % METRICS_INTERVAL === 0) {
+      const info = renderer.info.render;
+      console.log(`[LOD metrics] calls=${info.calls} triangles=${info.triangles} points=${info.points} lines=${info.lines}`);
+    }
   };
 
   animate();

@@ -11,6 +11,7 @@ import { buildDeepSky } from '../scene/buildDeepSky.js';
 import { attachPicking } from '../scene/picking.js';
 import { startAnimationLoop } from '../scene/animation.js';
 import { applyViewState } from '../scene/viewState.js';
+import { initLOD } from '../scene/lodController.js';
 
 const LIMITS = {
   real: { far: 4e6, maxDistance: 3e6, starField: 2e7, solarCam: [0, 9e4, 1.6e5] },
@@ -58,12 +59,21 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
       const { localOrbits, blackHolesList } = buildDeepSky(scaledObjects, nearby, galaxyMarkers, meshes);
 
       const catalogByMesh = new Map(scaledObjects.map(obj => [meshes.get(obj.id), obj]));
+
+      // --- LOD инициализация (Фаза 1) ---
+      const lod = initLOD({
+        scene, camera, objects: scaledObjects, meshes,
+        domElement: renderer.domElement,
+      });
+
       detachPicking = attachPicking({
         domElement: renderer.domElement,
         camera,
         meshes,
         catalogByMesh,
         onPick,
+        lod,
+        objects: scaledObjects,
       });
 
       appRef.current = {
@@ -71,6 +81,7 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
         system, galaxyMarkers, labels, moons, planets, localOrbits, view: 'solar',
         sunLight, ambient, focusLight, belt, kuiper, limits,
         simTime: simDate.getTime(),
+        lod,
       };
 
       applyViewState(appRef.current, 'solar');
@@ -78,6 +89,7 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
       stopAnimation = startAnimationLoop({
         state: appRef.current, camera, controls, renderer, scene,
         solar, meshes, moons, localOrbits, blackHolesList, labels,
+        lod,
       });
 
       const resize = () => {
@@ -95,6 +107,7 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
         stopAnimation?.();
         if (onResize) window.removeEventListener('resize', onResize);
         detachPicking?.();
+        lod?.dispose?.();
         renderer?.domElement?.remove();
         controls?.dispose();
         if (scene) disposeSceneResources(scene);
