@@ -62,6 +62,8 @@ INSTALL_PROBE = r"""() => {
             } : null,
             frame: state.renderer.info.render.frame,
             date: document.querySelector('.scaleBadge')?.textContent.trim(),
+            metrics: state.metrics ?? null,
+            lodCounts: state.lodCounts ?? null,
         };
         if (projectId !== null) {
             const mesh = state.meshes.get(projectId);

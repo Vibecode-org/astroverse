@@ -34,7 +34,7 @@ function shellGeometry(radius) {
 const LIMB_VERTEX_PRELUDE = 'varying vec3 vAstroNormal;\nvarying vec3 vAstroView;\n';
 const LIMB_FRAGMENT_PRELUDE = 'varying vec3 vAstroNormal;\nvarying vec3 vAstroView;\n';
 
-function applyLimbDarkening(material) {
+export function applyLimbDarkening(material) {
   material.onBeforeCompile = (shader) => {
     shader.vertexShader = shader.vertexShader
       .replace('void main() {', LIMB_VERTEX_PRELUDE + 'void main() {')

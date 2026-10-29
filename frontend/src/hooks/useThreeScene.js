@@ -11,6 +11,7 @@ import { buildDeepSky } from '../scene/buildDeepSky.js';
 import { attachPicking } from '../scene/picking.js';
 import { startAnimationLoop } from '../scene/animation.js';
 import { applyViewState } from '../scene/viewState.js';
+import { createLOD } from '../scene/lodController.js';
 
 const LIMITS = {
   real: { far: 4e6, maxDistance: 3e6, starField: 2e7, solarCam: [0, 9e4, 1.6e5] },
@@ -32,6 +33,7 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
     let renderer;
     let controls;
     let scene;
+    let lod = null;
     let onResize = null;
 
     try {
@@ -58,26 +60,39 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
       const { localOrbits, blackHolesList } = buildDeepSky(scaledObjects, nearby, galaxyMarkers, meshes);
 
       const catalogByMesh = new Map(scaledObjects.map(obj => [meshes.get(obj.id), obj]));
+
+      // Deep-sky LOD: thousands of local stars/exoplanets collapse into one
+      // Points cloud plus one InstancedMesh per kind. Solar system bodies are
+      // deliberately excluded (see lodController.js).
+      lod = createLOD({
+        objects: scaledObjects,
+        meshes,
+        camera,
+        domElement: renderer.domElement,
+        group: nearby,
+      });
+
       detachPicking = attachPicking({
         domElement: renderer.domElement,
         camera,
         meshes,
         catalogByMesh,
         onPick,
+        lod,
       });
 
       appRef.current = {
         scene, camera, renderer, controls, meshes, orbitLines, galaxy, nearby,
         system, galaxyMarkers, labels, moons, planets, localOrbits, view: 'solar',
         sunLight, ambient, focusLight, belt, kuiper, limits,
-        simTime: simDate.getTime(),
+        simTime: simDate.getTime(), lod,
       };
 
       applyViewState(appRef.current, 'solar');
 
       stopAnimation = startAnimationLoop({
         state: appRef.current, camera, controls, renderer, scene,
-        solar, meshes, moons, localOrbits, blackHolesList, labels,
+        solar, meshes, moons, localOrbits, blackHolesList, labels, lod,
       });
 
       const resize = () => {
@@ -95,6 +110,7 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
         stopAnimation?.();
         if (onResize) window.removeEventListener('resize', onResize);
         detachPicking?.();
+        lod?.dispose();
         renderer?.domElement?.remove();
         controls?.dispose();
         if (scene) disposeSceneResources(scene);
@@ -105,6 +121,7 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
       stopAnimation?.();
       if (onResize) window.removeEventListener('resize', onResize);
       detachPicking?.();
+      lod?.dispose();
       controls?.dispose();
       renderer?.domElement?.remove();
       if (scene) disposeSceneResources(scene);

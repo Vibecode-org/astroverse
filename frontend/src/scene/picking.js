@@ -6,7 +6,7 @@ import { objectScale } from '../bodies/index.js';
  * Returns a `detach()` that removes every listener it added — the caller wires
  * that into the effect cleanup, alongside renderer teardown.
  */
-export function attachPicking({ domElement, camera, meshes, catalogByMesh, onPick }) {
+export function attachPicking({ domElement, camera, meshes, catalogByMesh, onPick, lod }) {
   const raycaster = new THREE.Raycaster();
   raycaster.params.Points = { threshold: 1.2 };
   const pointer = new THREE.Vector2();
@@ -51,13 +51,22 @@ export function attachPicking({ domElement, camera, meshes, catalogByMesh, onPic
     }
 
     const hit = raycaster.intersectObjects(candidates, true)[0];
-    if (!hit) return;
-    // Groups (nebula, galaxy, black hole) are hit on a child, so walk up
-    // until the owning catalog object is found.
-    let mesh = hit.object;
-    while (mesh && !catalogByMesh.has(mesh)) mesh = mesh.parent;
-    const obj = catalogByMesh.get(mesh);
-    if (obj) onPick(obj, objectScale(obj));
+    if (hit) {
+      // Groups (nebula, galaxy, black hole) are hit on a child, so walk up
+      // until the owning catalog object is found.
+      let mesh = hit.object;
+      while (mesh && !catalogByMesh.has(mesh)) mesh = mesh.parent;
+      const obj = catalogByMesh.get(mesh);
+      if (obj) onPick(obj, objectScale(obj));
+      return;
+    }
+
+    // Deep-sky objects rendered as L0 points or L1 instances have no visible
+    // detailed mesh to raycast against.
+    if (lod) {
+      const obj = lod.pick(event.clientX, event.clientY);
+      if (obj) onPick(obj, objectScale(obj));
+    }
   };
 
   domElement.addEventListener('pointerdown', onPointerDown);

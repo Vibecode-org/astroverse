@@ -7,7 +7,7 @@ import { placeOnOrbit } from '../bodies/index.js';
  * textures are shared across the whole catalog (see `bodies/resources.js`) and
  * must never be mutated or disposed from here.
  */
-export function startAnimationLoop({ state, camera, controls, renderer, scene, solar, meshes, moons, localOrbits, blackHolesList, labels }) {
+export function startAnimationLoop({ state, camera, controls, renderer, scene, solar, meshes, moons, localOrbits, blackHolesList, labels, lod }) {
   let raf;
 
   // Переиспользуемые векторы: пока они создавались внутри цикла, на кадр
@@ -109,8 +109,29 @@ export function startAnimationLoop({ state, camera, controls, renderer, scene, s
       state.lastFollowPos = null;
     }
 
+    // LOD reads positions after the orbit update above, so a moving exoplanet
+    // never lags one frame behind its L0/L1 representation.
+    if (lod) lod.update();
+
     controls.update();
     renderer.render(scene, camera);
+
+    // Cheap always-on metrics for tests and the debug overlay. Console output
+    // stays behind an explicit flag; otherwise it floods the log at 60 Hz.
+    const info = renderer.info.render;
+    state.metrics = {
+      calls: info.calls,
+      triangles: info.triangles,
+      points: info.points,
+      lines: info.lines,
+    };
+    state.lodCounts = lod ? lod.counts() : null;
+    if (window.__astroverseLodDebug) {
+      console.log(
+        `[LOD] calls=${info.calls} triangles=${info.triangles} points=${info.points} lines=${info.lines}`,
+        state.lodCounts,
+      );
+    }
   };
 
   animate();
