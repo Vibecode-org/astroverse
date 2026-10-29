@@ -3,7 +3,6 @@ import os
 import pytest
 from playwright.sync_api import sync_playwright
 
-URL = "http://localhost:5173"
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 TIMEOUT_MS = 10_000
 LOAD_TIMEOUT_MS = 45_000
@@ -18,9 +17,14 @@ def playwright_instance():
 
 @pytest.fixture(scope="session")
 def browser(playwright_instance):
+    headless = os.environ.get("SMOKE_HEADED") != "1"
+    # Headless Chrome без GPU не создаёт WebGL-контекст, если не разрешить
+    # программный рендер. На машинах с GPU флаги безвредны.
+    args = ["--enable-unsafe-swiftshader", "--use-angle=swiftshader"] if headless else []
     browser = playwright_instance.chromium.launch(
         executable_path=CHROME,
-        headless=os.environ.get("SMOKE_HEADED") != "1",
+        headless=headless,
+        args=args,
     )
     yield browser
     browser.close()

@@ -113,7 +113,11 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
       console.error("Three.js Init Error:", err);
       setErrorDetails(err.name + ": " + err.message + "\n\nСтек:\n" + err.stack);
     }
-  }, [objects, appRef, solarScale, setErrorDetails, onPick, simDate]);
+  // simDate намеренно НЕ в зависимостях: сцена строится один раз на пару
+  // (каталог, масштаб), а время обновляется через useThreeTime -> state.simTime.
+  // Раньше simDate в deps пересобирал всю сцену 10 раз в секунду и сбрасывал
+  // follow/камеру.
+  }, [objects, appRef, solarScale, setErrorDetails, onPick]);
 
   return { mountRef };
 }

@@ -2,6 +2,7 @@
 
 import importlib
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -12,6 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+# Importing backend.app loads a catalog immediately. Tests must not depend on
+# data/objects.json, which is generated inside the container at startup.
+os.environ.setdefault("ASTROVERSE_CATALOG_PATH", str(ROOT / "data" / "catalog_seed.json"))
+
 from fastapi.testclient import TestClient
 
 from backend import app as app_module
@@ -20,24 +25,22 @@ from backend.app import app, fetch_jpl_vector
 
 def isolated_app(catalog):
     """Build an app instance with an isolated in-memory catalog."""
-    import importlib
-
-    with patch.object(app_module, "CATALOG", catalog):
-        importlib.reload(app_module)
-        return app_module.app
+    importlib.reload(app_module)
+    app_module.CATALOG = catalog
+    return app_module.app
 
 
 class AppTests(unittest.TestCase):
     def setUp(self):
         self.catalog = [
             {"id": "sun", "name": "Солнце", "kind": "star", "scale": "solar",
-             "jpl_command": "Sun", "name_latin": "Sol", "description": "star",
+             "jpl_command": "Sun", "latin": "Sol", "description": "star",
              "facts": [], "mythology": "", "history": ""},
             {"id": "earth", "name": "Земля", "kind": "planet", "scale": "solar",
-             "jpl_command": "Earth", "name_latin": "Terra", "description": "home",
+             "jpl_command": "Earth", "latin": "Earth", "description": "home",
              "facts": ["blue"], "mythology": "", "history": ""},
             {"id": "proxima", "name": "Proxima", "kind": "star", "scale": "local",
-             "jpl_command": None, "name_latin": "", "description": "near",
+             "jpl_command": None, "latin": "", "description": "near",
              "facts": [], "mythology": "", "history": ""},
         ]
         self.client = TestClient(isolated_app(self.catalog))
@@ -136,6 +139,9 @@ class AppTests(unittest.TestCase):
             self.assertNotIn("earth", data["positions"])
 
         with patch.object(app_module, "fetch_jpl_vector", side_effect=RuntimeError):
+            # Второй запрос должен быть независим от кеша, накопленного выше.
+            app_module.EPHEMERIS_CACHE["timestamp"] = None
+            app_module.EPHEMERIS_CACHE["data"] = {}
             resp = self.client.get("/api/live-ephemeris")
             self.assertEqual(resp.status_code, 200)
             # Total failure: still 200, empty positions.
@@ -235,7 +241,7 @@ class AppTests(unittest.TestCase):
         import datetime as dt
         fake_now = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=2)
 
-        with patch.object(app_module.datetime, "now", return_value=fake_now):
+        with patch.object(app_module, "utcnow", return_value=fake_now):
             with patch.object(app_module, "fetch_jpl_vector", return_value={"x": 9.0, "y": 9.0, "z": 9.0}) as mock_fetch:
                 resp2 = self.client.get("/api/live-ephemeris")
                 self.assertEqual(resp2.json()["positions"]["earth"], {"x": 9.0, "y": 9.0, "z": 9.0})

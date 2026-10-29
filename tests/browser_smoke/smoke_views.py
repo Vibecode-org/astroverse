@@ -1,6 +1,9 @@
 """Smoke test: view switching moves camera and renders while paused."""
 import math
-import pytest
+
+from playwright.sync_api import expect
+
+from common import INSTALL_PROBE, URL, wait_state
 
 
 class TestViews:
@@ -9,19 +12,16 @@ class TestViews:
         page.locator(".topmeta").wait_for(state="visible", timeout=45000)
         page.locator(".viewport canvas").wait_for(state="visible", timeout=45000)
         page.evaluate(INSTALL_PROBE)
-        page.wait_for_function(
-            "s => s && s.view === 'solar' && s.earth !== null && s.frame > 0",
-            timeout=45000,
-        )
+        wait_state(page, "s && s.view === 'solar' && s.earth !== null && s.frame > 0", timeout=45000)
 
         # Pause
-        page.get_by_role("button", name="Пауза", exact=True).click()
+        page.get_by_role("button", name="Пауза", exact=True).click(no_wait_after=True)
         page.get_by_role("button", name="Продолжить", exact=True).wait_for(
             state="attached", timeout=5000
         )
-        page.get_by_role("button", name="Продолжить", exact=True).wait_for(
-            lambda el: el.get_attribute("aria-pressed") == "true", timeout=5000
-        )
+        expect(
+            page.get_by_role("button", name="Продолжить", exact=True)
+        ).to_have_attribute("aria-pressed", "true")
 
         date = page.evaluate("() => window.__astroverseSmoke().date")
 
@@ -31,9 +31,10 @@ class TestViews:
             ("solar", "Солнечная система", [0, 65, 120]),
         ):
             before = page.evaluate("() => window.__astroverseSmoke()")
-            page.locator(".viewControls").get_by_role("button", name=label).click()
-            page.wait_for_function(
-                f"s => s && s.view === '{view}' && "
+            page.locator(".viewControls").get_by_role("button", name=label).click(no_wait_after=True)
+            wait_state(
+                page,
+                f"s && s.view === '{view}' && "
                 f"s.visible.system === {str(view == 'solar').lower()} && "
                 f"s.visible.nearby === {str(view == 'local').lower()} && "
                 f"s.visible.galaxy === {str(view == 'galaxy').lower()} && "
@@ -41,10 +42,7 @@ class TestViews:
                 timeout=10000,
             )
             # Wait for frames to advance
-            page.wait_for_function(
-                f"s => s && s.frame > {before['frame']}",
-                timeout=10000,
-            )
+            wait_state(page, f"s && s.frame > {before['frame']}", timeout=10000)
             after = page.evaluate("() => window.__astroverseSmoke()")
             assert math.dist(before["camera"], after["camera"]) > 1
             assert after["frame"] > before["frame"]

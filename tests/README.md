@@ -4,7 +4,6 @@
 
 ```text
 tests/
-├── conftest.py                      # общие pytest-фикстуры
 ├── test_catalog.py                  # валидация, загрузка, запись каталога
 ├── test_api.py                      # FastAPI: /health, /objects, /live-ephemeris
 ├── test_build_catalog.py            # сборщик каталога (offline/online)
@@ -17,6 +16,10 @@ tests/
     ├── smoke_picking.py             # выбор объекта, follow, клик по canvas
     └── smoke_search.py              # поиск и фильтрация
 ```
+
+Всего 79 backend-тестов (`grep -c "def test_" tests/test_*.py`). Отдельного
+`tests/conftest.py` нет — фикстуры браузерных тестов лежат только в
+`tests/browser_smoke/conftest.py`.
 
 ## Backend-тесты (unittest)
 
@@ -38,12 +41,19 @@ docker compose run --rm --no-deps -w /app backend \
 Адрес приложения фиксирован: `http://localhost:5173`.
 
 Frontend и API должны быть запущены, каталог должен содержать **3471 объект**.
+Сейчас это **8 тестов**; они используют общий `common.py` (URL, probe, разбор даты).
+Файл `pytest.ini` в корне задаёт `python_files = smoke_*.py`, поэтому каталог
+`tests/browser_smoke/` собирается обычным `pytest`.
 
 ```bash
 python3 -m venv /tmp/astroverse-smoke-env
-/tmp/astroverse-smoke-env/bin/python -m pip install playwright
+/tmp/astroverse-smoke-env/bin/python -m pip install playwright pytest
 /tmp/astroverse-smoke-env/bin/python -m pytest tests/browser_smoke/ -v
 ```
+
+В headless-режиме Chrome запускается с `--enable-unsafe-swiftshader` и
+`--use-angle=swiftshader`: без этого на машинах без доступного GPU не создаётся
+WebGL-контекст. Для видимого окна: `SMOKE_HEADED=1 ... pytest ...`.
 
 Один модуль или тест:
 

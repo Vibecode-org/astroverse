@@ -1,7 +1,10 @@
 import React from 'react';
 
 const DAY_MS = 86400000;
-const HOUR_MS = 3600000;
+const HOUR_S = 3600;
+const DAY_S = 86400;
+const WEEK_S = 604800;
+const YEAR_S = 31557600;
 
 // Скорость = симулированных секунд за реальную секунду. Подписи human-readable,
 // чтобы не считать нули в множителе: ×86400 читается хуже, чем «1 день/с».
@@ -16,17 +19,18 @@ const RATES = [
 
 function formatRate(rate) {
   if (rate < 60) return rate < 10 ? `×${rate}` : '×' + Math.round(rate);
-  if (rate < 3600) return `×${Math.round(rate / 60)} мин/с`;
-  if (rate < 86400) return `×${Math.round(rate / HOUR_MS)} ч/с`;
-  if (rate < 604800) return `×${Math.round(rate / DAY_MS)} д/с`;
-  return '×' + (rate / 31557600).toPrecision(3) + ' год/с';
+  if (rate < HOUR_S) return `×${Math.round(rate / 60)} мин/с`;
+  if (rate < DAY_S) return `×${Math.round(rate / HOUR_S)} ч/с`;
+  if (rate < WEEK_S) return `×${Math.round(rate / DAY_S)} д/с`;
+  if (rate < YEAR_S) return `×${Math.round(rate / WEEK_S)} нед/с`;
+  return '×' + Number((rate / YEAR_S).toPrecision(3)) + ' год/с';
 }
 
 export default function TimeControls ({ setSimDate, isPaused, setIsPaused, timeMultiplier, setTimeMultiplier }) {
   const shift = (deltaMs) => setSimDate(prev => new Date(prev.getTime() + deltaMs));
   const nearest = RATES.reduce((best, r) =>
-    Math.abs(Math.log(r.value)) - Math.log(timeMultiplier) <
-    Math.abs(Math.log(best.value)) - Math.log(timeMultiplier) ? r : best, RATES[0]);
+    Math.abs(Math.log(r.value / timeMultiplier)) <
+    Math.abs(Math.log(best.value / timeMultiplier)) ? r : best, RATES[0]);
 
   const step = (dir) => {
     const i = RATES.indexOf(nearest);

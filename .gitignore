@@ -3,6 +3,9 @@
 **/node_modules/
 **/dist/
 
+# Local environment overrides
+.env
+
 # Local agent memory: not part of the project, never commit
 .agent/
 

@@ -1,5 +1,5 @@
 """Smoke test: search and filter functionality."""
-import pytest
+from common import URL
 
 
 class TestSearch:
@@ -9,7 +9,7 @@ class TestSearch:
         page.locator(".viewport canvas").wait_for(state="visible", timeout=45000)
 
         # Search for Earth
-        search = page.locator(".searchBar input")
+        search = page.locator(".searchBox input")
         search.fill("земля")
         page.wait_for_timeout(500)  # debounce
 
@@ -30,7 +30,7 @@ class TestSearch:
         page.locator(".topmeta").wait_for(state="visible", timeout=45000)
         page.locator(".viewport canvas").wait_for(state="visible", timeout=45000)
 
-        search = page.locator(".searchBar input")
+        search = page.locator(".searchBox input")
         search.fill("earth")
         page.wait_for_timeout(500)
 
@@ -42,7 +42,7 @@ class TestSearch:
         page.locator(".topmeta").wait_for(state="visible", timeout=45000)
         page.locator(".viewport canvas").wait_for(state="visible", timeout=45000)
 
-        search = page.locator(".searchBar input")
+        search = page.locator(".searchBox input")
         search.fill("планета")
         page.wait_for_timeout(500)
 

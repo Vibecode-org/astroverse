@@ -1,6 +1,7 @@
 import csv
 import json
 import math
+import os
 import sys
 import urllib.parse
 import urllib.request
@@ -22,13 +23,24 @@ DATA_PATH = catalog_path()
 CATALOG = load_catalog(DATA_PATH)
 
 app = FastAPI(title="Astroverse API", version="0.4.0")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+# В обычной схеме frontend и API живут на одном origin (nginx проксирует /api),
+# поэтому CORS не нужен. Список разрешённых origin задаётся явно через env:
+# ASTROVERSE_CORS_ORIGINS=https://example.org,http://localhost:5173
+# Wildcard + credentials не используется: браузеры такой ответ всё равно отвергают.
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("ASTROVERSE_CORS_ORIGINS", "").split(",")
+    if origin.strip()
+]
+if CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["GET"],
+        allow_headers=["*"],
+    )
 
 
 EPHEMERIS_CACHE = {
@@ -36,10 +48,16 @@ EPHEMERIS_CACHE = {
     "data": {}
 }
 
+
+def utcnow():
+    """Single clock entry point, patched in tests to exercise cache expiry."""
+    return datetime.now(timezone.utc)
+
+
 def fetch_jpl_vector(cmd: str):
     """Запрашивает у NASA JPL вектор (X, Y, Z) в а.е. относительно центра Солнца (@10)"""
     base_url = "https://ssd-api.jpl.nasa.gov/horizons.api"
-    now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    now_str = utcnow().strftime("%Y-%m-%d")
 
     params = {
         "format": "json",
@@ -105,7 +123,7 @@ def objects(q: str | None = None, kind: str | None = None):
 @app.get("/api/live-ephemeris")
 def live_ephemeris():
     """Возвращает реальные текущие координаты планет в пространстве напрямую из NASA"""
-    now = datetime.now(timezone.utc)
+    now = utcnow()
 
     # Кэшируем на 1 час, чтобы не перегружать NASA и приложение летало
     if EPHEMERIS_CACHE["timestamp"] and (now - EPHEMERIS_CACHE["timestamp"]).total_seconds() < 3600:

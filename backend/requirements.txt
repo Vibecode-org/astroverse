@@ -1,2 +1,4 @@
 fastapi==0.115.12
 uvicorn[standard]==0.34.3
+# TestClient (starlette) требует httpx; используется в tests/test_api.py.
+httpx==0.28.1

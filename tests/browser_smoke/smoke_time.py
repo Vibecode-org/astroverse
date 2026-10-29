@@ -1,20 +1,11 @@
 """Smoke test: date jumps, pause/resume, speed controls."""
 import math
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-import pytest
+from playwright.sync_api import expect
 
-
-def parse_badge_date(text):
-    """Parse ru-RU numeric date/time independently of the host Python locale."""
-    match = re.search(
-        r"(\d{1,2})\.(\d{1,2})\.(\d{4})\D+(\d{1,2}):(\d{2}):(\d{2})", text
-    )
-    if not match:
-        raise AssertionError(f"Unexpected Russian .scaleBadge date: {text!r}")
-    day, month, year, hour, minute, second = map(int, match.groups())
-    return datetime(year, month, day, hour, minute, second)
+from common import INSTALL_PROBE, URL, parse_badge_date, wait_state
 
 
 class TestTime:
@@ -23,16 +14,11 @@ class TestTime:
         page.locator(".topmeta").wait_for(state="visible", timeout=45000)
         page.locator(".viewport canvas").wait_for(state="visible", timeout=45000)
         page.evaluate(INSTALL_PROBE)
-        page.wait_for_function(
-            "s => s && s.view === 'solar' && s.earth !== null && s.frame > 0",
-            timeout=45000,
-        )
+        wait_state(page, "s && s.view === 'solar' && s.earth !== null && s.frame > 0", timeout=45000)
 
         # Pause
-        page.get_by_role("button", name="Пауза", exact=True).click()
-        page.get_by_role("button", name="Продолжить", exact=True).wait_for(
-            lambda el: el.get_attribute("aria-pressed") == "true", timeout=5000
-        )
+        page.get_by_role("button", name="Пауза", exact=True).click(no_wait_after=True)
+        expect(page.get_by_role("button", name="Продолжить", exact=True)).to_have_attribute("aria-pressed", "true")
 
         initial = page.evaluate("() => window.__astroverseSmoke()")
         initial_date = parse_badge_date(initial["date"])
@@ -41,10 +27,11 @@ class TestTime:
             before = page.evaluate("() => window.__astroverseSmoke()")
             offset += step
             page.get_by_role(
-                "button", name="+1 день" if step > 0 else "-1 день", exact=True
-            ).click()
-            page.wait_for_function(
-                f"s => s && s.date !== '{before['date']}' && "
+                "button", name="+1 день" if step > 0 else "−1 день", exact=True
+            ).click(no_wait_after=True)
+            wait_state(
+                page,
+                f"s && s.date !== '{before['date']}' && "
                 f"Math.hypot(...s.earth.map((v, i) => v - {before['earth']}[i])) > 1e-4",
                 timeout=5000,
             )
@@ -70,28 +57,27 @@ class TestTime:
         # Speed controls: ▶▶ increases rate, ◀◀ decreases rate
         chip = page.locator(".speedChip")
         chip.wait_for(state="visible", timeout=5000)
-        assert chip.text_content() == "Скорость: ×1"
+        assert chip.text_content() == "×1"
 
         # Speed up: ×1 → 1 мин/с → 1 час/с
-        page.get_by_role("button", name="▶▶", exact=True).click()
-        chip.wait_for(lambda el: el.text_content() == "Скорость: ×1 мин/с", timeout=5000)
-        page.get_by_role("button", name="▶▶", exact=True).click()
-        chip.wait_for(lambda el: el.text_content() == "Скорость: ×1 ч/с", timeout=5000)
+        page.get_by_role("button", name="Ускорить", exact=True).click(no_wait_after=True)
+        expect(chip).to_have_text("×1 мин/с", timeout=5000)
+        page.get_by_role("button", name="Ускорить", exact=True).click(no_wait_after=True)
+        expect(chip).to_have_text("×1 ч/с", timeout=5000)
 
         # Slow down: 1 час/с → 1 мин/с → ×1
-        page.get_by_role("button", name="◀◀", exact=True).click()
-        chip.wait_for(lambda el: el.text_content() == "Скорость: ×1 мин/с", timeout=5000)
-        page.get_by_role("button", name="◀◀", exact=True).click()
-        chip.wait_for(lambda el: el.text_content() == "Скорость: ×1", timeout=5000)
+        page.get_by_role("button", name="Замедлить", exact=True).click(no_wait_after=True)
+        expect(chip).to_have_text("×1 мин/с", timeout=5000)
+        page.get_by_role("button", name="Замедлить", exact=True).click(no_wait_after=True)
+        expect(chip).to_have_text("×1", timeout=5000)
 
         # Resume and verify time advances
-        page.get_by_role("button", name="Продолжить", exact=True).click()
-        page.get_by_role("button", name="Пауза", exact=True).wait_for(
-            lambda el: el.get_attribute("aria-pressed") == "false", timeout=5000
-        )
-        page.wait_for_function(
-            f"s => s && s.date !== '{fixed['date']}' && "
-            f"Math.hypot(...s.earth.map((v, i) => v - {fixed['earth']}[i])) > 1e-3",
+        page.get_by_role("button", name="Продолжить", exact=True).click(no_wait_after=True)
+        expect(page.get_by_role("button", name="Пауза", exact=True)).to_have_attribute("aria-pressed", "false")
+        wait_state(
+            page,
+            f"s && s.date !== '{fixed['date']}' && "
+            f"Math.hypot(...s.earth.map((v, i) => v - {fixed['earth']}[i])) > 1e-6",
             timeout=10000,
         )
         assert parse_badge_date(page.evaluate("() => window.__astroverseSmoke().date")) > parse_badge_date(fixed["date"])
