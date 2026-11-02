@@ -2,9 +2,12 @@
 import math
 import re
 
+import pytest
 from playwright.sync_api import expect
 
 from common import INSTALL_PROBE, URL, wait_state
+
+pytestmark = pytest.mark.stack3471
 
 
 class TestPicking:

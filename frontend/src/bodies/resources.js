@@ -10,6 +10,10 @@ const shared = new Set();
 const geometries = new Map();
 const materials = new Map();
 const textures = new Map();
+// Textures that outlive a single scene (module-level caches). They must never
+// be disposed by `disposeSceneResources`, or the next scene rebuild would use a
+// texture whose GPU copy was already released.
+const sharedTextures = new Set();
 
 /** Reuse the geometry stored under `key`, or build, remember and store it. */
 export function sharedGeometry(key, build) {
@@ -35,26 +39,50 @@ export function sharedMaterial(key, build) {
 
 /** Reuse the texture stored under `key`, or build and store it.
  *
- * Textures are not tracked in `shared`: disposing a material never disposes its
- * maps, and a shared material is never disposed, so cached maps live as long as
- * the module that produced them.
+ * Shared textures are tracked separately: disposing a material never disposes
+ * its maps, and a shared material is never disposed, so cached maps live as
+ * long as the module that produced them.
  */
 export function sharedTexture(key, build) {
   let texture = textures.get(key);
   if (!texture) {
     texture = build();
     textures.set(key, texture);
+    sharedTextures.add(texture);
   }
   return texture;
 }
 
-/** Dispose the per-object resources under `root`, leaving shared ones intact. */
+/** Mark a texture as shared so scene teardown leaves it alone. */
+export function registerSharedTexture(texture) {
+  sharedTextures.add(texture);
+  return texture;
+}
+
+const TEXTURE_SLOTS = [
+  'map', 'alphaMap', 'emissiveMap', 'normalMap', 'roughnessMap', 'metalnessMap',
+  'aoMap', 'envMap', 'bumpMap', 'displacementMap', 'specularMap', 'lightMap',
+];
+
+/** Dispose the per-object resources under `root`, leaving shared ones intact.
+ *
+ * Textures created for a single scene (labels, the Milky Way glow) are disposed
+ * too; before this they leaked on every scene rebuild because only geometries
+ * and materials were released.
+ */
 export function disposeSceneResources(root) {
+  const ownedTextures = new Set();
   root.traverse((object) => {
     if (object.geometry && !shared.has(object.geometry)) object.geometry.dispose();
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     for (const material of materials) {
-      if (material && !shared.has(material)) material.dispose();
+      if (!material) continue;
+      for (const slot of TEXTURE_SLOTS) {
+        const texture = material[slot];
+        if (texture && !sharedTextures.has(texture)) ownedTextures.add(texture);
+      }
+      if (!shared.has(material)) material.dispose();
     }
   });
+  for (const texture of ownedTextures) texture.dispose();
 }

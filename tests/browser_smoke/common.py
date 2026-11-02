@@ -1,8 +1,101 @@
 """Общие константы и helpers для браузерных smoke-тестов."""
+import json
 import re
+import urllib.request
 from datetime import datetime
 
 URL = "http://localhost:5173"
+
+# Object counts the two supported stacks serve. `stack3471` / `stack100k`
+# markers in conftest.py skip modules that do not match the running stack, so
+# one command works against either one.
+DEFAULT_OBJECTS = 3471
+STRESS_OBJECTS = 100_000
+
+# Button labels live here once: a UI rename touches one dict, not every module.
+VIEW_LABELS = {
+    "solar": "Солнечная система",
+    "local": "Окрестности Солнца",
+    "galaxy": "Млечный Путь",
+}
+
+
+def served_object_count(timeout=5):
+    """Object count the running stack reports, or 0 when it is unreachable."""
+    try:
+        with urllib.request.urlopen(f"{URL}/api/health", timeout=timeout) as response:
+            return int(json.load(response)["objects"])
+    except (OSError, ValueError, KeyError):
+        return 0
+
+
+def switch_view(page, view, timeout=10000):
+    """Click a view button and wait until the scene reports that view."""
+    page.locator(".viewControls").get_by_role(
+        "button", name=VIEW_LABELS[view]
+    ).click(no_wait_after=True)
+    wait_state(page, f"s && s.view === '{view}'", timeout=timeout)
+
+
+def wait_lod_settled(page, stable_frames=5, timeout=10000):
+    """Wait until the LOD layer stops creating/disposing representations.
+
+    L2 meshes are built lazily under a per-frame budget and crossfaded over
+    several frames, so sampling after a fixed sleep is a race: on a slow
+    (SwiftShader) run the first sample catches the scene mid-build and the next
+    visit legitimately adds more meshes.
+    """
+    page.wait_for_function(
+        """(stableFrames) => {
+            const s = window.__astroverseSmoke();
+            if (!s || !s.lodCounts) return false;
+            const key = s.view + ':' + s.lodCounts.join(',');
+            if (window.__lodSettledKey !== key) {
+                window.__lodSettledKey = key;
+                window.__lodSettledFrames = 0;
+                return false;
+            }
+            window.__lodSettledFrames += 1;
+            return window.__lodSettledFrames >= stableFrames;
+        }""",
+        arg=stable_frames,
+        timeout=timeout,
+    )
+
+
+def wait_row(page, name, stable_polls=5, timeout=15000):
+    """Wait for exactly one list row showing `name` and return its locator.
+
+    The list is virtualized and re-renders when debounced server search results
+    arrive, so a row can appear and be replaced while Playwright is checking it.
+    Requiring the row to stay mounted for a few polls removes that race.
+    """
+    page.wait_for_function(
+        """(args) => {
+            const [name, stablePolls] = args;
+            const rows = [...document.querySelectorAll('.objectRow')];
+            const match = rows.filter(
+                row => row.querySelector('.objectName')?.textContent.trim() === name
+            );
+            if (match.length !== 1) {
+                window.__rowStable = 0;
+                return false;
+            }
+            const box = match[0].getBoundingClientRect();
+            if (!box.width || !box.height) {
+                window.__rowStable = 0;
+                return false;
+            }
+            window.__rowStable = (window.__rowStable || 0) + 1;
+            return window.__rowStable >= stablePolls;
+        }""",
+        arg=[name, stable_polls],
+        timeout=timeout,
+    )
+    return page.locator(".objectRow").filter(
+        has=page.locator(".objectName", has_text=re.compile(f"^{re.escape(name)}$"))
+    ).first
+
 
 INSTALL_PROBE = r"""() => {
     window.__astroverseSmoke = (projectId = null) => {
@@ -43,6 +136,29 @@ INSTALL_PROBE = r"""() => {
         const vector = v => v ? [v.x, v.y, v.z] : null;
         const earth = state.meshes.get('earth');
         const earthWorld = earth?.getWorldPosition(earth.position.clone());
+        // Resource counters for the leak test. Scene traversal counts unique
+        // geometries/materials/textures actually reachable from the scene;
+        // renderer.info.memory is the GPU-side view and is reported alongside.
+        const textureSlots = [
+            'map', 'alphaMap', 'emissiveMap', 'normalMap', 'roughnessMap',
+            'metalnessMap', 'aoMap', 'envMap', 'bumpMap', 'displacementMap',
+            'specularMap', 'lightMap',
+        ];
+        const seenGeometry = new Set();
+        const seenMaterial = new Set();
+        const seenTexture = new Set();
+        state.scene.traverse((object) => {
+            if (object.geometry) seenGeometry.add(object.geometry);
+            const materials = Array.isArray(object.material)
+                ? object.material : [object.material];
+            for (const material of materials) {
+                if (!material) continue;
+                seenMaterial.add(material);
+                for (const slot of textureSlots) {
+                    if (material[slot]) seenTexture.add(material[slot]);
+                }
+            }
+        });
         const result = {
             view: state.view,
             visible: {
@@ -64,6 +180,13 @@ INSTALL_PROBE = r"""() => {
             date: document.querySelector('.scaleBadge')?.textContent.trim(),
             metrics: state.metrics ?? null,
             lodCounts: state.lodCounts ?? null,
+            resources: {
+                geometries: seenGeometry.size,
+                materials: seenMaterial.size,
+                textures: seenTexture.size,
+                rendererGeometries: state.renderer.info.memory.geometries,
+                rendererTextures: state.renderer.info.memory.textures,
+            },
         };
         if (projectId !== null) {
             const mesh = state.meshes.get(projectId);

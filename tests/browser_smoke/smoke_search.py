@@ -1,5 +1,9 @@
 """Smoke test: search and filter functionality."""
+import pytest
+
 from common import URL
+
+pytestmark = pytest.mark.stack3471
 
 
 class TestSearch:

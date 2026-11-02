@@ -1,9 +1,12 @@
 """Smoke test: view switching moves camera and renders while paused."""
 import math
 
+import pytest
 from playwright.sync_api import expect
 
-from common import INSTALL_PROBE, URL, wait_state
+from common import INSTALL_PROBE, URL, switch_view, wait_state
+
+pytestmark = pytest.mark.stack3471
 
 
 class TestViews:
@@ -25,16 +28,16 @@ class TestViews:
 
         date = page.evaluate("() => window.__astroverseSmoke().date")
 
-        for view, label, camera in (
-            ("local", "Окрестности Солнца", [0, 35, 70]),
-            ("galaxy", "Млечный Путь", [0, 220, 350]),
-            ("solar", "Солнечная система", [0, 65, 120]),
+        for view, camera in (
+            ("local", [0, 35, 70]),
+            ("galaxy", [0, 220, 350]),
+            ("solar", [0, 65, 120]),
         ):
             before = page.evaluate("() => window.__astroverseSmoke()")
-            page.locator(".viewControls").get_by_role("button", name=label).click(no_wait_after=True)
+            switch_view(page, view)
             wait_state(
                 page,
-                f"s && s.view === '{view}' && "
+                "s && "
                 f"s.visible.system === {str(view == 'solar').lower()} && "
                 f"s.visible.nearby === {str(view == 'local').lower()} && "
                 f"s.visible.galaxy === {str(view == 'galaxy').lower()} && "

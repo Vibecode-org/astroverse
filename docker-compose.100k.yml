@@ -1,0 +1,15 @@
+# Override for the 100k stress catalog.
+#
+# `data/objects_100k.json` is generated locally and excluded from the image to
+# keep the build context small, so it is bind-mounted read-only. Generate it
+# first: `python3 data/gen_catalog_100k.py`.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.100k.yml up --build -d
+services:
+  backend:
+    environment:
+      ASTROVERSE_CATALOG_MODE: existing
+      ASTROVERSE_CATALOG_PATH: /app/data/objects_100k.json
+    volumes:
+      - ./data/objects_100k.json:/app/data/objects_100k.json:ro

@@ -3,9 +3,32 @@ import os
 import pytest
 from playwright.sync_api import sync_playwright
 
+from common import DEFAULT_OBJECTS, STRESS_OBJECTS, served_object_count
+
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 TIMEOUT_MS = 10_000
 LOAD_TIMEOUT_MS = 45_000
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip modules that do not match the stack that is actually running.
+
+    Both stacks serve http://localhost:5173, so the catalog size is the only
+    reliable signal. Without this a forgotten `docker compose up` switch shows
+    up as a wall of unrelated timeouts instead of one clear skip reason.
+    """
+    served = served_object_count()
+    reasons = {
+        "stack3471": (DEFAULT_OBJECTS, f"needs the {DEFAULT_OBJECTS}-object stack"),
+        "stack100k": (STRESS_OBJECTS, f"needs the {STRESS_OBJECTS}-object stress stack"),
+    }
+    for item in items:
+        for marker, (expected, reason) in reasons.items():
+            if marker in item.keywords and served != expected:
+                item.add_marker(pytest.mark.skip(
+                    reason=f"{reason} (served catalog: {served or 'unreachable'})"
+                ))
+                break
 
 
 @pytest.fixture(scope="session")

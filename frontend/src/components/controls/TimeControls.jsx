@@ -18,24 +18,30 @@ const RATES = [
 ];
 
 function formatRate(rate) {
-  if (rate < 60) return rate < 10 ? `×${rate}` : '×' + Math.round(rate);
-  if (rate < HOUR_S) return `×${Math.round(rate / 60)} мин/с`;
-  if (rate < DAY_S) return `×${Math.round(rate / HOUR_S)} ч/с`;
-  if (rate < WEEK_S) return `×${Math.round(rate / DAY_S)} д/с`;
-  if (rate < YEAR_S) return `×${Math.round(rate / WEEK_S)} нед/с`;
-  return '×' + Number((rate / YEAR_S).toPrecision(3)) + ' год/с';
+  const sign = rate < 0 ? '−' : '';
+  const value = Math.abs(rate);
+  if (value < 60) return value < 10 ? `${sign}×${value}` : `${sign}×` + Math.round(value);
+  if (value < HOUR_S) return `${sign}×${Math.round(value / 60)} мин/с`;
+  if (value < DAY_S) return `${sign}×${Math.round(value / HOUR_S)} ч/с`;
+  if (value < WEEK_S) return `${sign}×${Math.round(value / DAY_S)} д/с`;
+  if (value < YEAR_S) return `${sign}×${Math.round(value / WEEK_S)} нед/с`;
+  return `${sign}×` + Number((value / YEAR_S).toPrecision(3)) + ' год/с';
 }
 
 export default function TimeControls ({ setSimDate, isPaused, setIsPaused, timeMultiplier, setTimeMultiplier }) {
   const shift = (deltaMs) => setSimDate(prev => new Date(prev.getTime() + deltaMs));
+  // Negative multipliers run the simulation backwards. Keep the magnitude for
+  // rate matching and only flip the sign, so «−1 день/с» is a real direction.
+  const magnitude = Math.abs(timeMultiplier) || 1;
+  const reverse = timeMultiplier < 0;
   const nearest = RATES.reduce((best, r) =>
-    Math.abs(Math.log(r.value / timeMultiplier)) <
-    Math.abs(Math.log(best.value / timeMultiplier)) ? r : best, RATES[0]);
+    Math.abs(Math.log(r.value / magnitude)) <
+    Math.abs(Math.log(best.value / magnitude)) ? r : best, RATES[0]);
 
   const step = (dir) => {
     const i = RATES.indexOf(nearest);
     const next = RATES[Math.min(RATES.length - 1, Math.max(0, i + dir))];
-    setTimeMultiplier(next.value);
+    setTimeMultiplier(reverse ? -next.value : next.value);
   };
 
   return (
@@ -58,9 +64,12 @@ export default function TimeControls ({ setSimDate, isPaused, setIsPaused, timeM
           </button>
 
           <select
+            id="time-rate"
+            name="timeRate"
+            aria-label="Скорость симуляции"
             className="timeSelect"
             value={String(nearest.value)}
-            onChange={(e) => setTimeMultiplier(Number(e.target.value))}
+            onChange={(e) => setTimeMultiplier(reverse ? -Number(e.target.value) : Number(e.target.value))}
             title="Скорость симуляции"
           >
             {RATES.map(r => <option key={r.value} value={String(r.value)}>{r.label}</option>)}
@@ -73,6 +82,15 @@ export default function TimeControls ({ setSimDate, isPaused, setIsPaused, timeM
           <span className="speedChip" title={nearest.hint || 'Симулированных секунд за реальную секунду'}>
             {formatRate(timeMultiplier)}
           </span>
+          <button
+            type="button"
+            className={`timeBtn${reverse ? ' active' : ''}`}
+            aria-pressed={reverse}
+            title="Обратный ход времени"
+            onClick={() => setTimeMultiplier(-timeMultiplier)}
+          >
+            <span>⟲</span>
+          </button>
           <button
             type="button"
             className={`timeBtn${isPaused ? ' active' : ''}`}

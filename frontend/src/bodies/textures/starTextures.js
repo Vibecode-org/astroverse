@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { sharedMaterial, sharedTexture } from '../resources.js';
+import { registerSharedTexture, sharedMaterial, sharedTexture } from '../resources.js';
 import { rgba } from '../utils/colorUtils.js';
 
 const starPointTexture = (() => {
@@ -16,6 +16,8 @@ const starPointTexture = (() => {
   ctx.fillRect(0, 0, 64, 64);
   return new THREE.CanvasTexture(canvas);
 })();
+// Shared by every star-field/belt material; scene teardown must not dispose it.
+registerSharedTexture(starPointTexture);
 
 function buildCoronaTexture(colorHex) {
   const canvas = document.createElement('canvas');

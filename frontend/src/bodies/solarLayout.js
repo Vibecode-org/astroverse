@@ -31,19 +31,15 @@ const SUN_RADIUS_KM = 696340;
 // настоящие пропорции: тогда Юпитер — это 11 R⊕ на расстоянии 122 000 R⊕,
 // и планеты действительно точки. По умолчанию включён `compact`, чтобы
 // стартовый экран не был пустым; `real` доступен кнопкой в интерфейсе.
+//
+// Режим передаётся параметром, а не хранится в модуле: глобальный
+// `activeScale` был изменяемым синглтоном (K-6) и делал результат функций
+// зависимым от порядка вызовов.
 const SCALE_MODES = { REAL: 'real', COMPACT: 'compact' };
-let activeScale = SCALE_MODES.REAL;
+const DEFAULT_SCALE = SCALE_MODES.COMPACT;
 
-export function setSolarScale(mode) {
-  activeScale = mode === SCALE_MODES.COMPACT ? SCALE_MODES.COMPACT : SCALE_MODES.REAL;
-}
-
-export function getSolarScale() {
-  return activeScale;
-}
-
-export function solarScaleModes() {
-  return SCALE_MODES;
+function normalizeScale(mode) {
+  return mode === SCALE_MODES.REAL ? SCALE_MODES.REAL : SCALE_MODES.COMPACT;
 }
 
 const COMPACT_DISTANCE_BASE = 30;
@@ -64,8 +60,8 @@ const TAU = Math.PI * 2;
  * настоящие. Для астероидов и комет физический радиус бесполезен (видимый
  * размер задаёт правдоподобность картинки), оставляем авторский `radius`.
  */
-export function getBodyRadius(obj) {
-  const compact = activeScale === SCALE_MODES.COMPACT;
+export function getBodyRadius(obj, scale = DEFAULT_SCALE) {
+  const compact = normalizeScale(scale) === SCALE_MODES.COMPACT;
   if (obj.id === 'sun') {
     return compact ? COMPACT_SUN_RADIUS : SUN_RADIUS_KM / EARTH_RADIUS_KM;
   }
@@ -77,15 +73,16 @@ export function getBodyRadius(obj) {
 }
 
 /** Расстояние от Солнца. В режиме `real` — линейно по а.е., как в реальности. */
-export function getSolarDistance(obj) {
+export function getSolarDistance(obj, scale = DEFAULT_SCALE) {
+  const real = normalizeScale(scale) === SCALE_MODES.REAL;
   if (obj.id === 'sun') return 0;
   const au = obj.au;
   if (typeof au === 'number' && Number.isFinite(au) && au > 0) {
-    return activeScale === SCALE_MODES.REAL
+    return real
       ? au * AU_IN_EARTH_RADII
       : COMPACT_DISTANCE_BASE * Math.pow(au, COMPACT_DISTANCE_EXPONENT);
   }
-  return obj.distance || (activeScale === SCALE_MODES.REAL ? AU_IN_EARTH_RADII : COMPACT_DISTANCE_BASE);
+  return obj.distance || (real ? AU_IN_EARTH_RADII : COMPACT_DISTANCE_BASE);
 }
 
 /**
@@ -95,7 +92,7 @@ export function getSolarDistance(obj) {
  * @returns {Map<string, {distance:number, radius:number, moonOrbit:number,
  *   moonInclination:number, moonPhase:number}>} по id
  */
-export function buildSolarLayout(objects) {
+export function buildSolarLayout(objects, scale = DEFAULT_SCALE) {
   const layout = new Map();
   // Соседи для расчёта места нужны ТОЛЬКО среди планет и карликовых.
   // Астероиды и кометы при этом лежат где угодно: если включить их, то
@@ -103,14 +100,14 @@ export function buildSolarLayout(objects) {
   // и все его луны сядут на одну орбиту.
   const bodies = objects.filter(
     (o) => o.scale === 'solar' && (o.kind === 'planet' || o.kind === 'dwarf_planet')
-      && o.parent === 'sun' && getSolarDistance(o) > 0,
+      && o.parent === 'sun' && getSolarDistance(o, scale) > 0,
   );
 
   for (const obj of objects) {
     if (obj.scale !== 'solar') continue;
     layout.set(obj.id, {
-      distance: getSolarDistance(obj),
-      radius: getBodyRadius(obj),
+      distance: getSolarDistance(obj, scale),
+      radius: getBodyRadius(obj, scale),
       moonOrbit: 0,
       moonInclination: 0,
       moonPhase: 0,
@@ -148,7 +145,7 @@ export function buildSolarLayout(objects) {
     const sorted = moons.slice().sort(
       (a, b) => (a.moon_distance || 0) - (b.moon_distance || 0),
     );
-    const moonRadius = Math.max(...sorted.map((m) => getBodyRadius(m)));
+    const moonRadius = Math.max(...sorted.map((m) => getBodyRadius(m, scale)));
     const inner = parent.radius * 1.15 + moonRadius;
     // Никогда не выходим за 42% места до поверхности соседа — это и есть
     // защита от «Луна проходит сквозь Венеру».
@@ -160,7 +157,7 @@ export function buildSolarLayout(objects) {
     // поле moon_distance в снимке сжатое (у Луны 2.5 вместо 384 400 км) и для
     // настоящих пропорций не годится. Верхняя граница всё равно действует как
     // страховка на случай нереальных данных.
-    const real = activeScale === SCALE_MODES.REAL;
+    const real = normalizeScale(scale) === SCALE_MODES.REAL;
 
     sorted.forEach((moon, index) => {
       const entry = layout.get(moon.id);
@@ -193,9 +190,9 @@ export function buildSolarLayout(objects) {
  * их из разброса каталога: 400 астероидов лежат от 2.17 до 28.84 а.е. — это
  * вся внутренняя система, и отступ от края уводил бы нижнюю границу в минус.
  */
-export function buildBeltRanges() {
+export function buildBeltRanges(scale = DEFAULT_SCALE) {
   return {
-    belt: [getSolarDistance({ au: 2.1 }), getSolarDistance({ au: 3.3 })],
-    kuiper: [getSolarDistance({ au: 36 }), getSolarDistance({ au: 50 })],
+    belt: [getSolarDistance({ au: 2.1 }, scale), getSolarDistance({ au: 3.3 }, scale)],
+    kuiper: [getSolarDistance({ au: 36 }, scale), getSolarDistance({ au: 50 }, scale)],
   };
 }

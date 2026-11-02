@@ -11,7 +11,7 @@ import {
  * needs: which objects orbit, which moons follow which parent, and which
  * labels to project each frame.
  */
-export function buildSolarSystem(scaledObjects, system, scene) {
+export function buildSolarSystem(scaledObjects, system, scene, scale = 'compact') {
   const meshes = new Map();
   const orbitLines = [];
   const labels = [];
@@ -19,13 +19,13 @@ export function buildSolarSystem(scaledObjects, system, scene) {
 
   // Раскладка считается один раз для всей системы: расстояния, реальные
   // размеры и ограниченные зазорами орбиты спутников.
-  const solarLayout = buildSolarLayout(scaledObjects);
+  const solarLayout = buildSolarLayout(scaledObjects, scale);
 
   // Пояса берут границы из реальных расстояний каталога: раньше радиусы
   // были захардкожены (24.5–33 и 168–238) и разошлись с астероидами после
   // смены шкалы — в сцене появились две расходящиеся полосы, которые и
   // читались как «ряд из комет».
-  const belts = buildBeltRanges();
+  const belts = buildBeltRanges(scale);
   const belt = makeAsteroidBelt(belts.belt);
   const kuiper = makeKuiperBelt(belts.kuiper);
   system.add(belt, kuiper);
@@ -91,11 +91,28 @@ export function buildSolarSystem(scaledObjects, system, scene) {
   return { meshes, orbitLines, labels, moons, planets, solar, belt, kuiper };
 }
 
+/** Scaled rows are derived from the catalog and depend only on (catalog, mode).
+ *  Rebuilding the scene for the same pair (React StrictMode remount in dev,
+ *  error recovery, a redundant scale change) would otherwise allocate one clone
+ *  per object again — 100k objects on the stress catalog. The cache holds one
+ *  derived array per catalog, i.e. roughly the catalog's own size in memory;
+ *  it is released together with the catalog array (WeakMap).
+ */
+const scaledCache = new WeakMap();
+
 /** Attach `displayRadius` and a resolved `scale` to every catalog object. */
-export function scaleCatalog(objects) {
-  return objects.map((obj) => ({
-    ...obj,
-    scale: objectScale(obj),
-    displayRadius: getBodyRadius(obj),
-  }));
+export function scaleCatalog(objects, scale = 'compact') {
+  const cached = scaledCache.get(objects);
+  if (cached && cached.scale === scale) return cached.rows;
+  const rows = new Array(objects.length);
+  for (let i = 0; i < objects.length; i++) {
+    const obj = objects[i];
+    rows[i] = {
+      ...obj,
+      scale: objectScale(obj),
+      displayRadius: getBodyRadius(obj, scale),
+    };
+  }
+  scaledCache.set(objects, { scale, rows });
+  return rows;
 }

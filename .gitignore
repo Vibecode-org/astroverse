@@ -11,8 +11,13 @@
 
 # Generated catalog: built automatically inside the container
 data/objects.json
+# Local binary catalog and the 100k stress catalog: large, regenerable.
+data/objects.bin
+data/objects.v2.bin
+data/objects_100k.json
 
 # Python and OS artifacts
 **/__pycache__/
 *.py[cod]
+.pytest_cache/
 .DS_Store

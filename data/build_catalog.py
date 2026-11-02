@@ -11,7 +11,10 @@ import logging
 from pathlib import Path
 
 try:
-    from .catalog import catalog_path, load_catalog, validate_catalog, write_catalog
+    from .catalog import (
+        catalog_path, load_catalog, validate_catalog, write_catalog,
+        write_binary_catalog, write_binary_catalog_v2,
+    )
     from .enrichment import enrich_wikipedia
     from .normalizers import positive_limit, identity_index, SourceError
     from .sources import JsonClient, fetch_exoplanets, fetch_small_bodies
@@ -20,7 +23,10 @@ except ImportError:
     import sys
     from pathlib import Path
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from catalog import catalog_path, load_catalog, validate_catalog, write_catalog
+    from catalog import (
+        catalog_path, load_catalog, validate_catalog, write_catalog,
+        write_binary_catalog, write_binary_catalog_v2,
+    )
     from enrichment import enrich_wikipedia
     from normalizers import positive_limit, identity_index, SourceError
     from sources import JsonClient, fetch_exoplanets, fetch_small_bodies
@@ -90,6 +96,11 @@ def build_enriched_catalog(
 
     validate_catalog(items)
     write_catalog(output, items)
+    try:
+        write_binary_catalog(output.with_suffix(".bin"), items)
+        write_binary_catalog_v2(output.with_suffix(".v2.bin"), items)
+    except Exception as exc:  # pragma: no cover - binary is additive
+        LOG.warning("Binary catalog write failed: %s", exc)
     LOG.info("Saved %s objects to %s (%s)", len(items), output, "offline snapshot" if offline else "NASA refreshed")
     return items
 

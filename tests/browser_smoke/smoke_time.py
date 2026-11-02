@@ -3,9 +3,12 @@ import math
 import time
 from datetime import timedelta
 
+import pytest
 from playwright.sync_api import expect
 
 from common import INSTALL_PROBE, URL, parse_badge_date, wait_state
+
+pytestmark = pytest.mark.stack3471
 
 
 class TestTime:
@@ -26,18 +29,20 @@ class TestTime:
         for step in (1, 1, 1, -1, -1, -1):
             before = page.evaluate("() => window.__astroverseSmoke()")
             offset += step
+            expected = initial_date + timedelta(days=offset)
             page.get_by_role(
                 "button", name="+1 день" if step > 0 else "−1 день", exact=True
             ).click(no_wait_after=True)
+            # Wait for the exact expected date *and* the matching orbit update.
+            # The date comes from React state, the position from the next
+            # animation frame, so asserting immediately after the date is a race.
             wait_state(
                 page,
-                f"s && s.date !== '{before['date']}' && "
+                "s && s.date === '" + expected.strftime("%d.%m.%Y, %H:%M:%S") + "' && "
                 f"Math.hypot(...s.earth.map((v, i) => v - {before['earth']}[i])) > 1e-4",
                 timeout=5000,
             )
-            assert parse_badge_date(page.evaluate("() => window.__astroverseSmoke().date")) == (
-                initial_date + timedelta(days=offset)
-            )
+            assert parse_badge_date(page.evaluate("() => window.__astroverseSmoke().date")) == expected
 
         # Verify position returns to initial after forward/back
         assert math.dist(

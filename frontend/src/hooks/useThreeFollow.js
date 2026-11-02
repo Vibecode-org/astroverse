@@ -9,7 +9,17 @@ export function useThreeFollow({ selected, follow, setView, setFollow, appRef, o
   // Select object -> focus camera on it, switch view if needed, enable follow
   useEffect(() => {
     const state = appRef.current;
-    if (!state.scene || !selected) return;
+    if (!state.scene) return;
+    if (!selected) {
+      // Clear the pinned L2 mesh so it can fade out and be disposed.
+      state.lod?.releaseL2();
+      return;
+    }
+    // Ensure the detailed L2 mesh exists before the camera flies to the
+    // object. For L0/L1 objects this builds the mesh lazily; for solar
+    // objects (outside LOD) ensureL2 is a no-op since they always have a
+    // detailed mesh.
+    if (state.lod) state.lod.ensureL2(selected);
     const mesh = state.meshes.get(selected.id);
     if (!mesh) return;
     const nextView = objectScale(selected);

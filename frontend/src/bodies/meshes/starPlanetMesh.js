@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { getTexture, makeRingTexture } from '../textures/bodyTextures.js';
 import { makeStarCorona } from '../textures/starTextures.js';
 import { sharedGeometry, sharedMaterial } from '../resources.js';
+import { hashUnit } from '../utils/hash.js';
 
 const SHELL_SEGMENTS = 40;
 const SHELL_RINGS = 28;
@@ -9,6 +10,10 @@ const ATMOSPHERE_SEGMENTS = 36;
 const ATMOSPHERE_RINGS = 24;
 const RING_SEGMENTS = 96;
 const GAS_GIANTS = ['jupiter', 'saturn', 'uranus', 'neptune'];
+// One texture per exoplanet (up to 90k in the stress catalog) is hundreds of
+// megabytes of VRAM. Eight deterministic variants keep the variety while
+// bounding the texture/material caches.
+const EXOPLANET_TEXTURE_VARIANTS = 8;
 
 /** The catalog reuses a few dozen distinct radii, so shells are cached by radius
  * instead of allocating ~140 KB of vertices for every one of 3.2k bodies. */
@@ -61,9 +66,18 @@ export function applyLimbDarkening(material) {
   material.customProgramCacheKey = () => 'astroverse-star-limb';
 }
 
-function shellMaterial(isStar, texName, smooth) {
-  const map = getTexture(texName);
-  return sharedMaterial(`shell:${isStar}:${texName}:${smooth}`, () => {
+function shellMaterial(isStar, texName, smooth, obj) {
+  // Экзопланеты получают уникальную, но детерминированную текстуру (K-5).
+  // Вариантов всего 8: одна текстура на каждый id не помещается в память
+  // каталога на 100 000 объектов.
+  const seed = obj && obj.kind === 'exoplanet'
+    ? Math.floor(hashUnit(`${obj.id}:texture`) * EXOPLANET_TEXTURE_VARIANTS)
+    : undefined;
+  const map = getTexture(texName, seed);
+  const key = seed !== undefined
+    ? `shell:${isStar}:${texName}:${smooth}:${seed}`
+    : `shell:${isStar}:${texName}:${smooth}`;
+  return sharedMaterial(key, () => {
     const material = isStar
       ? new THREE.MeshBasicMaterial({ color: 0xffffff, map })
       : new THREE.MeshStandardMaterial({
@@ -130,7 +144,7 @@ export function createStarPlanetMesh(obj) {
     }
   }
 
-  const mesh = new THREE.Mesh(shellGeometry(radius), shellMaterial(isStar, texName, GAS_GIANTS.includes(obj.id)));
+  const mesh = new THREE.Mesh(shellGeometry(radius), shellMaterial(isStar, texName, GAS_GIANTS.includes(obj.id), obj));
   mesh.userData = obj;
   if (tilt) mesh.rotation.z = (tilt * Math.PI) / 180;
 

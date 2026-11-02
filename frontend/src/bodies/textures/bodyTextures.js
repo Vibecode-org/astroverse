@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { rgba } from '../utils/colorUtils.js';
+import { registerSharedTexture } from '../resources.js';
 
 const CDN_MAP = {
   sun: 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/sunmap.jpg',
@@ -23,12 +24,27 @@ const loader = new THREE.TextureLoader();
 loader.setCrossOrigin('anonymous');
 const cache = new Map();
 
-function canvasTexture(size, paint) {
+/** Deterministic PRNG (LCG) — замена Math.random для K-5.
+ *  Seed — строка или число; одинаковый seed даёт одинаковую последовательность. */
+function makeRng(seed) {
+  let state = 0;
+  const s = String(seed);
+  for (let i = 0; i < s.length; i++) {
+    state = (state * 31 + s.charCodeAt(i)) >>> 0;
+  }
+  if (state === 0) state = 1;
+  return function rng() {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 4294967296.0;
+  };
+}
+
+function canvasTexture(size, paint, rng) {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
-  paint(ctx, size);
+  paint(ctx, size, rng || makeRng('canvas-fallback'));
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.RepeatWrapping;
@@ -58,7 +74,8 @@ function wrappedRadial(ctx, s, x, y, r, stops) {
  * пятна, — а потемнение к краю считается отдельно, в пространстве вида
  * (см. applyLimbDarkening в bodies/meshes/starPlanetMesh.js).
  */
-function makePhotosphere(ctx, s, baseCol, grainCol, spotCol) {
+function makePhotosphere(ctx, s, baseCol, grainCol, spotCol, rng) {
+  rng = rng || makeRng('canvas-fallback');
   ctx.fillStyle = baseCol;
   ctx.fillRect(0, 0, s, s);
 
@@ -66,7 +83,7 @@ function makePhotosphere(ctx, s, baseCol, grainCol, spotCol) {
   const img = ctx.getImageData(0, 0, s, s);
   const d = img.data;
   for (let i = 0; i < s * s; i++) {
-    const grain = (Math.random() - 0.5) * 24;
+    const grain = (rng() - 0.5) * 24;
     const p = i * 4;
     d[p] = Math.max(0, Math.min(255, d[p] + grain));
     d[p + 1] = Math.max(0, Math.min(255, d[p + 1] + grain * 0.85));
@@ -76,9 +93,9 @@ function makePhotosphere(ctx, s, baseCol, grainCol, spotCol) {
 
   // Светлые гранулы — мягкие пятна, без резких краёв.
   for (let i = 0; i < 110; i++) {
-    const x = Math.random() * s;
-    const y = Math.random() * s;
-    const r = 3 + Math.random() * 9;
+    const x = rng() * s;
+    const y = rng() * s;
+    const r = 3 + rng() * 9;
     wrappedRadial(ctx, s, x, y, r, [
       [0, rgba(grainCol, 0.30)],
       [1, rgba(grainCol, 0)],
@@ -88,9 +105,9 @@ function makePhotosphere(ctx, s, baseCol, grainCol, spotCol) {
   // Звёздные пятна — тоже мягкие и низкоконтрастные.
   if (spotCol) {
     for (let i = 0; i < 5; i++) {
-      const x = Math.random() * s;
-      const y = s * (0.2 + Math.random() * 0.6);
-      const r = 6 + Math.random() * 14;
+      const x = rng() * s;
+      const y = s * (0.2 + rng() * 0.6);
+      const r = 6 + rng() * 14;
       wrappedRadial(ctx, s, x, y, r, [
         [0, rgba(spotCol, 0.34)],
         [0.55, rgba(spotCol, 0.16)],
@@ -102,42 +119,45 @@ function makePhotosphere(ctx, s, baseCol, grainCol, spotCol) {
 
 const painters = {
   // O/B Голубые сверхгиганты (Ригель, Спика)
-  star_blue: (ctx, s) => makePhotosphere(ctx, s, '#bcd8ff', '#eaf4ff', '#1e46a0'),
+  star_blue: (ctx, s, rng) => makePhotosphere(ctx, s, '#bcd8ff', '#eaf4ff', '#1e46a0', rng),
   // A Белые звезды (Сириус, Вега)
-  star_white: (ctx, s) => makePhotosphere(ctx, s, '#ffffff', '#ffffff', null),
+  star_white: (ctx, s, rng) => makePhotosphere(ctx, s, '#ffffff', '#ffffff', null, rng),
   // F/G Желтые звезды (Солнце, Альфа Центавра)
-  star_yellow: (ctx, s) => makePhotosphere(ctx, s, '#ffe08a', '#fff3c4', '#96460a'),
+  star_yellow: (ctx, s, rng) => makePhotosphere(ctx, s, '#ffe08a', '#fff3c4', '#96460a', rng),
   // K Оранжевые гиганты (Арктур, Альдебаран)
-  star_orange: (ctx, s) => makePhotosphere(ctx, s, '#ffb45e', '#ffd8a0', '#782800'),
+  star_orange: (ctx, s, rng) => makePhotosphere(ctx, s, '#ffb45e', '#ffd8a0', '#782800', rng),
   // M Красные сверхгиганты (Бетельгейзе, Антарес)
-  star_red: (ctx, s) => makePhotosphere(ctx, s, '#ff7a4a', '#ffab7a', '#5a0f00'),
+  star_red: (ctx, s, rng) => makePhotosphere(ctx, s, '#ff7a4a', '#ffab7a', '#5a0f00', rng),
 
-  exoplanet_habitable: (ctx, s) => {
+  exoplanet_habitable: (ctx, s, rng) => {
+    rng = rng || makeRng('canvas-fallback');
     ctx.fillStyle = '#0e3870';
     ctx.fillRect(0, 0, s, s);
     ctx.fillStyle = '#2d7a3a';
     for (let i = 0; i < 24; i++) {
       ctx.beginPath();
-      ctx.arc(Math.random() * s, Math.random() * s, 10 + Math.random() * 40, 0, Math.PI * 2);
+      ctx.arc(rng() * s, rng() * s, 10 + rng() * 40, 0, Math.PI * 2);
       ctx.fill();
     }
   },
-  exoplanet_lava: (ctx, s) => {
+  exoplanet_lava: (ctx, s, rng) => {
+    rng = rng || makeRng('canvas-fallback');
     ctx.fillStyle = '#1c0c06';
     ctx.fillRect(0, 0, s, s);
     ctx.strokeStyle = '#ff4400';
     ctx.lineWidth = 2;
     for (let i = 0; i < 30; i++) {
       ctx.beginPath();
-      ctx.moveTo(Math.random() * s, Math.random() * s);
-      ctx.lineTo(Math.random() * s, Math.random() * s);
+      ctx.moveTo(rng() * s, rng() * s);
+      ctx.lineTo(rng() * s, rng() * s);
       ctx.stroke();
     }
   },
-  rocky: (ctx, s) => {
+  rocky: (ctx, s, rng) => {
+    rng = rng || makeRng('canvas-fallback');
     const img = ctx.createImageData(s, s);
     for (let i = 0; i < s * s; i++) {
-      const v = 95 + Math.floor(Math.random() * 55);
+      const v = 95 + Math.floor(rng() * 55);
       img.data[i * 4] = v;
       img.data[i * 4 + 1] = v;
       img.data[i * 4 + 2] = v + 4;
@@ -147,10 +167,11 @@ const painters = {
   },
   // Лёд комет и ледяных карликовых. Раньше painter'а не было, поэтому все 80
   // комет молча попадали в rocky и были неотличимы от астероидов.
-  ice: (ctx, s) => {
+  ice: (ctx, s, rng) => {
+    rng = rng || makeRng('canvas-fallback');
     const img = ctx.createImageData(s, s);
     for (let i = 0; i < s * s; i++) {
-      const grain = Math.random();
+      const grain = rng();
       // Тёмные включения пыли на светлой ледяной поверхности.
       const dust = grain < 0.22 ? 0.45 : 1;
       const v = Math.floor((170 + grain * 70) * dust);
@@ -163,8 +184,10 @@ const painters = {
   },
 };
 
-export function getTexture(name) {
-  if (cache.has(name)) return cache.get(name);
+export function getTexture(name, seed) {
+  const hasSeed = seed !== undefined && seed !== null;
+  const cacheKey = hasSeed ? `${name}:${seed}` : name;
+  if (cache.has(cacheKey)) return cache.get(cacheKey);
 
   const url = CDN_MAP[name];
   if (url) {
@@ -175,13 +198,15 @@ export function getTexture(name) {
       () => {}
     );
     tex.colorSpace = THREE.SRGBColorSpace;
-    cache.set(name, tex);
+    cache.set(cacheKey, registerSharedTexture(tex));
     return tex;
   }
 
   const painter = painters[name] || painters.rocky;
-  const fallback = canvasTexture(256, painter);
-  cache.set(name, fallback);
+  // Seed 0 is a valid variant; `seed || name` would silently collapse it.
+  const rng = makeRng(hasSeed ? seed : name);
+  const fallback = registerSharedTexture(canvasTexture(256, painter, rng));
+  cache.set(cacheKey, fallback);
   return fallback;
 }
 
@@ -192,6 +217,6 @@ export function makeRingTexture() {
     t.needsUpdate = true;
   });
   tex.colorSpace = THREE.SRGBColorSpace;
-  cache.set('saturn_ring', tex);
+  cache.set('saturn_ring', registerSharedTexture(tex));
   return tex;
 }

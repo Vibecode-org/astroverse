@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { starPointTexture } from '../textures/starTextures.js';
 import { hashUnit } from '../utils/hash.js';
+import { makeSeededRng } from '../utils/rng.js';
 
 /** Ортонормированный базис плоскости орбиты, детерминированный по id системы.
  *
@@ -64,11 +65,12 @@ export function makeAsteroidBelt(span = [45, 58]) {
   const [inner, outer] = span;
   const width = Math.max(outer - inner, inner * 0.15);
   const pos = new Float32Array(n * 3);
+  const rng = makeSeededRng('asteroid-belt');
   for (let i = 0; i < n; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = inner + Math.random() * width;
+    const a = rng() * Math.PI * 2;
+    const r = inner + rng() * width;
     pos[i * 3] = Math.cos(a) * r;
-    pos[i * 3 + 1] = (Math.random() - 0.5) * width * 0.06;
+    pos[i * 3 + 1] = (rng() - 0.5) * width * 0.06;
     pos[i * 3 + 2] = Math.sin(a) * r;
   }
   const geo = new THREE.BufferGeometry();
@@ -89,11 +91,12 @@ export function makeKuiperBelt(span = [280, 380]) {
   const [inner, outer] = span;
   const width = Math.max(outer - inner, inner * 0.2);
   const pos = new Float32Array(n * 3);
+  const rng = makeSeededRng('kuiper-belt');
   for (let i = 0; i < n; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = inner + Math.random() * width;
+    const a = rng() * Math.PI * 2;
+    const r = inner + rng() * width;
     pos[i * 3] = Math.cos(a) * r;
-    pos[i * 3 + 1] = (Math.random() - 0.5) * width * 0.05;
+    pos[i * 3 + 1] = (rng() - 0.5) * width * 0.05;
     pos[i * 3 + 2] = Math.sin(a) * r;
   }
   const geo = new THREE.BufferGeometry();

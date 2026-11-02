@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useObjectData } from '../../hooks/useObjectData.js';
 import { useTimeEngine } from '../../hooks/useTimeEngine.js';
 import { useThree } from '../../hooks/useThree.js';
@@ -43,39 +43,74 @@ function App() {
   // Debounce search query to avoid filtering on every keystroke
   const debouncedQuery = useDebounce(query, 300);
 
+  // Binary v2 rows carry names but not descriptions/facts, so a non-empty
+  // query is resolved by the compact `/api/search` endpoint. Results are just
+  // ids; the rows themselves stay in `objects` (with colors and scene fields).
+  const [serverSearch, setServerSearch] = useState({ query: '', ids: null });
+  useEffect(() => {
+    const q = debouncedQuery.trim();
+    if (!q) {
+      setServerSearch({ query: '', ids: null });
+      return undefined;
+    }
+    let cancelled = false;
+    const controller = new AbortController();
+    fetch(`/api/search?q=${encodeURIComponent(q)}`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : Promise.reject(
+        new Error(`search HTTP ${response.status}`),
+      )))
+      .then((rows) => {
+        if (cancelled) return;
+        setServerSearch({ query: q, ids: new Set(rows.map((row) => row.id)) });
+      })
+      .catch((err) => {
+        if (cancelled || err.name === 'AbortError') return;
+        // Keep the old client-side filter as a fallback for name/latin.
+        console.warn('Server search failed, falling back to client filter:', err);
+        setServerSearch({ query: q, ids: null });
+      });
+    return () => { cancelled = true; controller.abort(); };
+  }, [debouncedQuery]);
+
   // Список пересчитывается только при смене debounced-запроса или масштаба.
   // useTimeEngine ререндерит App 10 раз в секунду — без debounce фильтр
   // срабатывал на каждом рендере.
   const filtered = useMemo(() => {
     const q = debouncedQuery.trim().toLowerCase();
+    if (!q) return objects;
+    // Only use a result set that belongs to the current query: a stale set
+    // from the previous keystroke would briefly show the wrong rows.
+    if (serverSearch.query === debouncedQuery.trim() && serverSearch.ids) {
+      return objects.filter((o) => serverSearch.ids.has(o.id));
+    }
     return objects.filter((o) => {
-      if (!q) return true;
+      // Fallback: binary rows have name/latin; solar JSON also has description.
       // facts/missions валидируются как список строк, но клиент не должен
       // падать, даже если придёт старый или битый каталог.
       const blob = [o.name, o.latin, o.description, o.constellation, o.spectral_type,
         ...(Array.isArray(o.facts) ? o.facts : [])].join(' ').toLowerCase();
       return blob.includes(q);
     });
-  }, [objects, debouncedQuery]);
+  }, [objects, debouncedQuery, serverSearch]);
 
   const displayObjects = useMemo(
     () => filtered.filter((o) => objectScale(o) === view),
     [filtered, view],
   );
 
-  const changeView = (nextView) => {
+  const changeView = useCallback((nextView) => {
     if (nextView === view) return;
     setSelected(null);
     setFollow(false);
     setView(nextView);
-  };
+  }, [view, setSelected, setFollow, setView]);
 
-  const selectObject = (object) => {
+  const selectObject = useCallback((object) => {
     setView(objectScale(object));
     setSelected(object);
     setFollow(true);
     setPanelTab('overview');
-  };
+  }, [setView, setSelected, setFollow, setPanelTab]);
 
   return (
     <div className="app">
@@ -114,6 +149,8 @@ function App() {
         <div className="controlBlock">
           <label className="followToggle">
             <input
+              id="follow-toggle"
+              name="follow"
               type="checkbox"
               checked={follow}
               onChange={(e) => setFollow(e.target.checked)}

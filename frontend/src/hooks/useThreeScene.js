@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { makeStarField, setSolarScale } from '../bodies/index.js';
+import { makeStarField } from '../bodies/index.js';
 import { makeMilkyWay } from '../bodies/meshes/milkyWayMesh.js';
 import { disposeSceneResources } from '../bodies/resources.js';
 import { createStage } from '../scene/stage.js';
@@ -25,7 +25,6 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
     const el = mountRef.current;
     if (!el || !objects.length) return;
 
-    setSolarScale(solarScale);
     const limits = LIMITS[solarScale] || LIMITS.real;
 
     let stopAnimation = null;
@@ -53,9 +52,9 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
       const galaxyMarkers = new THREE.Group();
       scene.add(galaxyMarkers);
 
-      const scaledObjects = scaleCatalog(objects);
+      const scaledObjects = scaleCatalog(objects, solarScale);
 
-      const solarBuilt = buildSolarSystem(scaledObjects, system, scene);
+      const solarBuilt = buildSolarSystem(scaledObjects, system, scene, solarScale);
       const { meshes, orbitLines, labels, moons, planets, solar, belt, kuiper } = solarBuilt;
       const { localOrbits, blackHolesList } = buildDeepSky(scaledObjects, nearby, galaxyMarkers, meshes);
 
@@ -70,6 +69,7 @@ export function useThreeScene({ objects, solarScale, appRef, setErrorDetails, on
         camera,
         domElement: renderer.domElement,
         group: nearby,
+        galaxyGroup: galaxyMarkers,
       });
 
       detachPicking = attachPicking({

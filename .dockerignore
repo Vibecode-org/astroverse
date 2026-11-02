@@ -9,3 +9,7 @@
 README.md
 # Каталог генерируется при старте контейнера, в образ попадать не должен.
 data/objects.json
+# Бинарный и 100k-каталоги тоже генерируются локально: не раздуваем build context.
+data/objects.bin
+data/objects.v2.bin
+data/objects_100k.json

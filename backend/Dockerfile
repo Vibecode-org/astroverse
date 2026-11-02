@@ -12,6 +12,13 @@ COPY backend /app/backend
 COPY data /app/data
 COPY tests /app/tests
 
+# Run as an unprivileged user: a remote-code-execution bug in the API must not
+# hand over root inside the container. The catalog builder writes into /app/data,
+# so the whole tree is owned by the service user.
+RUN useradd --create-home --uid 10001 astroverse \
+    && chown -R astroverse:astroverse /app
+USER astroverse
+
 WORKDIR /app/backend
 EXPOSE 8000
 

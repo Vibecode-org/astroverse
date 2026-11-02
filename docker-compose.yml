@@ -6,6 +6,7 @@ services:
     restart: unless-stopped
     environment:
       ASTROVERSE_CATALOG_MODE: ${ASTROVERSE_CATALOG_MODE:-offline}
+      ASTROVERSE_CATALOG_PATH: ${ASTROVERSE_CATALOG_PATH:-}
       ASTROVERSE_CORS_ORIGINS: ${ASTROVERSE_CORS_ORIGINS:-}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.build_opener(urllib.request.ProxyHandler({})).open('http://127.0.0.1:8000/api/health')"]
@@ -21,13 +22,13 @@ services:
     ports:
       # По умолчанию доступно всем устройствам в локальной сети.
       # Только localhost: ASTROVERSE_BIND=127.0.0.1 docker compose up
-      - "${ASTROVERSE_BIND:-0.0.0.0}:${ASTROVERSE_PORT:-5173}:80"
+      - "${ASTROVERSE_BIND:-0.0.0.0}:${ASTROVERSE_PORT:-5173}:8080"
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1/"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8080/"]
       interval: 10s
       timeout: 5s
       retries: 5

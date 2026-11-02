@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { makeNebulaCloudSprite } from '../textures/nebulaTextures.js';
 import { sharedGeometry, sharedMaterial } from '../resources.js';
 import { safeColor } from '../utils/colorUtils.js';
+import { makeSeededRng } from '../utils/rng.js';
 
 const SHELL_SEGMENTS = 32;
 
@@ -27,11 +28,12 @@ export function createNebulaMesh(obj) {
   group.add(new THREE.Mesh(shellGeometry(radius), shellMaterial()));
 
   // Облака туманности
+  const rng = makeSeededRng(`${obj.id}:clouds`);
   for (let i = 0; i < 3; i++) {
     const cloud = makeNebulaCloudSprite(safeColor(obj.color, '#ff8cb0'), radius * (2.6 + i * 0.7));
     cloud.position.set(
-      (Math.random() - 0.5) * radius * 0.4,
-      (Math.random() - 0.5) * radius * 0.3,
+      (rng() - 0.5) * radius * 0.4,
+      (rng() - 0.5) * radius * 0.3,
       0
     );
     group.add(cloud);

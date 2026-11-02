@@ -9,6 +9,10 @@ import { placeOnOrbit } from '../bodies/index.js';
  */
 export function startAnimationLoop({ state, camera, controls, renderer, scene, solar, meshes, moons, localOrbits, blackHolesList, labels, lod }) {
   let raf;
+  // Orbital transforms depend only on `simTime`. While paused they are
+  // recomputed needlessly: on a 100k catalog that means ~90k Euler updates and
+  // matrix rebuilds per frame for an unchanged picture.
+  let lastDays = null;
 
   // Переиспользуемые векторы: пока они создавались внутри цикла, на кадр
   // приходилось до нескольких тысяч аллокаций (на каждый спрайт-метку и на
@@ -25,43 +29,69 @@ export function startAnimationLoop({ state, camera, controls, renderer, scene, s
     // same positions.
     const days = (state.simTime - Date.UTC(2000, 0, 1, 12)) / 86400000;
 
-    solar.forEach((obj) => {
-      const mesh = meshes.get(obj.id);
-      if (!mesh || obj.kind === 'moon') return;
-      const dist = mesh.userData.calculatedDistance;
-      const periodDays = obj.period_days || (obj.au ? 365.25 * Math.pow(obj.au, 1.5) : 365);
+    if (days !== lastDays) {
+      lastDays = days;
 
-      if (['planet', 'dwarf_planet', 'asteroid'].includes(obj.kind) && dist > 0) {
-        mesh.userData.currentAngle = mesh.userData.initialAngle + (days / periodDays) * Math.PI * 2;
-        mesh.position.x = Math.cos(mesh.userData.currentAngle) * dist;
-        mesh.position.z = Math.sin(mesh.userData.currentAngle) * dist * 0.995;
+      solar.forEach((obj) => {
+        const mesh = meshes.get(obj.id);
+        if (!mesh || obj.kind === 'moon') return;
+        const dist = mesh.userData.calculatedDistance;
+        const periodDays = obj.period_days || (obj.au ? 365.25 * Math.pow(obj.au, 1.5) : 365);
+
+        if (['planet', 'dwarf_planet', 'asteroid'].includes(obj.kind) && dist > 0) {
+          mesh.userData.currentAngle = mesh.userData.initialAngle + (days / periodDays) * Math.PI * 2;
+          mesh.position.x = Math.cos(mesh.userData.currentAngle) * dist;
+          mesh.position.z = Math.sin(mesh.userData.currentAngle) * dist * 0.995;
+        }
+        mesh.rotation.y = days * Math.PI * 2;
+      });
+
+      moons.forEach(({ pivot, mesh, obj, parentId }) => {
+        const parent = meshes.get(parentId);
+        if (parent) pivot.position.copy(parent.position);
+        const period = obj.period_days || 27.3;
+        pivot.rotation.y = pivot.userData.initialAngle + (days / period) * Math.PI * 2;
+        // Разные плоскости не дают лунам одной планеты слипнуться.
+        pivot.rotation.x = pivot.userData.inclination || 0;
+        mesh.rotation.y = days * 0.3;
+      });
+
+      // Экзопланеты: круговые орбиты вокруг хозяина. Орбитальные элементы
+      // в каталоге отсутствуют, поэтому положение выводится из периода, а
+      // радиус и наклон — визуальные (см. getLocalOrbitRadius).
+      // Орбитальный базис приходит плоским массивом из buildDeepSky: на 100k
+      // это ~39k итераций за кадр, и обращения к Vector3 заметно дороже.
+      for (let i = 0; i < localOrbits.length; i++) {
+        const orbit = localOrbits[i];
+        const host = orbit.parent || meshes.get(orbit.parentId);
+        if (!host) continue;
+        const angle = orbit.phase + (days / orbit.period) * Math.PI * 2;
+        const basis = orbit.basis;
+        if (basis) {
+          const cos = Math.cos(angle) * orbit.radius;
+          const sin = Math.sin(angle) * orbit.radius;
+          const center = host.position;
+          orbit.mesh.position.set(
+            center.x + basis[0] * cos + basis[3] * sin,
+            center.y + basis[1] * cos + basis[4] * sin,
+            center.z + basis[2] * cos + basis[5] * sin,
+          );
+        } else {
+          placeOnOrbit(orbit.mesh.position, host.position, orbit.frame,
+            orbit.radius, angle);
+        }
+        orbit.mesh.rotation.y = days * 0.4;
       }
-      mesh.rotation.y = days * 0.2;
-    });
 
-    moons.forEach(({ pivot, mesh, obj, parentId }) => {
-      const parent = meshes.get(parentId);
-      if (parent) pivot.position.copy(parent.position);
-      const period = obj.period_days || 27.3;
-      pivot.rotation.y = pivot.userData.initialAngle + (days / period) * Math.PI * 2;
-      // Разные плоскости не дают лунам одной планеты слипнуться.
-      pivot.rotation.x = pivot.userData.inclination || 0;
-      mesh.rotation.y = days * 0.3;
-    });
+      blackHolesList.forEach(({ disk, lensHalo }) => {
+        if (disk) disk.rotation.z = days * 0.45;
+        if (lensHalo) lensHalo.rotation.z = -days * 0.25;
+      });
+    }
 
-    // Экзопланеты: круговые орбиты вокруг хозяина. Орбитальные элементы
-    // в каталоге отсутствуют, поэтому положение выводится из периода, а
-    // радиус и наклон — визуальные (см. getLocalOrbitRadius).
-    localOrbits.forEach(({ mesh, parentId, frame, radius, phase, period }) => {
-      const parent = meshes.get(parentId);
-      if (!parent) return;
-      placeOnOrbit(mesh.position, parent.position, frame, radius, phase + (days / period) * Math.PI * 2);
-      mesh.rotation.y = days * 0.4;
-    });
-
-    blackHolesList.forEach(({ disk, lensHalo, photonRing }) => {
-      if (disk) disk.rotation.z = days * 0.45;
-      if (lensHalo) lensHalo.rotation.z = -days * 0.25;
+    // Фотонное кольцо разворачивается к камере каждый кадр, в том числе на
+    // паузе: иначе оно «отклеивается» при движении камеры.
+    blackHolesList.forEach(({ photonRing }) => {
       if (photonRing) photonRing.quaternion.copy(camera.quaternion);
     });
 

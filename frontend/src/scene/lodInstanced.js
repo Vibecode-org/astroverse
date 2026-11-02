@@ -8,11 +8,18 @@
 import * as THREE from 'three';
 import { applyLimbDarkening } from '../bodies/meshes/starPlanetMesh.js';
 
-const SPHERE_SEGMENTS = 16;
-const SPHERE_RINGS = 12;
+// L1 spheres are 2–12 px in radius by construction (L2 takes over at 12 px).
+// The old 16×12 sphere cost 384 triangles per instance, and an InstancedMesh
+// draws every instance even when its matrix is scaled to zero: at 100k objects
+// that alone was ~35M triangles. 8×6 (96) for stars keeps the limb-darkening
+// silhouette; 6×4 (48) for the rest is indistinguishable at this size.
+const STAR_SEGMENTS = 8;
+const STAR_RINGS = 6;
+const BODY_SEGMENTS = 6;
+const BODY_RINGS = 4;
 
-function makeSphere() {
-  const geometry = new THREE.SphereGeometry(1, SPHERE_SEGMENTS, SPHERE_RINGS);
+function makeSphere(segments, rings) {
+  const geometry = new THREE.SphereGeometry(1, segments, rings);
   // `vertexColors` needs a geometry color attribute. White keeps the result
   // equal to the per-instance color while still letting InstancedMesh multiply
   // it in the fragment shader.
@@ -47,7 +54,18 @@ export function createLODInstanced(objects) {
     byKind.get(obj.kind).push({ obj, index });
   });
 
-  const geometry = makeSphere();
+  const geometries = new Map();
+  const geometryFor = (kind) => {
+    const key = kind === 'star' ? 'star' : 'body';
+    let geometry = geometries.get(key);
+    if (!geometry) {
+      geometry = key === 'star'
+        ? makeSphere(STAR_SEGMENTS, STAR_RINGS)
+        : makeSphere(BODY_SEGMENTS, BODY_RINGS);
+      geometries.set(key, geometry);
+    }
+    return geometry;
+  };
   const zero = new THREE.Matrix4().makeScale(0, 0, 0);
   const matrix = new THREE.Matrix4();
   const color = new THREE.Color();
@@ -58,7 +76,7 @@ export function createLODInstanced(objects) {
 
   for (const [kind, entries] of byKind) {
     const material = makeMaterial(kind);
-    const mesh = new THREE.InstancedMesh(geometry, material, entries.length);
+    const mesh = new THREE.InstancedMesh(geometryFor(kind), material, entries.length);
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     // The shared unit sphere's bounds do not describe scaled instances.
     mesh.frustumCulled = false;
@@ -104,7 +122,7 @@ export function createLODInstanced(objects) {
     },
 
     dispose() {
-      geometry.dispose();
+      for (const geometry of geometries.values()) geometry.dispose();
       for (const { material } of meshes) material.dispose();
     },
   };
