@@ -4,7 +4,7 @@ import re
 import urllib.request
 from datetime import datetime
 
-URL = "http://localhost:5173"
+URL = "http://localhost:5173/?scene=legacy"
 
 # Object counts the two supported stacks serve. `stack3471` / `stack100k`
 # markers in conftest.py skip modules that do not match the running stack, so

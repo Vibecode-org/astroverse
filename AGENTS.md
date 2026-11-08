@@ -1,62 +1,69 @@
 # Astroverse
 
-Browser 3D planetarium (React + Three.js frontend, FastAPI backend), runs via Docker. Catalog built at container startup.
+React + Three.js / FastAPI, Docker. Catalog prepared at container startup.
+Start with this file and the relevant document; do not load every document by
+habit. Current sequence/status: `ROADMAP.md`; verification: `docs/TEST_COVERAGE.md`.
+Commands and browser/benchmark details: `tests/README.md`.
 
-## Commands
+## Non-negotiable physical contract
 
-- Start: `docker compose up --build -d`, open http://localhost:5173
-- Stop: `docker compose down`
-- Logs: `docker compose logs -f backend` / `frontend`
+- Real bodies occupy actual positions at the selected time (current time in
+  Now), within declared source/model accuracy. See `docs/COORDINATES.md`.
+- Separate physical and render coordinates; declare unit, frame/origin, epoch,
+  time scale, source, accuracy. Camera/floating origin/LOD preserve centers and
+  distances. No nonlinear compression, separation for visibility or ID phases.
+- Unknown positions/parameters remain null. Synthetic stress/background are
+  not measured bodies. Never infer epoch/frame/accuracy from a source label.
+- `coordinates/1` = catalog snapshots; `positions/1` = requested-time positions;
+  legacy v2 = render coordinates. Do not reinterpret one as another. Snapshots
+  never feed the physical scene; unsupported dates never fall back to snapshots
+  or a previous date. Validate positions numerically, not just screenshots.
+- Five opted-in DE440s centers: Sun 10, Earth 399, Moon 301, Mercury 199,
+  Venus 299. Barycenters differ from body centers. UTC 2000–2026; raw JD TDB
+  bounds in contract. Keep checksum-pinned `data/ephemeris/de440s.bsp` and
+  100 Horizons vectors. Regression tolerance is not absolute uncertainty.
 
-Backend tests (run inside container; `-w /app` is required because image WORKDIR is `/app/backend` but tests live in `/app/tests`):
+## Run and check
 
 ```bash
+docker compose up --build -d  # http://localhost:5173
 docker compose build backend
 docker compose run --rm --no-deps -w /app backend python -m unittest discover -s tests -t . -v
+# From frontend/: npm ci; npm run test:coverage; npm run build
+python3 tests/browser_physical_mcp.py --catalog 3471
 ```
 
-Browser smoke (pytest + Playwright; needs frontend+API running with 3471-object catalog):
+`-w /app` is required (image WORKDIR is /app/backend). One-off commands must
+not start with `uvicorn`, which triggers catalog preparation. Backend :8000
+is internal; frontend nginx proxies /api. Dev Vite proxies to 127.0.0.1:8000.
+After synthetic stress restore `docker compose up --build -d` without override;
+verify `/api/health` has 3471 objects. Both stacks share :5173.
+Remove only task-created reports, screenshots, generated stress data, temporary
+environments/caches; retain test sources, numeric fixtures, lockfiles, MCP, BSP.
 
-```bash
-python3 -m venv /tmp/astroverse-smoke-env
-/tmp/astroverse-smoke-env/bin/python -m pip install playwright pytest
-/tmp/astroverse-smoke-env/bin/python -m pytest tests/browser_smoke/ -v
-```
+## Ownership and pitfalls
 
-100k stress smoke (needs the 100k stack; the module is marked `stack100k` and is skipped automatically on the 3471 stack):
-
-```bash
-python3 data/gen_catalog_100k.py
-docker compose -f docker-compose.yml -f docker-compose.100k.yml up --build -d
-/tmp/astroverse-smoke-env/bin/python -m pytest tests/browser_smoke/ -m stack100k -v
-```
-
-Smoke tests use system Chrome at `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`; no `playwright install` needed. Headless uses SwiftShader; use `SMOKE_HEADED=1` for a visible window. Run one module/test with `.../pytest tests/browser_smoke/smoke_time.py::TestTime::test_... -v`.
-
-Both stacks serve port 5173, so modules are marked `stack3471` / `stack100k` and `conftest.py` skips the ones that do not match `/api/health` (reason names the served catalog size). There is no `SMOKE_STRESS` env var any more.
-
-Frontend dev: `cd frontend && npm run dev` (Vite, port 5173, proxies `/api` to 127.0.0.1:8000). Build: `npm run build`.
-
-## Architecture
-
-- `backend/app.py` — FastAPI app (`/api/health`, `/api/objects` JSON/v1/v2 with ETag, `/api/search`, `/api/objects/{id}`, `/api/live-ephemeris`)
-- `backend/entrypoint.py` — prepares catalog before uvicorn starts; mode from `ASTROVERSE_CATALOG_MODE` (`offline`/`online`/`existing`)
-- `data/` — catalog sources/builders (`sources.py`, `build_catalog.py`, `catalog.py`, `catalog_seed.json`); `data/objects.json` is generated (gitignored)
-- `frontend/src/` — React + Three.js
-- `tests/test_*.py` — unittest backend tests; `tests/browser_smoke/smoke_*.py` — pytest Playwright smoke (named `smoke_*` so unittest discover skips them)
-
-## Gotchas
-
-- `tests/test_api.py` sets `ASTROVERSE_CATALOG_PATH` to `data/catalog_seed.json` so it doesn't depend on generated `data/objects.json`.
-- Smoke tests require exactly 3471 objects in the catalog (the `stack3471` modules); `smoke_stress` needs 100000 and is skipped otherwise.
-- `pytest.ini` registers the two markers; a marker name not registered there fails collection with a warning-as-error setup.
-- Backend port 8000 is not published; frontend nginx proxies `/api` in Docker.
-- Smoke test probe uses React fiber internals (`window.__astroverseSmoke`); may need updates after React upgrades.
-- One-off container commands (tests, shells) must not be first arg `uvicorn` or entrypoint rebuilds catalog.
-- The 100k stack and normal stack cannot run simultaneously on port 5173: switch back with `docker compose up --build -d` (without the 100k override). Check `/api/health` — should be `3471` for normal smoke, `100000` for stress.
-- v2 binary endpoint: `GET /api/objects?format=v2` returns `application/octet-stream` with header `X-Catalog-Format: v2`. v1 JSON remains the default.
-- nginx gzips `application/octet-stream` (v1 and v2 binary): 13 MB on 100k → ~2.46 MB on the wire. Gzipped responses are chunked and have no `Content-Length`, so tests assert `Content-Encoding` plus the decoded body (`response.body()`) instead of the header.
-- `/api/objects` responses carry `ETag` + `Cache-Control: public, max-age=0, must-revalidate` + `Vary: Accept`. nginx rewrites the ETag of gzip responses to a weak `W/"…"` validator, so anything comparing validators must strip `W/` (see `etag_matches`). The ETag includes the percent-encoded `q`: header values are latin-1 and a Cyrillic query would otherwise raise.
-- `backend/app.py` keeps a lazy catalog index (`catalog_index()`): `id → object` plus one lowercase haystack per object. It rebuilds only when the `CATALOG` list object is replaced, so tests that swap the catalog get a fresh index instead of stale results.
-- `frontend/src/scene/buildSolarSystem.js::scaleCatalog` caches the derived rows in a `WeakMap` keyed by the catalog array, including the scale mode. Do not mutate those rows: they are shared by every mount of the scene.
-- Headless SwiftShader renders the 100k catalog at ~0.5 fps (~2.5 s per frame). `smoke_stress` raises action timeouts to 60 s and clicks rows through `element.click()` because Playwright's real mouse click waits for a frame ack.
+- `data/source_registry.py` / `backend/position_api.py` / `data/ephemeris.py`:
+  opted-in capabilities and offline positions; `docs/SOURCES.md`.
+- `data/physical_hierarchy.py` / `frontend/src/physical/`: default scene,
+  Float64 centers, linear GPU transform; `docs/HIERARCHY.md`. One physical
+  sector today; general 3.3/3.8 remain open. Legacy is `/?scene=legacy`.
+- `backend/sector_api.py`, `data/sectors.py`: bounded snapshot API/index;
+  `docs/SECTORS.md`. `at` always 422. `frontend/src/data/sectorStore.js`
+  reads bounded snapshot cards only.
+- `streaming_catalog.py`, `streaming_binary.py`, `incremental_catalog.py`:
+  bounded JSON→SQLite/patch preparation; full legacy publication remains O(N).
+  `backend/prepare_runtime.py` runs separately. Runtime `CATALOG` is DiskCatalog;
+  never populate the test-only list `catalog_index()` from production data.
+- `backend/entrypoint.py`: offline/online/existing mode; objects.json generated.
+  `tests/test_api.py` pins catalog_seed.json. unittest ignores smoke_*.py.
+- HTTP limits: filtered legacy 4096 objects/8 MiB; snapshot pages 512/2 MiB;
+  separate sector/filtered caches 8 MiB each. Full legacy routes stream.
+  ETag must handle weak W/, lists, * and percent-encoded Cyrillic queries.
+  nginx gzip is chunked: assert encoding + decoded body, not Content-Length.
+- Shared resources in `bodies/resources.js` and WeakMap `scaleCatalog` rows
+  must not be mutated. Composition changes must preserve WebGLRenderer.
+- MCP runners use installed Chrome DevTools MCP. Legacy Playwright uses system
+  Chrome, stack3471/stack100k markers (not SMOKE_STRESS). Private React probes
+  may need adjustment after React upgrades. SwiftShader fps is not GPU fps;
+  stress uses DOM-click and longer waits. Details: `tests/README.md`.

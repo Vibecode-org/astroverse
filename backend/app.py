@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import json
 import math
 import os
@@ -12,7 +13,8 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, StreamingResponse
+from starlette.background import BackgroundTask
 
 ROOT = Path(__file__).resolve().parents[1]
 # Support `uvicorn app:app` from backend/ both locally and in Docker.
@@ -20,12 +22,14 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from data.catalog import (
-    catalog_path, encode_binary_catalog, encode_binary_catalog_v2, load_catalog,
+    catalog_path, encode_binary_catalog, encode_binary_catalog_v2,
 )
+from backend.prepare_runtime import ensure_runtime
+from backend.byte_cache import ByteLRU
+from data.runtime_catalog import DiskCatalog
 
 DATA_PATH = catalog_path()
-# Loaded once: restart the backend after catalog or environment changes.
-CATALOG = load_catalog(DATA_PATH)
+CATALOG = DiskCatalog(ensure_runtime(DATA_PATH))
 
 app = FastAPI(title="Astroverse API", version="0.4.0")
 
@@ -58,12 +62,14 @@ EPHEMERIS_CACHE = {
 }
 EPHEMERIS_FAILURE_TTL_SECONDS = 300
 
-# Serialized binary responses are cached per filter combination: encoding the
-# full 100k catalog takes noticeable CPU, and the catalog is immutable for the
-# lifetime of the process. Eight entries keep the cache bounded (~21 MB at
-# 100k objects); the oldest entry is evicted first.
+# In-memory injection remains available to existing embedders/tests. Production
+# uses DiskCatalog, prebuilt binary blobs and a separate byte-bounded cache.
 BINARY_CACHE = OrderedDict()
 BINARY_CACHE_MAX = int(os.environ.get("ASTROVERSE_BINARY_CACHE_ENTRIES", "8") or 0)
+BINARY_CACHE_BYTES = int(os.environ.get("ASTROVERSE_BINARY_CACHE_BYTES", "8388608"))
+SERIALIZED_CACHE = ByteLRU(BINARY_CACHE_BYTES)
+LEGACY_FILTER_MAX_OBJECTS = 4096
+LEGACY_FILTER_MAX_BYTES = 8 * 1024 * 1024
 
 # Fixed-window rate limits per client IP, disabled with 0. Generous defaults:
 # a page load fetches the catalog once, and the smoke suite reloads the page a
@@ -81,13 +87,8 @@ SEARCH_LIMIT = int(os.environ.get("ASTROVERSE_SEARCH_LIMIT", "500") or 0)
 SEARCH_FIELDS = ("name", "latin", "description", "facts", "mythology", "history")
 RATE_LIMIT_STATE = {}
 
-# Searchable text and ids are indexed once per catalog object, lazily. Without
-# the index every keystroke lowercases six fields for every object: 600k string
-# allocations per query at 100k objects (~80 ms). With it a query is one
-# `substring in str` per object (~3 ms at 100k) plus O(1) id lookups.
-# Cost is memory: roughly the size of the searchable text itself (~150 B per
-# object for the seed catalog). The index is rebuilt when `CATALOG` is replaced
-# (tests do that), not when the list is mutated in place.
+# Only used for explicit in-memory injection. Production search text and ID
+# indexes live in SQLite and never populate this Python index.
 _CATALOG_INDEX = {"catalog": None, "by_id": {}, "haystacks": []}
 
 
@@ -119,6 +120,9 @@ def matching_items(query):
     query = query.strip().lower()
     if not query:
         return []
+    if isinstance(CATALOG, DiskCatalog):
+        with CATALOG.snapshot() as index:
+            return list(index.select(q=query, limit=LEGACY_FILTER_MAX_OBJECTS))
     _, haystacks = catalog_index()
     return [item for item, blob in zip(CATALOG, haystacks) if query in blob]
 
@@ -149,16 +153,17 @@ async def rate_limit(request: Request, call_next):
 
 def binary_payload(format_version, q, kind, scale, items) -> bytes:
     """Encode and memoize a binary response for one format/filter combination."""
-    key = (format_version, q or "", kind or "", scale or "")
+    key = (format_version, q or "", kind or "", scale or "", CATALOG_REVISION)
     cached = BINARY_CACHE.get(key)
     if cached is not None:
         BINARY_CACHE.move_to_end(key)
         return cached
     encoder = encode_binary_catalog_v2 if format_version == "v2" else encode_binary_catalog
     data = encoder(items)
-    if BINARY_CACHE_MAX > 0:
+    if BINARY_CACHE_MAX > 0 and len(data) <= BINARY_CACHE_BYTES:
         BINARY_CACHE[key] = data
-        while len(BINARY_CACHE) > BINARY_CACHE_MAX:
+        while (len(BINARY_CACHE) > BINARY_CACHE_MAX
+               or sum(len(value) for value in BINARY_CACHE.values()) > BINARY_CACHE_BYTES):
             BINARY_CACHE.popitem(last=False)
     return data
 
@@ -173,9 +178,7 @@ def catalog_revision(path=DATA_PATH):
 
 
 CATALOG_REVISION = catalog_revision()
-# The catalog cannot change while the process is alive, so clients only need to
-# revalidate: a reload costs one conditional request (~300 bytes) instead of
-# 13 MB on the 100k catalog.
+# Runtime disk responses use content revisions from a transaction snapshot.
 CACHE_CONTROL = "public, max-age=0, must-revalidate"
 
 
@@ -195,6 +198,84 @@ def etag_matches(header, etag):
     return any(
         part.strip().removeprefix("W/") == etag for part in header.split(",")
     )
+
+
+from backend.sector_api import install_sector_api
+
+install_sector_api(app, CATALOG, etag_matches,
+                   int(os.environ.get("ASTROVERSE_SECTOR_CACHE_BYTES", "8388608")))
+
+
+def disk_objects(request, q, kind, scale, version):
+    # Keep the transaction alive until the streaming response is consumed.
+    context = CATALOG.snapshot()
+    index = context.__enter__()
+    try:
+        revision = index.metadata["catalog_revision"]
+        key = ("legacy", revision, version, q, kind, scale)
+        etag = '"' + hashlib.sha256(repr(key).encode()).hexdigest() + '"'
+        headers = {"ETag": etag, "Cache-Control": CACHE_CONTROL, "Vary": "Accept"}
+        if etag_matches(request.headers.get("if-none-match"), etag):
+            return Response(status_code=304, headers=headers)
+        if version != "json" and not any((q, kind, scale)):
+            headers.update({"X-Object-Count": str(index.metadata["object_count"]),
+                            "X-Catalog-Format": version,
+                            "Content-Length": str(index.binary_size(version))})
+            def stream_binary():
+                try:
+                    yield from index.binary(version)
+                finally:
+                    stream_context.__exit__(None, None, None)
+            stream_context = context
+            response = StreamingResponse(stream_binary(), media_type="application/octet-stream", headers=headers,
+                                         background=BackgroundTask(stream_context.__exit__, None, None, None))
+            context = None
+            return response
+        if version == "json" and not any((q, kind, scale)):
+            def stream_json():
+                try:
+                    yield b"["
+                    separator = b""
+                    buffer = bytearray()
+                    for payload in index.select(raw=True):
+                        buffer.extend(separator + payload.encode())
+                        if len(buffer) >= 65536:
+                            yield bytes(buffer)
+                            buffer.clear()
+                        separator = b","
+                    yield bytes(buffer) + b"]"
+                finally:
+                    stream_context.__exit__(None, None, None)
+            stream_context = context
+            response = StreamingResponse(stream_json(), media_type="application/json", headers=headers,
+                                         background=BackgroundTask(stream_context.__exit__, None, None, None))
+            context = None
+            return response
+        payload = SERIALIZED_CACHE.get(key)
+        if payload is None:
+            rows, row_bytes = [], 0
+            for raw in index.select(q=q, kind=kind, scale=scale, limit=LEGACY_FILTER_MAX_OBJECTS + 1, raw=True):
+                row_bytes += len(raw.encode())
+                if len(rows) >= LEGACY_FILTER_MAX_OBJECTS or row_bytes > LEGACY_FILTER_MAX_BYTES:
+                    raise HTTPException(413, "Legacy filtered response exceeds budget; use /api/spatial/v1")
+                rows.append(json.loads(raw))
+            if version == "json":
+                payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode()
+            else:
+                encoder = encode_binary_catalog_v2 if version == "v2" else encode_binary_catalog
+                payload = encoder(rows)
+            if len(payload) > LEGACY_FILTER_MAX_BYTES:
+                raise HTTPException(413, "Legacy filtered response exceeds byte budget")
+            SERIALIZED_CACHE.put(key, payload)
+            count = len(rows)
+        else:
+            count = (int.from_bytes(payload[8:12], "little") if version != "json" else 0)
+        if version != "json":
+            headers.update({"X-Object-Count": str(count), "X-Catalog-Format": version})
+        return Response(payload, media_type="application/json" if version == "json" else "application/octet-stream", headers=headers)
+    finally:
+        if context is not None:
+            context.__exit__(None, None, None)
 
 
 def utcnow():
@@ -261,14 +342,6 @@ def objects(
     kind: str | None = None,
     scale: str | None = None,
 ):
-    # Search uses the prebuilt lowercase index instead of lowercasing six
-    # fields per object on every request.
-    items = matching_items(q) if q else CATALOG
-    if kind:
-        items = [x for x in items if x["kind"] == kind]
-    if scale:
-        items = [x for x in items if x["scale"] == scale]
-
     accept = request.headers.get("accept", "")
     # v2 is explicit: `?format=v2` or the vendor media type. Plain
     # `Accept: application/octet-stream` stays on v1 for older clients.
@@ -279,6 +352,14 @@ def objects(
     )
     wants_binary = wants_v2 or "application/octet-stream" in accept
     version = "v2" if wants_v2 else ("v1" if wants_binary else "json")
+
+    if isinstance(CATALOG, DiskCatalog):
+        return disk_objects(request, q or None, kind or None, scale or None, version)
+    items = matching_items(q) if q else CATALOG
+    if kind:
+        items = [x for x in items if x["kind"] == kind]
+    if scale:
+        items = [x for x in items if x["scale"] == scale]
 
     etag = response_etag(version, q, kind, scale)
     headers = {
@@ -316,6 +397,13 @@ def search(q: str = ""):
     server when the query is non-empty and maps returned ids back to the
     objects it already has. An empty query returns an empty list.
     """
+    if isinstance(CATALOG, DiskCatalog):
+        if not q.strip():
+            return []
+        with CATALOG.snapshot() as index:
+            return [{"id": item["id"], "name": item["name"], "latin": item.get("latin") or "",
+                     "kind": item["kind"], "scale": item["scale"]}
+                    for item in index.select(q=q, limit=min(SEARCH_LIMIT if SEARCH_LIMIT > 0 else 500, 500))]
     results = []
     for item in matching_items(q):
         results.append({
@@ -333,8 +421,12 @@ def search(q: str = ""):
 @app.get("/api/objects/{object_id}")
 def object_by_id(object_id: str):
     """Full metadata for one object (the compact list payload omits long text)."""
-    by_id, _ = catalog_index()
-    item = by_id.get(object_id)
+    if isinstance(CATALOG, DiskCatalog):
+        with CATALOG.snapshot() as index:
+            item = index.object(object_id)
+    else:
+        by_id, _ = catalog_index()
+        item = by_id.get(object_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Object not found")
     return item
@@ -383,3 +475,7 @@ def live_ephemeris():
         "positions": EPHEMERIS_CACHE["data"],
         "source": "NASA JPL Horizons Live Ephemeris"
     }
+
+# Physical positions have their own version; snapshot and render APIs keep their semantics.
+from backend.position_api import install_position_api
+install_position_api(app, etag_matches)

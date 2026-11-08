@@ -15,9 +15,19 @@ data/objects.json
 data/objects.bin
 data/objects.v2.bin
 data/objects_100k.json
+# Offline sector-index artifacts (Phase 3.1).
+data/sectors*.sqlite
 
 # Python and OS artifacts
 **/__pycache__/
 *.py[cod]
 .pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+frontend/coverage/
 .DS_Store
+data/*.runtime.sqlite
+# Persistent advisory lock inodes used by atomic runtime writers.
+data/*.runtime.sqlite.lock
+data/sectors*.sqlite.lock

@@ -13,3 +13,8 @@ data/objects.json
 data/objects.bin
 data/objects.v2.bin
 data/objects_100k.json
+# Generated sector indexes are built separately, not baked into the image.
+data/sectors*.sqlite
+data/*.runtime.sqlite
+data/*.runtime.sqlite.lock
+data/sectors*.sqlite.lock

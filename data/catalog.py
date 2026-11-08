@@ -409,6 +409,8 @@ def read_binary_catalog(path=None):
 
     with open(path, "rb") as stream:
         header = stream.read(BINARY_HEADER_SIZE)
+    if len(header) < BINARY_HEADER_SIZE:
+        raise ValueError("truncated binary catalog header")
     magic, version, count, offset = struct.unpack(BINARY_HEADER_FORMAT, header)
     if offset != BINARY_HEADER_SIZE:
         raise ValueError("invalid array offset")
@@ -440,6 +442,8 @@ def read_binary_catalog(path=None):
     if sys.byteorder != "little":
         for values in (positions, sizes, colors, parents):
             values.byteswap()
+    if any(index < -1 or index >= count for index in parents):
+        raise ValueError("invalid parent index")
 
     return {
         "version": version,
@@ -755,6 +759,8 @@ def read_binary_catalog_v2(path=None):
     names = decode(name_offsets, name_lengths)
     latins = decode(latin_offsets, latin_lengths)
     parent_indices = _array_from_bytes("i", section("parents"))
+    if any(index < -1 or index >= count for index in parent_indices):
+        raise ValueError("invalid parent index")
     parents = [ids[index] if index >= 0 else None for index in parent_indices]
 
     return {

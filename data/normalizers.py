@@ -69,7 +69,7 @@ def make_object(
     import copy
     previous = identities.get((kind, name.casefold()), {})
     item = {
-        "id": previous.get("id", slug(name)),
+        "id": previous["id"] if "id" in previous else slug(name),
         "name": previous.get("name", name),
         "latin": name,
         "kind": kind,

@@ -1,0 +1,852 @@
+{
+  "source": "https://ssd.jpl.nasa.gov/horizons/manual.html",
+  "origin": "Solar System Barycenter (0)",
+  "reference_system": "ICRF",
+  "plane": "FRAME",
+  "time_scale": "TDB",
+  "unit": "km",
+  "corrections": "NONE",
+  "tolerance_km": 1.0,
+  "samples": [
+    {
+      "id": "sun",
+      "target": 10,
+      "url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%2710%27&EPHEM_TYPE=%27VECTORS%27&CENTER=%27500%400%27&REF_SYSTEM=%27ICRF%27&REF_PLANE=%27FRAME%27&VEC_CORR=%27NONE%27&VEC_TABLE=%272%27&OUT_UNITS=%27KM-S%27&CSV_FORMAT=%27YES%27&TIME_TYPE=%27TDB%27&TLIST=%272451545.0%0A2451545.125%0A2451546.0%0A2451910.5%0A2453005.5%0A2455197.5%0A2456109.5%0A2457204.5%0A2457754.5%0A2457754.5008%0A2458849.5%0A2459215.5%0A2459580.5%0A2460310.5%0A2460409.25%0A2460676.5%0A2461041.5%0A2461200.123456%0A2461350.5%0A2461406.5%27",
+      "header": "*******************************************************************************\n Revised: July 31, 2013                  Sun                                 10\n\n PHYSICAL PROPERTIES (updated 2024-Oct-30):\n  GM, km^3/s^2          = 132712440041.93938  Mass, 10^24 kg        = ~1988410\n  Vol. mean radius, km  = 695700              Volume, 10^12 km^3    = 1412000\n  Solar radius (IAU2015)= 695700 km           Mean density, g/cm^3  = 1.408\n  Radius (photosphere)  = 696500 km           Angular diam at 1 AU  = 1919.3\"\n  Photosphere temp., K  = 6600 (bottom)       Photosphere temp., K  = 4400(top)\n  Photospheric depth    = ~500 km             Chromospheric depth   = ~2500 km\n  Flatness, f           = 0.00005             Adopted sid. rot. per.= 25.38 d\n  Surface gravity       =  274.0 m/s^2        Escape speed, km/s    =  617.7\n  Pole (RA,DEC), deg.   = (286.13, 63.87)     Obliquity to ecliptic = 7.25 deg.\n  Solar constant (1 AU) = 1367.6 W/m^2        Luminosity, 10^24 J/s = 382.8\n  Mass-energy conv rate = 4.260 x 10^9 kg/s   Effective temp, K     = 5772\n  Sunspot cycle         = 11.4 yr             Cycle 24 sunspot min. = 2008 A.D.\n\n  Motion relative to nearby stars = apex : R.A.= 271 deg.; DEC.= +30 deg.\n                                    speed: 19.4 km/s (0.0112 au/day)\n  Motion relative to 2.73K BB/CBR = apex : l= 264.7 +- 0.8; b= 48.2 +- 0.5 deg.\n                                    speed: 369 +-11 km/s\n*******************************************************************************\n\n\n*******************************************************************************\nEphemeris / API_USER Thu Nov  5 22:31:14 2026 Pasadena, USA      / Horizons\n*******************************************************************************\nTarget body name: Sun (10)                        {source: DE441}\nCenter body name: Solar System Barycenter (0)     {source: DE441}\nCenter-site name: BODY CENTER\n*******************************************************************************\nStart time      : A.D. 2000-Jan-01 12:00:00.0000 TDB\nStop  time      : A.D. 2027-Jan-01 00:00:00.0000 TDB\nStep-size       : DISCRETE TIME-LIST\n*******************************************************************************\nCenter geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}\nCenter cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}\nCenter radii    : (undefined)\nOutput units    : KM-S\nCalendar mode   : Mixed Julian/Gregorian\nOutput type     : GEOMETRIC cartesian states\nOutput format   : 2 (position and velocity)\nReference frame : ICRF\n*******************************************************************************\n            JDTDB,            Calendar Date (TDB),                      X,                      Y,                      Z,                     VX,                     VY,                     VZ,\n**************************************************************************************************************************************************************************************************\n",
+      "rows": [
+        {
+          "jd_tdb": 2451545.0,
+          "position": [
+            -1067706.805380953,
+            -396036.1847959462,
+            -138065.1842868809
+          ]
+        },
+        {
+          "jd_tdb": 2451545.125,
+          "position": [
+            -1067606.219795921,
+            -396162.5522827053,
+            -138121.8944220475
+          ]
+        },
+        {
+          "jd_tdb": 2451546.0,
+          "position": [
+            -1066901.571767913,
+            -397046.6336193695,
+            -138518.6674258239
+          ]
+        },
+        {
+          "jd_tdb": 2451910.5,
+          "position": [
+            -693371.8344268551,
+            -684999.2512066719,
+            -271678.2065386985
+          ]
+        },
+        {
+          "jd_tdb": 2453005.5,
+          "position": [
+            512217.0344286224,
+            -386314.650802028,
+            -177379.7950709531
+          ]
+        },
+        {
+          "jd_tdb": 2455197.5,
+          "position": [
+            -560672.8022547087,
+            401372.3493127084,
+            174761.924172754
+          ]
+        },
+        {
+          "jd_tdb": 2456109.5,
+          "position": [
+            -352874.3288648642,
+            -277973.6563973043,
+            -123600.4578274065
+          ]
+        },
+        {
+          "jd_tdb": 2457204.5,
+          "position": [
+            512932.8747692322,
+            36360.49534387157,
+            -9064.670002059132
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5,
+          "position": [
+            506363.4398940383,
+            549557.9037287155,
+            212823.6854907853
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5008,
+          "position": [
+            506363.126865169,
+            549558.6381744156,
+            212824.010883834
+          ]
+        },
+        {
+          "jd_tdb": 2458849.5,
+          "position": [
+            -568371.8842782438,
+            1019737.70732801,
+            445880.6938056395
+          ]
+        },
+        {
+          "jd_tdb": 2459215.5,
+          "position": [
+            -995114.9776804566,
+            817718.8786490922,
+            371770.6287264635
+          ]
+        },
+        {
+          "jd_tdb": 2459580.5,
+          "position": [
+            -1283674.643550172,
+            449092.8700115578,
+            222928.4561315225
+          ]
+        },
+        {
+          "jd_tdb": 2460310.5,
+          "position": [
+            -1191989.205285392,
+            -411404.0540603102,
+            -144074.6315160215
+          ]
+        },
+        {
+          "jd_tdb": 2460409.25,
+          "position": [
+            -1114766.202489422,
+            -501529.1489500934,
+            -184051.0516076585
+          ]
+        },
+        {
+          "jd_tdb": 2460676.5,
+          "position": [
+            -857286.503946925,
+            -684672.4735690065,
+            -267572.3556624345
+          ]
+        },
+        {
+          "jd_tdb": 2461041.5,
+          "position": [
+            -458863.9674035421,
+            -767304.103760174,
+            -311195.5872581376
+          ]
+        },
+        {
+          "jd_tdb": 2461200.123456,
+          "position": [
+            -294059.3056794194,
+            -745266.1882542273,
+            -305237.9766283896
+          ]
+        },
+        {
+          "jd_tdb": 2461350.5,
+          "position": [
+            -154005.6396345073,
+            -697784.6131694339,
+            -287851.4056840714
+          ]
+        },
+        {
+          "jd_tdb": 2461406.5,
+          "position": [
+            -105636.5570205363,
+            -673721.0351726485,
+            -278568.3168081098
+          ]
+        }
+      ]
+    },
+    {
+      "id": "earth",
+      "target": 399,
+      "url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27399%27&EPHEM_TYPE=%27VECTORS%27&CENTER=%27500%400%27&REF_SYSTEM=%27ICRF%27&REF_PLANE=%27FRAME%27&VEC_CORR=%27NONE%27&VEC_TABLE=%272%27&OUT_UNITS=%27KM-S%27&CSV_FORMAT=%27YES%27&TIME_TYPE=%27TDB%27&TLIST=%272451545.0%0A2451545.125%0A2451546.0%0A2451910.5%0A2453005.5%0A2455197.5%0A2456109.5%0A2457204.5%0A2457754.5%0A2457754.5008%0A2458849.5%0A2459215.5%0A2459580.5%0A2460310.5%0A2460409.25%0A2460676.5%0A2461041.5%0A2461200.123456%0A2461350.5%0A2461406.5%27",
+      "header": "*******************************************************************************\n Revised: April 12, 2021                 Earth                              399\n \n GEOPHYSICAL PROPERTIES (revised May 9, 2022):\n  Vol. Mean Radius (km)    = 6371.01+-0.02   Mass x10^24 (kg)= 5.97219+-0.0006\n  Equ. radius, km          = 6378.137        Mass layers:\n  Polar axis, km           = 6356.752          Atmos         = 5.1   x 10^18 kg\n  Flattening               = 1/298.257223563   oceans        = 1.4   x 10^21 kg\n  Density, g/cm^3          = 5.51              crust         = 2.6   x 10^22 kg\n  J2 (IERS 2010)           = 0.00108262545     mantle        = 4.043 x 10^24 kg\n  g_p, m/s^2  (polar)      = 9.8321863685      outer core    = 1.835 x 10^24 kg\n  g_e, m/s^2  (equatorial) = 9.7803267715      inner core    = 9.675 x 10^22 kg\n  g_o, m/s^2               = 9.82022         Fluid core rad  = 3480 km\n  GM, km^3/s^2             = 398600.435436   Inner core rad  = 1215 km\n  GM 1-sigma, km^3/s^2     =      0.0014     Escape velocity = 11.186 km/s\n  Rot. Rate (rad/s)        = 0.00007292115   Surface area:\n  Mean sidereal day, hr    = 23.9344695944     land          = 1.48 x 10^8 km\n  Mean solar day 2000.0, s = 86400.002         sea           = 3.62 x 10^8 km\n  Mean solar day 1820.0, s = 86400.0         Love no., k2    = 0.299\n  Moment of inertia        = 0.3308          Atm. pressure   = 1.0 bar\n  Mean surface temp (Ts), K= 287.6           Volume, km^3    = 1.08321 x 10^12\n  Mean effect. temp (Te), K= 255             Magnetic moment = 0.61 gauss Rp^3\n  Geometric albedo         = 0.367           Vis. mag. V(1,0)= -3.86\n  Solar Constant (W/m^2)   = 1367.6 (mean), 1414 (perihelion), 1322 (aphelion)\n HELIOCENTRIC ORBIT CHARACTERISTICS:\n  Obliquity to orbit, deg  = 23.4392911  Sidereal orb period  = 1.0000174 y\n  Orbital speed, km/s      = 29.79       Sidereal orb period  = 365.25636 d\n  Mean daily motion, deg/d = 0.9856474   Hill's sphere radius = 234.9       \n*******************************************************************************\n\n\n*******************************************************************************\nEphemeris / API_USER Thu Nov  5 22:31:15 2026 Pasadena, USA      / Horizons\n*******************************************************************************\nTarget body name: Earth (399)                     {source: DE441}\nCenter body name: Solar System Barycenter (0)     {source: DE441}\nCenter-site name: BODY CENTER\n*******************************************************************************\nStart time      : A.D. 2000-Jan-01 12:00:00.0000 TDB\nStop  time      : A.D. 2027-Jan-01 00:00:00.0000 TDB\nStep-size       : DISCRETE TIME-LIST\n*******************************************************************************\nCenter geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}\nCenter cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}\nCenter radii    : (undefined)\nOutput units    : KM-S\nCalendar mode   : Mixed Julian/Gregorian\nOutput type     : GEOMETRIC cartesian states\nOutput format   : 2 (position and velocity)\nReference frame : ICRF\n*******************************************************************************\n            JDTDB,            Calendar Date (TDB),                      X,                      Y,                      Z,                     VX,                     VY,                     VZ,\n**************************************************************************************************************************************************************************************************\n",
+      "rows": [
+        {
+          "jd_tdb": 2451545.0,
+          "position": [
+            -27566740.48281145,
+            132361381.1535491,
+            57418653.28625385
+          ]
+        },
+        {
+          "jd_tdb": 2451545.125,
+          "position": [
+            -27888354.47809386,
+            132306735.8954131,
+            57394962.05860137
+          ]
+        },
+        {
+          "jd_tdb": 2451546.0,
+          "position": [
+            -30135977.94042192,
+            131906095.8607605,
+            57221275.65356607
+          ]
+        },
+        {
+          "jd_tdb": 2451910.5,
+          "position": [
+            -27825993.33641417,
+            131962686.8372101,
+            57238181.44926216
+          ]
+        },
+        {
+          "jd_tdb": 2453005.5,
+          "position": [
+            -24637491.69409495,
+            132589153.1301626,
+            57473233.99501199
+          ]
+        },
+        {
+          "jd_tdb": 2455197.5,
+          "position": [
+            -26892559.46563401,
+            133184391.8254764,
+            57739678.05594286
+          ]
+        },
+        {
+          "jd_tdb": 2456109.5,
+          "position": [
+            24482342.72157952,
+            -137945001.2079021,
+            -59804667.11956516
+          ]
+        },
+        {
+          "jd_tdb": 2457204.5,
+          "position": [
+            23422443.15678287,
+            -137907866.3915064,
+            -59810261.28557708
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5,
+          "position": [
+            -26363456.28507423,
+            133247595.101721,
+            57738481.94920442
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5008,
+          "position": [
+            -26365515.10808458,
+            133247243.1882574,
+            57738329.48643166
+          ]
+        },
+        {
+          "jd_tdb": 2458849.5,
+          "position": [
+            -25453343.41413143,
+            134037225.5727666,
+            58109292.86273248
+          ]
+        },
+        {
+          "jd_tdb": 2459215.5,
+          "position": [
+            -27790490.35695899,
+            133518832.4018863,
+            57897105.38110869
+          ]
+        },
+        {
+          "jd_tdb": 2459580.5,
+          "position": [
+            -27411475.60901964,
+            133274802.1573211,
+            57802488.94783486
+          ]
+        },
+        {
+          "jd_tdb": 2460310.5,
+          "position": [
+            -26002982.46493929,
+            132622048.0770947,
+            57524031.6086633
+          ]
+        },
+        {
+          "jd_tdb": 2460409.25,
+          "position": [
+            -142729327.9784007,
+            -45376896.07797054,
+            -19636045.24000881
+          ]
+        },
+        {
+          "jd_tdb": 2460676.5,
+          "position": [
+            -27587948.80287251,
+            132040008.4949669,
+            57267288.22700958
+          ]
+        },
+        {
+          "jd_tdb": 2461041.5,
+          "position": [
+            -26531002.41556548,
+            132064399.5462592,
+            57268703.37495859
+          ]
+        },
+        {
+          "jd_tdb": 2461200.123456,
+          "position": [
+            -33233640.31777287,
+            -136740798.2002257,
+            -59256754.59229337
+          ]
+        },
+        {
+          "jd_tdb": 2461350.5,
+          "position": [
+            107944084.0516305,
+            92477971.01391362,
+            40101527.15718419
+          ]
+        },
+        {
+          "jd_tdb": 2461406.5,
+          "position": [
+            -25511787.37699769,
+            132268759.0850452,
+            57349728.890605
+          ]
+        }
+      ]
+    },
+    {
+      "id": "moon",
+      "target": 301,
+      "url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27301%27&EPHEM_TYPE=%27VECTORS%27&CENTER=%27500%400%27&REF_SYSTEM=%27ICRF%27&REF_PLANE=%27FRAME%27&VEC_CORR=%27NONE%27&VEC_TABLE=%272%27&OUT_UNITS=%27KM-S%27&CSV_FORMAT=%27YES%27&TIME_TYPE=%27TDB%27&TLIST=%272451545.0%0A2451545.125%0A2451546.0%0A2451910.5%0A2453005.5%0A2455197.5%0A2456109.5%0A2457204.5%0A2457754.5%0A2457754.5008%0A2458849.5%0A2459215.5%0A2459580.5%0A2460310.5%0A2460409.25%0A2460676.5%0A2461041.5%0A2461200.123456%0A2461350.5%0A2461406.5%27",
+      "header": "*******************************************************************************\n Revised: July 31, 2013             Moon / (Earth)                          301\n \n GEOPHYSICAL DATA (updated 2018-Aug-15):\n  Vol. mean radius, km  = 1737.53+-0.03    Mass, x10^22 kg       =    7.349\n  Radius (gravity), km  = 1738.0           Surface emissivity    =    0.92\n  Radius (IAU), km      = 1737.4           GM, km^3/s^2          = 4902.800066\n  Density, g/cm^3       =    3.3437        GM 1-sigma, km^3/s^2  =  +-0.0001  \n  V(1,0)                =   +0.21          Surface accel., m/s^2 =    1.62\n  Earth/Moon mass ratio = 81.3005690769    Farside crust. thick. = ~80 - 90 km\n  Mean crustal density  = 2.97+-.07 g/cm^3 Nearside crust. thick.= 58+-8 km \n  Heat flow, Apollo 15  = 3.1+-.6 mW/m^2   Mean angular diameter = 31'05.2\"\n  Heat flow, Apollo 17  = 2.2+-.5 mW/m^2   Sid. rot. rate, rad/s = 0.0000026617\n  Geometric Albedo      = 0.12             Mean solar day        = 29.5306 d\n  Obliquity to orbit    = 6.67 deg         Orbit period          = 27.321582 d\n  Semi-major axis, a    = 384400 km        Eccentricity          = 0.05490\n  Mean motion, rad/s    = 2.6616995x10^-6  Inclination           = 5.145 deg\n  Apsidal period        = 3231.50 d        Nodal period          = 6798.38 d\n                                 Perihelion  Aphelion    Mean\n  Solar Constant (W/m^2)         1414+-7     1323+-7     1368+-7\n  Maximum Planetary IR (W/m^2)   1314        1226        1268\n  Minimum Planetary IR (W/m^2)      5.2         5.2         5.2\n********************************************************************************\n\n\n*******************************************************************************\nEphemeris / API_USER Thu Nov  5 22:31:16 2026 Pasadena, USA      / Horizons\n*******************************************************************************\nTarget body name: Moon (301)                      {source: DE441}\nCenter body name: Solar System Barycenter (0)     {source: DE441}\nCenter-site name: BODY CENTER\n*******************************************************************************\nStart time      : A.D. 2000-Jan-01 12:00:00.0000 TDB\nStop  time      : A.D. 2027-Jan-01 00:00:00.0000 TDB\nStep-size       : DISCRETE TIME-LIST\n*******************************************************************************\nCenter geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}\nCenter cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}\nCenter radii    : (undefined)\nOutput units    : KM-S\nCalendar mode   : Mixed Julian/Gregorian\nOutput type     : GEOMETRIC cartesian states\nOutput format   : 2 (position and velocity)\nReference frame : ICRF\n*******************************************************************************\n            JDTDB,            Calendar Date (TDB),                      X,                      Y,                      Z,                     VX,                     VY,                     VZ,\n**************************************************************************************************************************************************************************************************\n",
+      "rows": [
+        {
+          "jd_tdb": 2451545.0,
+          "position": [
+            -27858348.86699916,
+            132094664.319695,
+            57342550.79894725
+          ]
+        },
+        {
+          "jd_tdb": 2451545.125,
+          "position": [
+            -28172907.37960453,
+            132032921.584788,
+            57315632.65239073
+          ]
+        },
+        {
+          "jd_tdb": 2451546.0,
+          "position": [
+            -30365675.15305248,
+            131588312.0320198,
+            57121047.22394653
+          ]
+        },
+        {
+          "jd_tdb": 2451910.5,
+          "position": [
+            -27434397.83197682,
+            131903968.833801,
+            57176676.93092168
+          ]
+        },
+        {
+          "jd_tdb": 2453005.5,
+          "position": [
+            -24281413.44881456,
+            132764097.130745,
+            57534440.31328393
+          ]
+        },
+        {
+          "jd_tdb": 2455197.5,
+          "position": [
+            -26973935.90193487,
+            133503710.0103497,
+            57883061.85219967
+          ]
+        },
+        {
+          "jd_tdb": 2456109.5,
+          "position": [
+            24306469.67391821,
+            -138235294.4437778,
+            -59932745.34873819
+          ]
+        },
+        {
+          "jd_tdb": 2457204.5,
+          "position": [
+            23386436.3626942,
+            -138265503.1230017,
+            -59929807.54605233
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5,
+          "position": [
+            -26103826.7895647,
+            132973909.0907937,
+            57634536.81764288
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5008,
+          "position": [
+            -26105835.39975493,
+            132973603.4388204,
+            57634398.08621816
+          ]
+        },
+        {
+          "jd_tdb": 2458849.5,
+          "position": [
+            -25063157.77479142,
+            133960702.9774128,
+            58038568.20862802
+          ]
+        },
+        {
+          "jd_tdb": 2459215.5,
+          "position": [
+            -27997376.84184251,
+            133807947.0395512,
+            58048680.06908305
+          ]
+        },
+        {
+          "jd_tdb": 2459580.5,
+          "position": [
+            -27503344.15265606,
+            132959761.5995232,
+            57657184.52015043
+          ]
+        },
+        {
+          "jd_tdb": 2460310.5,
+          "position": [
+            -26370934.99608123,
+            132764823.0502377,
+            57613373.88984415
+          ]
+        },
+        {
+          "jd_tdb": 2460409.25,
+          "position": [
+            -142388817.8184648,
+            -45271152.51995748,
+            -19587962.72728501
+          ]
+        },
+        {
+          "jd_tdb": 2460676.5,
+          "position": [
+            -27435896.44230116,
+            131732184.8635358,
+            57100408.34113483
+          ]
+        },
+        {
+          "jd_tdb": 2461041.5,
+          "position": [
+            -26386676.68807356,
+            132353983.7038041,
+            57428862.29796027
+          ]
+        },
+        {
+          "jd_tdb": 2461200.123456,
+          "position": [
+            -32855197.76697003,
+            -136806421.0795012,
+            -59274133.07054836
+          ]
+        },
+        {
+          "jd_tdb": 2461350.5,
+          "position": [
+            107558896.742433,
+            92457323.42664205,
+            40069640.79171817
+          ]
+        },
+        {
+          "jd_tdb": 2461406.5,
+          "position": [
+            -25867653.87596482,
+            132134383.4582757,
+            57257149.88680702
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mercury",
+      "target": 199,
+      "url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27199%27&EPHEM_TYPE=%27VECTORS%27&CENTER=%27500%400%27&REF_SYSTEM=%27ICRF%27&REF_PLANE=%27FRAME%27&VEC_CORR=%27NONE%27&VEC_TABLE=%272%27&OUT_UNITS=%27KM-S%27&CSV_FORMAT=%27YES%27&TIME_TYPE=%27TDB%27&TLIST=%272451545.0%0A2451545.125%0A2451546.0%0A2451910.5%0A2453005.5%0A2455197.5%0A2456109.5%0A2457204.5%0A2457754.5%0A2457754.5008%0A2458849.5%0A2459215.5%0A2459580.5%0A2460310.5%0A2460409.25%0A2460676.5%0A2461041.5%0A2461200.123456%0A2461350.5%0A2461406.5%27",
+      "header": "*******************************************************************************\n Revised: April 12, 2021             Mercury                            199 / 1\n\n PHYSICAL DATA (updated 2024-Mar-04):\n  Vol. Mean Radius (km) =  2439.4+-0.1    Density (g cm^-3)     = 5.427\n  Mass x10^23 (kg)      =     3.302       Volume (x10^10 km^3)  = 6.085  \n  Sidereal rot. period  =    58.6463 d    Sid. rot. rate (rad/s)= 0.00000124001\n  Mean solar day        =   175.9421 d    Core radius (km)      = ~1600 \n  Geometric Albedo      =     0.106       Surface emissivity    = 0.77+-0.06\n  GM (km^3/s^2)         = 22031.86855     Equatorial radius, Re = 2440.53 km\n  GM 1-sigma (km^3/s^2) =                 Mass ratio (Sun/plnt) = 6023682\n  Mom. of Inertia       =     0.33        Equ. gravity  m/s^2   = 3.701     \n  Atmos. pressure (bar) = < 5x10^-15      Max. angular diam.    = 11.0\"   \n  Mean Temperature (K)  = 440             Visual mag. V(1,0)    = -0.42 \n  Obliquity to orbit[1] =  2.11' +/- 0.1' Hill's sphere rad. Rp = 94.4 \n  Sidereal orb. per.    =  0.2408467 y    Mean Orbit vel.  km/s = 47.362 \n  Sidereal orb. per.    = 87.969257  d    Escape vel. km/s      =  4.435\n                                 Perihelion  Aphelion    Mean\n  Solar Constant (W/m^2)         14462       6278        9126\n  Maximum Planetary IR (W/m^2)   12700       5500        8000\n  Minimum Planetary IR (W/m^2)   6           6           6\n*******************************************************************************\n\n\n*******************************************************************************\nEphemeris / API_USER Thu Nov  5 23:41:02 2026 Pasadena, USA      / Horizons\n*******************************************************************************\nTarget body name: Mercury (199)                   {source: DE441}\nCenter body name: Solar System Barycenter (0)     {source: DE441}\nCenter-site name: BODY CENTER\n*******************************************************************************\nStart time      : A.D. 2000-Jan-01 12:00:00.0000 TDB\nStop  time      : A.D. 2027-Jan-01 00:00:00.0000 TDB\nStep-size       : DISCRETE TIME-LIST\n*******************************************************************************\nCenter geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}\nCenter cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}\nCenter radii    : (undefined)\nOutput units    : KM-S\nCalendar mode   : Mixed Julian/Gregorian\nOutput type     : GEOMETRIC cartesian states\nOutput format   : 2 (position and velocity)\nReference frame : ICRF\n*******************************************************************************\n            JDTDB,            Calendar Date (TDB),                      X,                      Y,                      Z,                     VX,                     VY,                     VZ,\n**************************************************************************************************************************************************************************************************\n",
+      "rows": [
+        {
+          "jd_tdb": 2451545.0,
+          "position": [
+            -20529433.16123468,
+            -60324003.95827633,
+            -30130837.8641183
+          ]
+        },
+        {
+          "jd_tdb": 2451545.125,
+          "position": [
+            -20129346.48028679,
+            -60414885.33153787,
+            -30220856.54467205
+          ]
+        },
+        {
+          "jd_tdb": 2451546.0,
+          "position": [
+            -17305467.77414133,
+            -60974340.36023655,
+            -30812422.94412361
+          ]
+        },
+        {
+          "jd_tdb": 2451910.5,
+          "position": [
+            24547752.15018597,
+            -53996562.12165795,
+            -31366466.7357247
+          ]
+        },
+        {
+          "jd_tdb": 2453005.5,
+          "position": [
+            -26922205.10074244,
+            33816520.57605618,
+            20937634.51273866
+          ]
+        },
+        {
+          "jd_tdb": 2455197.5,
+          "position": [
+            7054675.512251608,
+            40750932.32003709,
+            20938992.17497237
+          ]
+        },
+        {
+          "jd_tdb": 2456109.5,
+          "position": [
+            -47139092.26735366,
+            -44721761.91806794,
+            -19013903.58430477
+          ]
+        },
+        {
+          "jd_tdb": 2457204.5,
+          "position": [
+            54388581.36137268,
+            -6589045.120329005,
+            -9133493.453876877
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5,
+          "position": [
+            -20941774.25545749,
+            37327408.31653328,
+            22082606.11155568
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5008,
+          "position": [
+            -20945456.82693379,
+            37326043.48599566,
+            22082258.68923684
+          ]
+        },
+        {
+          "jd_tdb": 2458849.5,
+          "position": [
+            -10043134.54665499,
+            -60337689.64179783,
+            -31348656.76319171
+          ]
+        },
+        {
+          "jd_tdb": 2459215.5,
+          "position": [
+            34461544.13918527,
+            -45282495.93798109,
+            -27929924.9310101
+          ]
+        },
+        {
+          "jd_tdb": 2459580.5,
+          "position": [
+            52426172.05495467,
+            -2986698.203670293,
+            -7179450.323749503
+          ]
+        },
+        {
+          "jd_tdb": 2460310.5,
+          "position": [
+            -42276107.97568034,
+            24615647.89560287,
+            17483605.10496309
+          ]
+        },
+        {
+          "jd_tdb": 2460409.25,
+          "position": [
+            -60209868.94739376,
+            -12710364.98572619,
+            -581112.3052265197
+          ]
+        },
+        {
+          "jd_tdb": 2460676.5,
+          "position": [
+            -58796991.89509091,
+            -24209319.28698606,
+            -6829421.499590079
+          ]
+        },
+        {
+          "jd_tdb": 2461041.5,
+          "position": [
+            -32652520.87416521,
+            -56116990.28397373,
+            -26542575.68507895
+          ]
+        },
+        {
+          "jd_tdb": 2461200.123456,
+          "position": [
+            -59223284.56951467,
+            -9963172.548110783,
+            877842.1773058567
+          ]
+        },
+        {
+          "jd_tdb": 2461350.5,
+          "position": [
+            29857039.08017691,
+            32280549.82388088,
+            14219081.77425881
+          ]
+        },
+        {
+          "jd_tdb": 2461406.5,
+          "position": [
+            10163015.24592174,
+            -60049105.26678493,
+            -33061417.30796664
+          ]
+        }
+      ]
+    },
+    {
+      "id": "venus",
+      "target": 299,
+      "url": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27299%27&EPHEM_TYPE=%27VECTORS%27&CENTER=%27500%400%27&REF_SYSTEM=%27ICRF%27&REF_PLANE=%27FRAME%27&VEC_CORR=%27NONE%27&VEC_TABLE=%272%27&OUT_UNITS=%27KM-S%27&CSV_FORMAT=%27YES%27&TIME_TYPE=%27TDB%27&TLIST=%272451545.0%0A2451545.125%0A2451546.0%0A2451910.5%0A2453005.5%0A2455197.5%0A2456109.5%0A2457204.5%0A2457754.5%0A2457754.5008%0A2458849.5%0A2459215.5%0A2459580.5%0A2460310.5%0A2460409.25%0A2460676.5%0A2461041.5%0A2461200.123456%0A2461350.5%0A2461406.5%27",
+      "header": "*******************************************************************************\n Revised: April 12, 2021                Venus                           299 / 2\n \n PHYSICAL DATA (updated 2020-Oct-19):\n  Vol. Mean Radius (km) =  6051.84+-0.01 Density (g/cm^3)      =  5.204\n  Mass x10^23 (kg)      =    48.685      Volume (x10^10 km^3)  = 92.843\n  Sidereal rot. period  =   243.018484 d Sid. Rot. Rate (rad/s)= -0.00000029924\n  Mean solar day        =   116.7490 d   Equ. gravity  m/s^2   =  8.870\n  Mom. of Inertia       =     0.33       Core radius (km)      = ~3200\n  Geometric Albedo      =     0.65       Potential Love # k2   = ~0.25\n  GM (km^3/s^2)         = 324858.592     Equatorial Radius, Re = 6051.893 km\n  GM 1-sigma (km^3/s^2) =    +-0.006     Mass ratio (Sun/Venus)= 408523.72\n  Atmos. pressure (bar) =  90            Max. angular diam.    =   60.2\"\n  Mean Temperature (K)  = 735            Visual mag. V(1,0)    =   -4.40\n  Obliquity to orbit    = 177.3 deg      Hill's sphere rad.,Rp =  167.1\n  Sidereal orb. per., y =   0.61519726   Orbit speed, km/s     =   35.021\n  Sidereal orb. per., d = 224.70079922   Escape speed, km/s    =   10.361\n                                 Perihelion  Aphelion    Mean\n  Solar Constant (W/m^2)         2759         2614       2650\n  Maximum Planetary IR (W/m^2)    153         153         153\n  Minimum Planetary IR (W/m^2)    153         153         153\n*******************************************************************************\n\n\n*******************************************************************************\nEphemeris / API_USER Thu Nov  5 23:41:03 2026 Pasadena, USA      / Horizons\n*******************************************************************************\nTarget body name: Venus (299)                     {source: DE441}\nCenter body name: Solar System Barycenter (0)     {source: DE441}\nCenter-site name: BODY CENTER\n*******************************************************************************\nStart time      : A.D. 2000-Jan-01 12:00:00.0000 TDB\nStop  time      : A.D. 2027-Jan-01 00:00:00.0000 TDB\nStep-size       : DISCRETE TIME-LIST\n*******************************************************************************\nCenter geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}\nCenter cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}\nCenter radii    : (undefined)\nOutput units    : KM-S\nCalendar mode   : Mixed Julian/Gregorian\nOutput type     : GEOMETRIC cartesian states\nOutput format   : 2 (position and velocity)\nReference frame : ICRF\n*******************************************************************************\n            JDTDB,            Calendar Date (TDB),                      X,                      Y,                      Z,                     VX,                     VY,                     VZ,\n**************************************************************************************************************************************************************************************************\n",
+      "rows": [
+        {
+          "jd_tdb": 2451545.0,
+          "position": [
+            -108524200.8575715,
+            -7318564.9596786,
+            3548121.861333776
+          ]
+        },
+        {
+          "jd_tdb": 2451545.125,
+          "position": [
+            -108508510.7588942,
+            -7664440.217464361,
+            3391530.839105961
+          ]
+        },
+        {
+          "jd_tdb": 2451546.0,
+          "position": [
+            -108361465.6086315,
+            -10082808.87322126,
+            2294279.375238336
+          ]
+        },
+        {
+          "jd_tdb": 2451910.5,
+          "position": [
+            73254262.64545266,
+            72917819.042247,
+            28161352.58520377
+          ]
+        },
+        {
+          "jd_tdb": 2453005.5,
+          "position": [
+            108980256.7320918,
+            4390658.313988619,
+            -4892665.27331437
+          ]
+        },
+        {
+          "jd_tdb": 2455197.5,
+          "position": [
+            7419727.547536319,
+            -98356164.94822657,
+            -44763061.63828394
+          ]
+        },
+        {
+          "jd_tdb": 2456109.5,
+          "position": [
+            45777253.15471244,
+            -89124719.71630883,
+            -43017340.31497248
+          ]
+        },
+        {
+          "jd_tdb": 2457204.5,
+          "position": [
+            -36734747.30680253,
+            -93811011.81369305,
+            -39877247.34689559
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5,
+          "position": [
+            70417098.66480905,
+            77307186.07546642,
+            30325714.68143107
+          ]
+        },
+        {
+          "jd_tdb": 2457754.5008,
+          "position": [
+            70415245.08370258,
+            77308563.03894562,
+            30326451.4880236
+          ]
+        },
+        {
+          "jd_tdb": 2458849.5,
+          "position": [
+            107620853.0906284,
+            10672710.03811669,
+            -2056282.695116783
+          ]
+        },
+        {
+          "jd_tdb": 2459215.5,
+          "position": [
+            -67777993.81680109,
+            -78472379.12085609,
+            -31079560.74021517
+          ]
+        },
+        {
+          "jd_tdb": 2459580.5,
+          "position": [
+            -11436128.8965462,
+            97909479.54701678,
+            44718123.44935494
+          ]
+        },
+        {
+          "jd_tdb": 2460310.5,
+          "position": [
+            -108190731.4450878,
+            -13315087.78140792,
+            819211.4637316635
+          ]
+        },
+        {
+          "jd_tdb": 2460409.25,
+          "position": [
+            102918753.6996958,
+            -26660093.88476121,
+            -18536408.68428114
+          ]
+        },
+        {
+          "jd_tdb": 2460676.5,
+          "position": [
+            66973195.34635594,
+            77578758.01579006,
+            30656865.0147744
+          ]
+        },
+        {
+          "jd_tdb": 2461041.5,
+          "position": [
+            12836983.32887579,
+            -98936397.3942134,
+            -45325679.53985732
+          ]
+        },
+        {
+          "jd_tdb": 2461200.123456,
+          "position": [
+            -106498054.6303351,
+            11723949.97648655,
+            12024611.80656736
+          ]
+        },
+        {
+          "jd_tdb": 2461350.5,
+          "position": [
+            67925795.89088172,
+            77388218.64038333,
+            30541899.40563267
+          ]
+        },
+        {
+          "jd_tdb": 2461406.5,
+          "position": [
+            -84083757.18971798,
+            58365591.46050918,
+            31600736.44162326
+          ]
+        }
+      ]
+    }
+  ]
+}

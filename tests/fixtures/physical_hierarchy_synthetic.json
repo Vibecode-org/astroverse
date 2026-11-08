@@ -1,0 +1,216 @@
+{
+  "provenance": "Hand-calculated synthetic Cartesian translations, not real/NASA positions. Powers of two fractions are exactly representable.",
+  "frame": {
+    "version": "positions/1",
+    "revision": "synthetic-hierarchy-1",
+    "evaluated_at": null,
+    "jd_tdb": 2451545,
+    "coordinates": {
+      "representation": "simulation_position",
+      "unit": "km",
+      "reference_system": "ICRF",
+      "origin": "solar_system_barycenter",
+      "corrections": "NONE",
+      "time_scale": "TDB",
+      "source_epoch": null,
+      "accuracy": null,
+      "source": "synthetic test data; not NASA",
+      "revision": "synthetic-hierarchy-1"
+    },
+    "objects": [
+      {
+        "id": "a",
+        "status": "computed",
+        "position": [
+          1000000000000.5,
+          2000000000012.25,
+          -2999999999990.75
+        ]
+      },
+      {
+        "id": "b",
+        "status": "computed",
+        "position": [
+          1000000000000.625,
+          2000000000012.75,
+          -2999999999989.75
+        ]
+      },
+      {
+        "id": "c",
+        "status": "computed",
+        "position": [
+          1000000000050,
+          2000000000020,
+          -3000000000010
+        ]
+      },
+      {
+        "id": "d",
+        "status": "computed",
+        "position": [
+          1000000000100,
+          2000000000030,
+          -3000000000020
+        ]
+      },
+      {
+        "id": "unknown",
+        "status": "unknown",
+        "position": null
+      }
+    ],
+    "hierarchy": {
+      "version": "physical-hierarchy/1",
+      "revision": "synthetic-hierarchy-1",
+      "evaluated_at": null,
+      "jd_tdb": 2451545,
+      "unit": "km",
+      "reference_system": "ICRF",
+      "origin": "solar_system_barycenter",
+      "time_scale": "TDB",
+      "sectors": [
+        {
+          "id": "s1",
+          "origin_km": [
+            1000000000000.0,
+            2000000000000.0,
+            -3000000000000.0
+          ]
+        },
+        {
+          "id": "s2",
+          "origin_km": [
+            1000000000080.0,
+            2000000000030.0,
+            -3000000000020.0
+          ]
+        },
+        {
+          "id": "unlocated",
+          "origin_km": null
+        }
+      ],
+      "systems": [
+        {
+          "id": "sys1",
+          "sector_id": "s1",
+          "offset_km": [
+            0.25,
+            12,
+            9
+          ]
+        },
+        {
+          "id": "sys2",
+          "sector_id": "s1",
+          "offset_km": [
+            50,
+            20,
+            -10
+          ]
+        },
+        {
+          "id": "sys3",
+          "sector_id": "s2",
+          "offset_km": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "sys-unknown",
+          "sector_id": "unlocated",
+          "offset_km": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "bodies": [
+        {
+          "id": "a",
+          "system_id": "sys1",
+          "offset_km": [
+            0.25,
+            0.25,
+            0.25
+          ]
+        },
+        {
+          "id": "b",
+          "system_id": "sys1",
+          "offset_km": [
+            0.375,
+            0.75,
+            1.25
+          ]
+        },
+        {
+          "id": "c",
+          "system_id": "sys2",
+          "offset_km": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "d",
+          "system_id": "sys3",
+          "offset_km": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "unknown",
+          "system_id": "sys-unknown",
+          "offset_km": [
+            1,
+            2,
+            3
+          ]
+        }
+      ]
+    }
+  },
+  "relative": {
+    "b:a": [
+      0.125,
+      0.5,
+      1
+    ],
+    "c:a": [
+      49.5,
+      7.75,
+      -19.25
+    ],
+    "d:a": [
+      99.5,
+      17.75,
+      -29.25
+    ]
+  },
+  "repartition": {
+    "a": {
+      "system_id": "sys3",
+      "offset_km": [
+        -89.5,
+        -17.75,
+        29.25
+      ]
+    },
+    "b": {
+      "system_id": "sys3",
+      "offset_km": [
+        -89.375,
+        -17.25,
+        30.25
+      ]
+    }
+  }
+}

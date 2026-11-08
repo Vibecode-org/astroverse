@@ -1,0 +1,9 @@
+.physicalApp .legacyLink { color: #b8cde4; font-size: 12px; padding: 8px; }
+.physicalApp .physicalSearch { margin: 12px; width: calc(100% - 24px); padding: 10px; color: #e1ebff; background: #101c2b; border: 1px solid #345; border-radius: 6px; }
+.physicalApp .controlBlock p { color: #acbdd0; font-size: 12px; line-height: 1.5; }
+.physicalApp .physicalStatus { z-index: 30; position: fixed; bottom: 20px; left: 340px; right: 20px; padding: 12px; pointer-events: none; line-height: 1.6; color: #b9cee5; font-size: 13px; }
+.physicalApp small { font-size: 11px; color: #94aac0; }
+.physicalApp input[type=datetime-local] { display: block; width: 100%; background: #102033; color: #def; border: 1px solid #456; padding: 6px; }
+.legacyNotice { position: fixed; bottom: 8px; left: 340px; z-index: 100; font-size: 12px; color: #ffcf83; background: #182030dd; padding: 8px; border-radius: 6px; }
+.legacyNotice a { color: #b7d7ff; margin-left: 12px; }
+@media(max-width: 800px) { .physicalApp .physicalStatus { left: 12px; bottom: 12px; right: 12px; } .physicalApp .legacyLink { max-width: 90px; } }

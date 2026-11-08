@@ -1,0 +1,47 @@
+{
+  "objects": [
+    {
+      "id": "host",
+      "name": "Звезда 🌟",
+      "latin": "Host",
+      "kind": "star",
+      "scale": "local",
+      "ra": 3,
+      "dec": -20,
+      "distance_ly": 12,
+      "radius": 0.5,
+      "color": "#abc",
+      "temperature_k": 5000
+    },
+    {
+      "id": "planet",
+      "name": "Планета",
+      "kind": "exoplanet",
+      "scale": "local",
+      "parent": "host",
+      "ra": 3,
+      "dec": -20,
+      "distance_ly": 12,
+      "radius": 0.1,
+      "color": "#1234",
+      "au": 1,
+      "period_days": 365,
+      "radius_earth": 1
+    },
+    {
+      "id": "hole",
+      "name": "Hole",
+      "latin": "",
+      "kind": "black_hole",
+      "scale": "galaxy",
+      "gx": 1,
+      "gy": 2,
+      "gz": 3,
+      "has_jet": true,
+      "color": "#11223344",
+      "radius": 2
+    }
+  ],
+  "v1": "QVNUVgEAAAADAAAAFAAAAAAAAADAnwhBQKaMwMCfCEHAnwhBQKaMwMCfCEEAAIA/AAAAQAAAQEAAAAA/zczMPQAAAED/zLuqRDMiEUQzIhEABwYAAQD/////AAAAAP////8=",
+  "v2": "QVNUVgIAAAADAAAArAAAABMAAACsAAAAAAAAANAAAAAAAAAA3AAAAAAAAADoAAAAAAAAAOwAAAAAAAAA8AAAAAAAAAD8AAAAAAAAAAABAAAAAAAADAEAAAAAAAAYAQAAAAAAACQBAAAAAAAAMAEAAAAAAAA8AQAAAAAAAEgBAAAAAAAAVAEAAAAAAABgAQAAAAAAAGwBAAAAAAAAeAEAAAAAAACEAQAAAAAAAMCfCEFApozAwJ8IQcCfCEFApozAwJ8IQQAAgD8AAABAAABAQAAAAD/NzMw9AAAAQP/Mu6pEMyIRRDMiEQAHBgAAAQIA/////wAAAAD/////AQECAAAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAgLZDAAAAAABAnEUAAAAAAAAAAAAAAAAZAAAALQAAAAQAAAAGAAAABAAAAAQAAAAfAAAAMQAAABEAAAAOAAAABAAAABUAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAGhvc3TQl9Cy0LXQt9C00LAg8J+Mn0hvc3RwbGFuZXTQn9C70LDQvdC10YLQsGhvbGVIb2xl"
+}

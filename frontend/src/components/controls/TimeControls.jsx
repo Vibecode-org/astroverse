@@ -28,7 +28,7 @@ function formatRate(rate) {
   return `${sign}×` + Number((value / YEAR_S).toPrecision(3)) + ' год/с';
 }
 
-export default function TimeControls ({ setSimDate, isPaused, setIsPaused, timeMultiplier, setTimeMultiplier }) {
+export default function TimeControls ({ setSimDate, isPaused, setIsPaused, timeMultiplier, setTimeMultiplier, onNow }) {
   const shift = (deltaMs) => setSimDate(prev => new Date(prev.getTime() + deltaMs));
   // Negative multipliers run the simulation backwards. Keep the magnitude for
   // rate matching and only flip the sign, so «−1 день/с» is a real direction.
@@ -48,7 +48,7 @@ export default function TimeControls ({ setSimDate, isPaused, setIsPaused, timeM
     <div className="timeControls">
       <div className="timeControlBar">
         <div className="timeMain">
-          <button type="button" className="timeBtn" onClick={() => setSimDate(new Date())}>
+          <button type="button" className="timeBtn" onClick={() => onNow ? onNow() : setSimDate(new Date())}>
             <span>Сейчас</span>
           </button>
           <button type="button" className="timeBtn" onClick={() => shift(-DAY_MS)}>

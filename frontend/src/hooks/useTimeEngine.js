@@ -4,7 +4,9 @@ const DAY_MS = 86400000;
 const UPDATE_INTERVAL_MS = 100;
 const MAX_FRAME_GAP_MS = 1000;
 
-export function useTimeEngine() {
+export function useTimeEngine({ nowMode = false } = {}) {
+  const nowModeRef = useRef(nowMode);
+  nowModeRef.current = nowMode;
   const [simDate, setSimDate] = useState(() => new Date());
   // Скорость = симулированных СЕКУНД за реальную секунду. Раньше множитель
   // означал «дней за секунду», из-за чего ×1 был суточным ускорением, а
@@ -28,7 +30,8 @@ export function useTimeEngine() {
       pendingSimulationMs = 0;
       elapsedSinceUpdate = 0;
       if (delta !== 0) {
-        setSimDate(prev => new Date(prev.getTime() + delta));
+        setSimDate(prev => nowModeRef.current && multiplier === 1
+            ? new Date() : new Date(prev.getTime() + delta));
       }
     };
 

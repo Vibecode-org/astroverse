@@ -3,12 +3,24 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": {"dev":"vite","build":"vite build","preview":"vite preview"},
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
   "dependencies": {
+    "@vitejs/plugin-react": "^4.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "three": "^0.186.1",
-    "vite": "^5.4.10",
-    "@vitejs/plugin-react": "^4.3.3"
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.1.0",
+    "@vitest/coverage-v8": "^5.1.0",
+    "jsdom": "^25.0.1",
+    "vite": "^6.4.4",
+    "vitest": "^5.1.0"
   }
 }

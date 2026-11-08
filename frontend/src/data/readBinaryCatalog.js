@@ -52,11 +52,15 @@ function readHeader(bytes, view) {
 }
 
 function readV1(buffer) {
+  if (buffer.byteLength < V1_HEADER_SIZE) throw new Error('Truncated v1 header');
   const view = new DataView(buffer);
   const count = view.getUint32(8, true);
   const offset = Number(view.getBigUint64(12, true));
   if (offset !== V1_HEADER_SIZE) {
     throw new Error(`Invalid array offset: ${offset}`);
+  }
+  if (buffer.byteLength !== V1_HEADER_SIZE + count * 26) {
+    throw new Error('Invalid v1 catalog size');
   }
 
   let cursor = offset;
@@ -74,6 +78,7 @@ function readV1(buffer) {
   const parentIndices = new Int32Array(count);
   for (let i = 0; i < count; i++) {
     parentIndices[i] = view.getInt32(cursor + i * 4, true);
+    if (parentIndices[i] < -1 || parentIndices[i] >= count) throw new Error('Invalid parent index');
   }
 
   const objects = new Array(count);
@@ -176,6 +181,7 @@ function decodeTablesFast(bytes, decoder, tables) {
 }
 
 function readV2(buffer) {
+  if (buffer.byteLength < V2_FIXED_HEADER_SIZE) throw new Error('Truncated v2 header');
   const bytes = new Uint8Array(buffer);
   const view = new DataView(buffer);
   const count = view.getUint32(8, true);
@@ -205,6 +211,12 @@ function readV2(buffer) {
     }
   }
   const sectionOffset = (name) => offsets[V2_SECTIONS.indexOf(name)];
+  const bytesPerObject = [12, 4, 4, 1, 1, 4, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
+  for (let i = 0; i < bytesPerObject.length; i++) {
+    if (offsets[i] + count * bytesPerObject[i] > offsets[i + 1]) {
+      throw new Error(`Truncated or overlapping v2 section ${V2_SECTIONS[i]}`);
+    }
+  }
 
   const positions = new Float32Array(buffer, sectionOffset("positions"), count * 3);
   const sizes = new Float32Array(buffer, sectionOffset("sizes"), count);
@@ -245,6 +257,7 @@ function readV2(buffer) {
   for (let i = 0; i < count; i++) {
     const position = [positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]];
     const parentIndex = parentIndices[i];
+    if (parentIndex < -1 || parentIndex >= count) throw new Error('Invalid parent index');
     objects[i] = {
       _index: i,
       id: ids[i],

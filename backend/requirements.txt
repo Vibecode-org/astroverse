@@ -2,3 +2,10 @@ fastapi==0.115.12
 uvicorn[standard]==0.34.3
 # TestClient (starlette) требует httpx; используется в tests/test_api.py.
 httpx==0.28.1
+# Offline geometric centers and streaming catalog preparation.
+skyfield==1.53
+jplephem==2.23
+numpy==2.2.6
+sgp4==2.24
+certifi==2025.4.26
+ijson==3.3.0

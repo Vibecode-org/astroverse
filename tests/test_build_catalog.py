@@ -168,6 +168,7 @@ class ConfigTests(unittest.TestCase):
         import tempfile, json
         from pathlib import Path
         tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
         config_path = Path(tmp.name) / "config.json"
         config = {
             "seed": "catalog_seed.json",
@@ -186,6 +187,7 @@ class ConfigTests(unittest.TestCase):
         import tempfile, json
         from pathlib import Path
         tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
         config_path = Path(tmp.name) / "config.json"
         config = {
             "seed": "catalog_seed.json",

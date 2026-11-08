@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY backend /app/backend
 COPY data /app/data
 COPY tests /app/tests
+COPY .coveragerc /app/.coveragerc
 
 # Run as an unprivileged user: a remote-code-execution bug in the API must not
 # hand over root inside the container. The catalog builder writes into /app/data,

@@ -1,0 +1,33 @@
+{
+  "source_url": "https://ssd-api.jpl.nasa.gov/sbdb_query.api?info=field",
+  "signature": {
+    "source": "NASA/JPL SBDB (Small-Body DataBase) Query API",
+    "version": "1.0"
+  },
+  "fields": [
+    {
+      "name": "epoch",
+      "units": "TDB",
+      "title": "epoch",
+      "description": "epoch of osculation in Julian day form"
+    },
+    {
+      "description": "semi-major axis",
+      "title": "a",
+      "units": "au",
+      "name": "a"
+    },
+    {
+      "description": "sidereal orbital period",
+      "title": "period",
+      "units": "d",
+      "name": "per"
+    },
+    {
+      "description": "sidereal orbital period",
+      "title": "period",
+      "units": "years",
+      "name": "per_y"
+    }
+  ]
+}

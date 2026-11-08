@@ -42,8 +42,7 @@ def load_config(path: Path) -> dict:
     http = config["http"]
     if not isinstance(http["retries"], int) or isinstance(http["retries"], bool) or http["retries"] < 0:
         raise ValueError("http.retries must be a nonnegative integer")
-    if positive_limit(http["timeout_seconds"]) is None:
-        raise ValueError("http.timeout_seconds must be positive")
+    positive_limit(http["timeout_seconds"])
     for name in ("exoplanets", "asteroids", "comets"):
         positive_limit(config["sources"][name]["limit"])
     return config
@@ -99,7 +98,7 @@ def build_enriched_catalog(
     try:
         write_binary_catalog(output.with_suffix(".bin"), items)
         write_binary_catalog_v2(output.with_suffix(".v2.bin"), items)
-    except Exception as exc:  # pragma: no cover - binary is additive
+    except Exception as exc:
         LOG.warning("Binary catalog write failed: %s", exc)
     LOG.info("Saved %s objects to %s (%s)", len(items), output, "offline snapshot" if offline else "NASA refreshed")
     return items
@@ -122,7 +121,7 @@ def main():
     }
     try:
         build_enriched_catalog(args.config, args.output, offline=args.offline, wikipedia=args.wikipedia, limits=limits)
-    except (ValueError, OSError, KeyError, TypeError, OverflowError) as exc:
+    except (SourceError, ValueError, OSError, KeyError, TypeError, OverflowError) as exc:
         parser.exit(1, f"Catalog build failed; output was not replaced: {exc}\n")
 
 
