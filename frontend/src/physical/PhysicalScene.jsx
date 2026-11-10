@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createStage } from '../scene/stage.js';
+import { frameReadyAt } from './sectorManager.js';
 import { physicalOffset } from './coordinates.js';
 
 export { createPhysicalLayer } from './physicalLayer.js';
@@ -18,12 +19,18 @@ export default function PhysicalScene({ frame, bodies = [], centerId, overview, 
       const { scene, camera, renderer, controls } = stage;
       camera.near = 0.00001; camera.updateProjectionMatrix(); controls.minDistance = 0.0001;
       layer = createPhysicalLayer(scene);
-      const state = { ...stage, layer, generation: 1, frames: 0 };
+      const state = { ...stage, layer, generation: 1, frames: 0, displayedAt:null };
       sceneRef.current = state;
       let previousNeighborhood = null;
       const animate = () => {
         raf = requestAnimationFrame(animate);
         controls.update(); layer.tick(camera, renderer.getPixelRatio?.() || 1); renderer.render(scene, camera);
+        if (state.pendingDisplay) {
+          const {frame, ready} = state.pendingDisplay;
+          state.displayedAt = frame.evaluated_at;
+          state.onTiming?.({kind:'display', ms:performance.now()-ready, at:frame.evaluated_at});
+          state.pendingDisplay = null;
+        }
         if (neighborhoodRef.current) {
           const offset = physicalOffset(camera.position);
           const radius = Math.max(2e6, camera.position.distanceTo(controls.target) * 2e5);
@@ -85,7 +92,9 @@ export default function PhysicalScene({ frame, bodies = [], centerId, overview, 
     const state = sceneRef.current;
     if (!state) return;
     try {
+      state.pendingDisplay = null; state.displayedAt = null;
       state.layer.update(frame, centerId, overview, state.neighborhood, bodies, selectedId);
+      state.pendingDisplay = frame ? {frame, ready:frameReadyAt.get(frame) ?? performance.now()} : null;
       if (frame) onError(null, 'frame');
     } catch (error) { state.layer.update(null); onError(error.message, 'frame'); }
   }, [frame, bodies, centerId, overview, sceneRef, onError, selectedId]);

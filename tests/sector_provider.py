@@ -1,7 +1,7 @@
 """Isolated synthetic positions HTTP fixture. NEVER imported by production.
 
 Run only with docker-compose.sectors-test.yml. No BSP, catalog or real bodies.
-Four independently delayed sectors, 64 artificial centers each, plus unknowns.
+32 independently delayed sectors, 64 artificial centers each, plus unknowns.
 """
 import asyncio
 from collections import deque
@@ -20,7 +20,7 @@ timescale = load.timescale(builtin=True)
 state = {'revision':1, 'delay':200, 'fail':'', 'conflict':0, 'hang':'', 'mixed':''}
 metrics = {'requests':0, 'active':0, 'peak_active':0, 'bytes':0, 'max_bytes':0,
            'statuses':{}, 'total_ms':0, 'max_ms':0}
-traces = deque(maxlen=512)
+traces = deque(maxlen=4096)
 
 
 def current_revision():
@@ -111,10 +111,10 @@ def measurements():
 @app.get('/api/sources/v1/objects')
 def sources(limit: int=128, q: str=''):
     objects = [{'id':f'synthetic-{i:03}', 'name':f'Synthetic {i:03}', 'kind':'star',
-                'color':'#66bbff','model_id':'synthetic'} for i in range(256)]
+                'color':'#66bbff','model_id':'synthetic'} for i in range(2048)]
     selected = [row for row in objects if q.lower() in row['name'].lower() or q in row['id']]
     return {'version':'sources/1','revision':'synthetic-registry','objects':selected[:min(limit,128)],
-            'total':256,'models':[{'id':'synthetic','source':'SYNTHETIC HTTP TEST — no NASA data'}]}
+            'total':2048,'models':[{'id':'synthetic','source':'SYNTHETIC HTTP TEST — no NASA data'}]}
 
 
 @app.get('/api/search')
@@ -132,7 +132,7 @@ async def nearby(at: str, anchor: str, dx: float, dy: float, dz: float, radius: 
     center = [dx+(anchor_number//64*6000000+(anchor_number%64)*1000 if anchor_number is not None else 0),dy,dz]
     result['sectors'] = []
     if anchor_number is not None:
-        for number in range(4):
+        for number in range(32):
             delta = [max(number*6000000-center[0],0,center[0]-(number*6000000+63000)),
                      max(0,-center[1],center[1]-864),max(0,-center[2],center[2]-31500)]
             if math.hypot(*delta) <= radius:
@@ -142,10 +142,10 @@ async def nearby(at: str, anchor: str, dx: float, dy: float, dz: float, radius: 
 
 @app.get('/api/positions/v1/sectors/{sector}')
 async def sector(sector: str, at: str, revision: str):
-    if sector not in [f'synthetic:{i}' for i in range(4)]:
+    if sector not in [f'synthetic:{i}' for i in range(32)]:
         raise HTTPException(404,'Unknown synthetic sector')
     metadata(at)
-    await asyncio.sleep(12 if state['hang']==sector else (state['delay']+[200,0,150,50][int(sector[-1])])/1000)
+    await asyncio.sleep(12 if state['hang']==sector else (state['delay']+[200,0,150,50][int(sector.rsplit(':',1)[1])%4])/1000)
     if state['conflict']:
         state['conflict'] -= 1; state['revision'] += 1
         raise HTTPException(409,detail={'message':'Injected revision conflict'})

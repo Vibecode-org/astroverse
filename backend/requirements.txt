@@ -1,4 +1,6 @@
-fastapi==0.115.12
+fastapi==0.162.3
+# Pin the audited ASGI dependency as well as the framework.
+starlette==1.10.0
 uvicorn[standard]==0.34.3
 # TestClient (starlette) требует httpx; используется в tests/test_api.py.
 httpx==0.28.1
@@ -7,5 +9,5 @@ skyfield==1.53
 jplephem==2.23
 numpy==2.2.6
 sgp4==2.24
-certifi==2025.4.26
+certifi==2026.10.23
 ijson==3.3.0

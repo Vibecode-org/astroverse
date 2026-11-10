@@ -127,7 +127,7 @@ export default function PhysicalApp() {
     </header>
     <aside className="sidebar glass">
       <div className="controlBlock"><b>{bodies.slice(0,5).map(body => body.name).join(' · ')}{bodies.length > 5 && ` · ещё ${bodies.length-5}`}</b><p>{models.map(model => model.source).join(' · ')} · геометрические центры</p>
-        <p>В каталоге: {total ?? '…'}. Положения на дату подтверждены для {supportedTotal} тел.</p>
+        <p>В каталоге: {total ?? '…'}. В реестре положений: {supportedTotal} тел.</p>
         <button className="viewBtn" onClick={() => setOverview(value => !value)}>{overview ? 'Окрестность тела' : 'Обзор системы'}</button>
         <p>L0: точки; L1: кольцевые маркеры рядом и при выборе. Размеры графические, не радиусы тел. Расстояния линейные.</p>
       </div>

@@ -20,7 +20,7 @@
     "@testing-library/react": "^16.1.0",
     "@vitest/coverage-v8": "^5.1.0",
     "jsdom": "^25.0.1",
-    "vite": "^6.4.4",
+    "vite": "^6.4.6",
     "vitest": "^5.1.0"
   }
 }

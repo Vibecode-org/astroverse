@@ -24,7 +24,7 @@ class SyntheticHTTPProviderTests(unittest.TestCase):
         self.assertTrue(all(row['id'].startswith('synthetic-') for row in rows))
         query = dict(at=AT,anchor='synthetic-000',dx=0,dy=0,dz=0,radius=1e9)
         manifest = self.client.get('/api/positions/v1/nearby',params=query).json()
-        self.assertEqual(len(manifest['sectors']),4)
+        self.assertEqual(len(manifest['sectors']),32)
         self.assertEqual(manifest['objects'],[])
         query['dx'] = 1e12; query['radius'] = 1
         self.assertEqual(self.client.get('/api/positions/v1/nearby',params=query).json()['sectors'],[])

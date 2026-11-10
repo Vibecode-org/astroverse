@@ -23,7 +23,7 @@ for(let i=0;i<12;i++) {
  times.push(performance.now()-start);
 }
 const managerMetrics=manager.inspect();manager.cancel();
-if(managerMetrics.requests!==60 || managerMetrics.peakActive!==4)throw new Error('Unexpected HTTP request count/concurrency');
+if(managerMetrics.requests!==396 || managerMetrics.peakActive!==4)throw new Error('Unexpected HTTP request count/concurrency');
 // Preload wire string and warm parser/graph before the component-only delta.
 const wire=JSON.stringify(frame);frame=null;
 for(let i=0;i<20;i++)new PhysicalHierarchy(JSON.parse(wire));
@@ -34,7 +34,7 @@ const componentHeap=(after.heapUsed-before.heapUsed)/graphs.length;
 const bytes=new TextEncoder().encode(wire).length;
 const providerAfter=await (await fetch(base+'/api/_test/metrics')).json();
 console.log(JSON.stringify({node:process.version,iterations:12,first_ms:times[0],median_ms:[...times].sort((a,b)=>a-b)[6],
- manager:managerMetrics,wire_bytes:bytes,decoded_estimate_bytes:decodedEstimate(bytes)+256*512,
+ manager:managerMetrics,wire_bytes:bytes,decoded_estimate_bytes:decodedEstimate(bytes)+2048*512,
  component_retained_heap_bytes:componentHeap,batch:graphs.length,
  client_rss_before_bytes:before.rss,client_rss_after_bytes:after.rss,
  provider_rss_before_kib:providerBefore.provider_rss_kib,provider_rss_after_kib:providerAfter.provider_rss_kib,

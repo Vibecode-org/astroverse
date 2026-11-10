@@ -54,7 +54,7 @@ describe('physical experience',()=>{
     render(<PhysicalApp/>);
     await screen.findByText(/В каталоге: 3471/);
     expect(document.querySelectorAll('.objectRow')).toHaveLength(5);
-    expect(screen.getByText(/подтверждены для 5 тел/)).toBeTruthy();
+    expect(screen.getByText(/В реестре положений: 5 тел/)).toBeTruthy();
     for (const [name,id] of [['Меркурий','mercury'],['Венера','venus']]) {
       fireEvent.click(screen.getAllByText(name)[0]);
       expect(mocks.scene.centerId).toBe(id);expect(mocks.scene.overview).toBe(false);
@@ -116,7 +116,7 @@ it('uses synthetic registry membership and marker metadata beyond five without a
   expect(mocks.scene.centerId).toBe('synthetic-8');
   expect(mocks.scene.bodies.find(row=>row.id==='synthetic-8').color).toBe('#aa0000');
   expect(mocks.card).not.toHaveBeenCalled();
-  expect(screen.getByText(/подтверждены для 300 тел/)).toBeTruthy();
+  expect(screen.getByText(/В реестре положений: 300 тел/)).toBeTruthy();
   expect(screen.getByText('Источник положения: Synthetic test provider')).toBeTruthy();
 });
 

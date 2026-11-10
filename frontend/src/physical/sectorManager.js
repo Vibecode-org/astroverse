@@ -1,10 +1,12 @@
 import { verifiedRows } from './coordinates.js';
 
+export const frameReadyAt = new WeakMap();
+
 export class PositionRevisionChanged extends Error {
   constructor() { super('Ревизия положений изменилась; повторите запрос'); }
 }
 export const SECTOR_LIMITS = Object.freeze({ concurrency:4, queue:128, objects:4096,
-  serialized:4*1024*1024, decoded:16*1024*1024, response:256*1024,
+  serialized:4*1024*1024, decoded:32*1024*1024, response:256*1024,
   timeout:10000, retries:1, backoff:100 });
 const abortError = () => new DOMException('cancelled', 'AbortError');
 const fail = message => { throw new Error(message); };
@@ -99,6 +101,16 @@ export class PhysicalSectorManager {
     }
     return result;
   }
+  admit(state, addition) {
+    this.check(state);
+    const current = this.inspect();
+    for (const key of ['objects','serialized','decoded']) {
+      if (current[key] + (addition[key] || 0) > this.limits[key]) {
+        const error = new Error('Превышен бюджет физических секторов: '+key);
+        error.permanent = true; throw error;
+      }
+    }
+  }
   account(state) {
     this.check(state);
     const metrics = this.inspect();
@@ -137,13 +149,14 @@ export class PhysicalSectorManager {
     });
     return state.promise;
   }
-  async request(state, url, attemptSignal) {
+  async request(state, url, attemptSignal, reservedObjects=0) {
     const {limits} = this;
     for (let retry=0; ; retry++) {
       this.check(state, attemptSignal);
       // Reserve before reading/decoding: all active responses and staged/old
       // frames count. Unused allowance is returned after the response is parsed.
-      const reserve = {objects:0, serialized:limits.response, decoded:decodedEstimate(limits.response)};
+      const reserve = {objects:reservedObjects, serialized:limits.response, decoded:decodedEstimate(limits.response)};
+      this.admit(state, reserve);
       for (const key of Object.keys(reserve)) state.reserved[key] += reserve[key];
       let controller, timer, stop, headers, outcome='error', retryDelay=limits.backoff * 2**retry;
       const started = performance.now();
@@ -184,6 +197,9 @@ export class PhysicalSectorManager {
         if (!body) fail('Некорректный ответ сервера эфемерид');
         validate(body, state.milliseconds);
         if (body.objects.length > 128) fail('Превышен размер физического сектора');
+        // Transfer the reservation to decoded residency without double counting.
+        this.admit(state, {objects:body.objects.length-reserve.objects,
+          serialized:bytes-reserve.serialized, decoded:decodedEstimate(bytes)-reserve.decoded});
         state.cost.objects += body.objects.length;
         state.cost.serialized += bytes;
         state.cost.decoded += decodedEstimate(bytes);
@@ -268,6 +284,10 @@ export class PhysicalSectorManager {
             ids.add(sector.id);
             if (sector.revision !== manifest.revision) throw new PositionRevisionChanged();
           }
+          // Known counts allow rejection before any sector work. Without counts,
+          // each bounded response is admitted before becoming staging residency.
+          if (manifest.sectors.every(s => Number.isSafeInteger(s.object_count) && s.object_count >= 0 && s.object_count <= 128))
+            this.admit(state, {objects:manifest.sectors.reduce((n,s)=>n+s.object_count,0)});
           const bodies = new Array(manifest.sectors.length); let next = 0, failure;
           state.queue = bodies.length; this.account(state);
           const worker = async () => {
@@ -276,7 +296,7 @@ export class PhysicalSectorManager {
                 this.check(state, controller.signal);
                 const index = next++, sector = manifest.sectors[index]; state.queue--;
                 const query = new URLSearchParams({at:params.get('at'), revision:manifest.revision});
-                const body = await this.request(state, this.root+'sectors/'+encodeURIComponent(sector.id)+'?'+query, controller.signal);
+                const body = await this.request(state, this.root+'sectors/'+encodeURIComponent(sector.id)+'?'+query, controller.signal, Number.isSafeInteger(sector.object_count) && sector.object_count >= 0 && sector.object_count <= 128 ? sector.object_count : 0);
                 if (body.revision !== manifest.revision || body.registry_revision !== manifest.registry_revision) throw new PositionRevisionChanged();
                 if (body.sector !== sector.id || body.jd_tdb !== manifest.jd_tdb
                     || body.evaluated_at !== manifest.evaluated_at
@@ -289,6 +309,7 @@ export class PhysicalSectorManager {
           if (failure) throw failure;
           this.check(state);
           // Reserve combined arrays/identity maps while old and staging coexist.
+          this.admit(state, {decoded:state.cost.objects * 512});
           state.cost.decoded += state.cost.objects * 512; this.account(state);
           const frame = combine(manifest, bodies, state.milliseconds);
           return this.publish(state, frame);
@@ -309,6 +330,7 @@ export class PhysicalSectorManager {
     if (this.resident) this.metrics.evictions++;
     this.resident = {cost:{...state.cost}, context:state.context};
     state.cost = emptyCost(); state.pending = 0; state.queue = 0;
+    frameReadyAt.set(frame, performance.now());
     return frame;
   }
 }

@@ -18,10 +18,10 @@ def run(catalog):
             m.evaluate('async()=>{await new Promise(r=>setTimeout(r,700));return true;}')
             return m.evaluate('()=>window.__sectorStage.layer.stats()')
         near=zoom(19);assert near['detailed']>=1
-        far=zoom(29);assert far['detailed']==0
-        zoom(23)
+        far=zoom(35);assert far['detailed']==0
+        zoom(25)
         start=m.evaluate('()=>window.__sectorManager.inspect().requests')
-        for z in [22.9,23.1]*4:assert zoom(z)['detailed']==0
+        for z in [24.9,25.1]*4:assert zoom(z)['detailed']==0
         assert m.evaluate('()=>window.__sectorManager.inspect().requests')==start
         before=m.evaluate(PROBE)
         def click_center():
@@ -37,7 +37,7 @@ def run(catalog):
         assert m.evaluate("()=>document.querySelector('.infoPanel')===null")
         # Match Retina framebuffer while keeping CSS picking coordinates.
         m.evaluate('()=>{window.__sectorStage.renderer.setPixelRatio(2);return true;}')
-        zoom(23)
+        zoom(25)
         assert m.evaluate('()=>window.__sectorStage.scene.children.find(x=>x.isPoints).material.uniforms.markerPixelRatio.value')==2
         m.evaluate("()=>{const el=document.querySelector('.viewport');el.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,isPrimary:true}));return true;}")
         click_center();m.wait('window.__sectorStage.layer.stats().detailed>=1')

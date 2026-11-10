@@ -297,3 +297,14 @@ it('does not pick or refocus after dragging the physical camera',()=>{
  fireEvent(el,new MouseEvent('pointerdown',{button:2,bubbles:true}));fireEvent.click(el,{button:2});expect(onPick).toHaveBeenCalledOnce();
  view.unmount();
 });
+it('does not acknowledge an obsolete frame after a failed apply before the next RAF',()=>{
+ let next;vi.stubGlobal('requestAnimationFrame',vi.fn(fn=>{next=fn;return 1;}));
+ vi.stubGlobal('cancelAnimationFrame',vi.fn());
+ const sceneRef={current:null},onError=vi.fn();
+ const view=render(<PhysicalScene frame={frame} centerId="earth" onError={onError} sceneRef={sceneRef}/>);
+ const timing=vi.fn();sceneRef.current.onTiming=timing;
+ view.rerender(<PhysicalScene frame={{version:'v2'}} centerId="earth" onError={onError} sceneRef={sceneRef}/>);
+ act(()=>next());
+ expect(timing).not.toHaveBeenCalled();expect(sceneRef.current.pendingDisplay).toBe(null);
+ expect(sceneRef.current.displayedAt).toBe(null);view.unmount();
+});

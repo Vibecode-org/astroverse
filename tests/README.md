@@ -78,7 +78,7 @@ curl -fsS http://localhost:5173/api/health
 ## Несколько физических секторов через HTTP
 
 Opt-in fixture работает отдельным Docker-проектом на :5174, не добавляет
-маршрутов/тел в обычный API :5173. Health: `synthetic:true, objects:0`. Четыре сектора по 64 искусственные
+маршрутов/тел в обычный API :5173. Health: `synthetic:true, objects:0`. 32 сектора по 64 искусственные
 записи, по одному unknown/null в секторе. Это не NASA и не массовая астрометрия.
 
 ```bash
@@ -99,8 +99,8 @@ Now/ускорение/реверс при jitter >100 мс, остановку 
 ошибки, renderer identity и GPU-счётчики.
 Private React probe читает менеджер/sceneRef, как прежние MCP runners.
 Корреляция: X-Astroverse-Client/Selection/Request проходят через nginx JSON
-access log и bounded trace provider (512 записей). Optional onRequest sink
-менеджера не хранит историю в production; runner ограничивает свои события 512.
+access log и bounded trace provider (4096 записей). Optional onRequest sink
+менеджера не хранит историю в production; runner ограничивает свои события 4096.
 Сверка в report.reconciliation относится к окну после подключения observer:
 каждый fetch либо имеет уникальный request ID в provider, либо завершён cancel
 до API. Стартовые/контрольные обращения считаются отдельно. Повтор ID — ошибка.
@@ -187,3 +187,34 @@ heap/ArrayBuffers слоя отдельно от готового входа и 
 `browser_lod_mcp.py` проверяет L0/L1 picking/refocus и отсутствие HTTP при
 движении камеры внутри прежней области. `browser_sectors_mcp.py` дополнительно
 проводит 18 zoom-переходов через production manager/HTTP/RAF/WebGL.
+
+
+CPU/GPU stage: `browser_sectors_mcp.py --report /tmp/astroverse-cpu-sectors.json`
+на fixture :5174 измеряет p95 (nearest rank) / max apply, LOD и ready→render,
+включая отдельные fullApply/fullLod/fullDisplay для 2048 записей/2016 маркеров.
+Apply/tick измеряются вокруг настоящих методов слоя; диагностические подсчёты
+не включаются в замер. Display заканчивается возвратом renderer.render,
+не GPU fence. Лимиты 16/50 ms, 1/8 ms и 250/1000 ms проверяются assert.
+В report: среда, число наблюдений, HTTP durations, provider RSS, пики менеджера,
+номинальные GPU bytes, scene geometry/material, listeners window/document/
+viewport/canvas и события dispose. Сравнение ресурсов после прогрева и 48
+переходов не является доказательством отсутствия всех утечек JS/драйвера.
+Runner проверяет численно все 2016 центров и Float32 linear transform.
+Запускать итоговые browser-замеры последовательно, без других Chrome stress.
+`node --expose-gc tests/benchmark_sector_manager.mjs` теперь также использует
+32×64; он меняет fault controls provider, поэтому запускать после браузера.
+
+После основного сценария runner открывает отдельную страницу для admission:
+лимит 2048 при resident=2048, Now, терминальная ошибка без повторов (1500 ms),
+возврат лимита 4096 и явное восстановление. Никакой fetch mock не используется.
+Сводка принятого прогона: [physical_budget_report.json](../docs/physical_budget_report.json).
+Временный `--report` содержит также транспортные события/ссылку на screenshot;
+постоянный отчёт сохраняет измерения и checkpoints, без временных путей.
+
+
+Аудит зависимостей перед публикацией: `npm audit` в frontend/;
+в одноразовом backend-контейнере установить pip-audit в /tmp и выполнить
+`PYTHONPATH=/tmp/audit python -m pip_audit -r backend/requirements.txt`.
+Временный scanner не добавлять в production requirements. Результаты и область
+аудита — docs/TEST_COVERAGE.md. Runtime/debug *.log и logs/ игнорируются Git;
+сохранённый числовой отчёт приёмки не является runtime log.

@@ -188,3 +188,27 @@ it('reads bounded streaming HTTP bodies and rejects malformed/oversized streams'
  }
  globalThis.TextDecoder=saved;
 });
+it('updates 2048 resident records and rejects a single-set-only budget before sector work',async()=>{
+ const ids=Array.from({length:32},(_,i)=>String(i));
+ const fetcher=vi.fn(async url=>{
+  if(url.includes('nearby?'))return reply({...manifest(ids),sectors:ids.map(id=>({id,revision:'r',object_count:64}))});
+  const id=decodeURIComponent(url.split('sectors/')[1].split('?')[0]),body=frame(id);delete body.hierarchy;
+  body.objects=Array.from({length:64},(_,i)=>({id:id+':'+i,position:[Number(id)*1e6,i,0],status:'computed'}));return reply(body);
+ });
+ const m=new PhysicalSectorManager({fetcher});
+ for(let i=0;i<5;i++){
+  expect((await m.load({milliseconds,context:'Now',retainPrevious:true})).objects).toHaveLength(2048);
+  expect(m.inspect()).toMatchObject({residentObjects:2048,active:0,pending:0});
+ }
+ expect(m.inspect().peakObjects).toBe(4096);expect(m.inspect().peakDecoded).toBeLessThanOrEqual(m.limits.decoded);
+ const tight=new PhysicalSectorManager({fetcher,limits:{objects:2048}});
+ await tight.load({milliseconds,context:'Now'});const before=fetcher.mock.calls.length;
+ await expect(tight.load({milliseconds,context:'Now',retainPrevious:true})).rejects.toMatchObject({permanent:true});
+ expect(fetcher.mock.calls.length-before).toBe(1);
+ expect(tight.inspect().peakObjects).toBe(2048);expect(tight.inspect().objects).toBe(0);
+});
+it('rejects reservation before crossing a byte budget and marks it terminal',async()=>{
+ const m=new PhysicalSectorManager({fetcher:provider(),limits:{decoded:100}});
+ await expect(m.load({milliseconds,retainPrevious:true})).rejects.toMatchObject({permanent:true});
+ expect(m.inspect()).toMatchObject({requests:0,peakDecoded:0,decoded:0});
+});
