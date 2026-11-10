@@ -20,6 +20,14 @@ beforeEach(()=>{
 });
 
 describe('physical experience',()=>{
+  it('shows the active source UTC interval from registry metadata',async()=>{
+    const data={...registry,models:[{id:'de440',utc_interval:['2000-01-01T00:00:00Z','2027-06-28T00:00:00Z']}],
+      objects:registry.objects.map(row=>({...row,model_id:'de440'}))};
+    vi.stubGlobal('fetch',vi.fn(async path=>({ok:true,json:async()=>path.startsWith('/api/sources/')?data:{objects:3471}})));
+    render(<PhysicalApp/>);
+    await screen.findByText(/2000-01-01 ≤ дата < 2027-06-28/);
+    expect(screen.queryByText(/2026-12-31/)).toBe(null);
+  });
   it('loads no full catalog, offers a far view and only focuses verified centers',async()=>{
     render(<PhysicalApp/>);
     await screen.findByText(/В каталоге: 3471/);
@@ -104,6 +112,7 @@ it('uses synthetic registry membership and marker metadata beyond five without a
   vi.stubGlobal('fetch',vi.fn(async path=>({ok:true,json:async()=>path.startsWith('/api/sources/')?synthetic:{objects:3471}})));
   render(<PhysicalApp/>);
   fireEvent.click(await screen.findByText('Synthetic 8'));
+  expect(document.querySelector('.controlBlock b').textContent).toContain('ещё 4');
   expect(mocks.scene.centerId).toBe('synthetic-8');
   expect(mocks.scene.bodies.find(row=>row.id==='synthetic-8').color).toBe('#aa0000');
   expect(mocks.card).not.toHaveBeenCalled();
@@ -150,4 +159,31 @@ it('clears recovered frame errors without hiding an initialization failure',asyn
   act(()=>mocks.scene.onError(null,'initialization'));
   expect(screen.queryByText('no WebGL')).toBe(null);
   expect(screen.getByText('Положения вычислены на момент кадра')).toBeTruthy();
+});
+
+it('picks located IDs beyond the metadata page and refocuses known bodies at either LOD',async()=>{
+ mocks.positions.frame.objects.push({id:'synthetic-tail',position:[4,5,6]});
+ render(<PhysicalApp/>);await screen.findByText(/В каталоге: 3471/);
+ act(()=>mocks.scene.onPick('synthetic-tail'));
+ expect(screen.getByRole('heading',{name:'synthetic-tail'})).toBeTruthy();
+ expect(mocks.scene.centerId).toBe('synthetic-tail');
+ act(()=>mocks.scene.onPick('earth'));expect(mocks.scene.centerId).toBe('earth');
+ act(()=>mocks.scene.onPick('missing'));expect(mocks.scene.centerId).toBe('earth');
+});
+
+it('refocuses a picked registry search result beyond the first metadata page',async()=>{
+ const remote={id:'verified-remote',name:'Remote verified',model_id:'de440'};
+ vi.stubGlobal('fetch',vi.fn(async path=>({ok:true,status:200,json:async()=>path==='/api/health'?{objects:3471}:path.includes('/api/sources/')?path.includes('&q=')?{...registry,revision:'r1',objects:[remote]}:{...registry,revision:'r1'}:[]})));
+ mocks.positions.frame.objects.push({id:remote.id,position:[4,5,6]});
+ render(<PhysicalApp/>);await screen.findByText(/В каталоге: 3471/);
+ fireEvent.change(screen.getByLabelText('Поиск по всему каталогу'),{target:{value:'verified-remote'}});
+ await screen.findByText('Remote verified');
+ act(()=>mocks.scene.onPick(remote.id));
+ expect(mocks.scene.centerId).toBe(remote.id);
+});
+it('keeps scene metadata stable across clock-only renders',async()=>{
+ const view=render(<PhysicalApp/>);await screen.findByText(/В каталоге: 3471/);
+ const bodies=mocks.scene.bodies;
+ mocks.time={...mocks.time,simDate:new Date('2026-11-06T00:00:01Z')};
+ view.rerender(<PhysicalApp/>);expect(mocks.scene.bodies).toBe(bodies);
 });

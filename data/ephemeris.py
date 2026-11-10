@@ -31,8 +31,8 @@ def contract(registry=REGISTRY):
         'time_scale': 'TDB', 'input_time_scales': ['UTC', 'TDB'],
         'utc_interval': [UTC_START.isoformat(), UTC_STOP.isoformat()],
         'tdb_jd_interval': [TDB_START, TDB_STOP], 'interval_end': 'exclusive',
-        'utc_source': 'Skyfield 1.53 built-in leap table; IERS Bulletin C 72 confirms no December 2026 leap',
-        'utc_source_url': 'https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.72',
+        'utc_source': 'Skyfield 1.53 built-in leap table; IERS Bulletin C 72, leap table expires 2027-06-28 (exclusive API bound)',
+        'utc_source_url': 'https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat',
         'accuracy': None, 'accuracy_status': 'no per-vector physical uncertainty provided by kernel',
         'validation': {'reference': 'JPL Horizons geometric ICRF barycentric vectors',
                        'samples_per_body': 20, 'tolerance_km': 1.0,
@@ -67,7 +67,7 @@ def parse_utc(value, start=UTC_START, stop=UTC_STOP):
     except (ValueError, OverflowError) as exc:
         raise ValueError('invalid timestamp or unsupported leap-second syntax') from exc
     if not start <= result < stop:
-        raise ValueError('UTC date outside confirmed interval [2000-01-01, 2027-01-01)')
+        raise ValueError(f'UTC date outside confirmed interval [{start.isoformat()}, {stop.isoformat()})')
     return result
 
 

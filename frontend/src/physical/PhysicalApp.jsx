@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTimeEngine } from '../hooks/useTimeEngine.js';
 import TimeControls from '../components/controls/TimeControls.jsx';
 import ObjectList from '../components/ui/ObjectList.jsx';
@@ -18,6 +18,7 @@ export default function PhysicalApp() {
   const [supportedTotal, setSupportedTotal] = useState(0);
   const [searchBodies, setSearchBodies] = useState([]);
   const [searchModels, setSearchModels] = useState([]);
+  const sceneBodies = useMemo(() => [...bodies, ...searchBodies], [bodies, searchBodies]);
   const verifiedIds = new Set(bodies.map(row => row.id));
   const supported = row => verifiedIds.has(row.id) || (row.verifiedRegistry && row.registryRevision === registryRevision);
   const [registryError, setRegistryError] = useState(null);
@@ -88,7 +89,7 @@ export default function PhysicalApp() {
           if (registry.version !== 'sources/1' || !Array.isArray(registry.objects) || registry.objects.length > 128) throw new Error('Некорректный реестр');
           return {rows:[...registry.objects.map(row=>({...row,verifiedRegistry:true,registryRevision:registry.revision})), ...catalog.filter(row=>!registry.objects.some(body=>body.id===row.id))].slice(0,500), registry};
         })
-        .then(data => { if (!cancelled) { setRows(data.rows); setSearchBodies(data.registry.objects); setSearchModels(data.registry.models || []); setSearchError(null); } })
+        .then(data => { if (!cancelled) { setRows(data.rows); setSearchBodies(data.registry.objects.map(row=>({...row,verifiedRegistry:true,registryRevision:data.registry.revision}))); setSearchModels(data.registry.models || []); setSearchError(null); } })
         .catch(err => { if (!cancelled && err.name !== 'AbortError') { setRows([]); setSearchError(err.message); } });
     }, 300);
     return () => { cancelled = true; clearTimeout(timer); controller.abort(); };
@@ -109,7 +110,15 @@ export default function PhysicalApp() {
     setSelected(row);
     if (supported(row)) { setCenterId(row.id); setOverview(false); setFocusVersion(value => value + 1); }
   };
+  const pick = id => {
+    const known = [...bodies, ...searchBodies].find(body => body.id === id);
+    const located = frame?.objects.find(body => body.id === id && body.position);
+    if (known) select(known);
+    else if (located) select({ ...located, name: id, verifiedRegistry: true, registryRevision });
+  };
   const position = frame?.objects.find(row => row.id === selected?.id && row.position);
+  const activeBody = [...bodies,...searchBodies].find(row=>row.id===centerId);
+  const utcInterval = [...models,...searchModels].find(model=>model.id===activeBody?.model_id)?.utc_interval;
   return <div className="app physicalApp">
     <header className="topbar">
       <div className="brand"><div className="logo">✦</div><div><b>ASTROVERSE</b><small>ПРОВЕРЕННЫЕ ПОЛОЖЕНИЯ</small></div></div>
@@ -117,10 +126,10 @@ export default function PhysicalApp() {
       <a href="?scene=legacy" className="legacyLink">Иллюстративный вид</a>
     </header>
     <aside className="sidebar glass">
-      <div className="controlBlock"><b>{bodies.map(body => body.name).join(' · ')}</b><p>{models.map(model => model.source).join(' · ')} · геометрические центры</p>
+      <div className="controlBlock"><b>{bodies.slice(0,5).map(body => body.name).join(' · ')}{bodies.length > 5 && ` · ещё ${bodies.length-5}`}</b><p>{models.map(model => model.source).join(' · ')} · геометрические центры</p>
         <p>В каталоге: {total ?? '…'}. Положения на дату подтверждены для {supportedTotal} тел.</p>
         <button className="viewBtn" onClick={() => setOverview(value => !value)}>{overview ? 'Окрестность тела' : 'Обзор системы'}</button>
-        <p>Маркеры увеличены в пикселях. Расстояния линейные.</p>
+        <p>L0: точки; L1: кольцевые маркеры рядом и при выборе. Размеры графические, не радиусы тел. Расстояния линейные.</p>
       </div>
       <input className="physicalSearch" aria-label="Поиск по всему каталогу" value={query} onChange={e => setQuery(e.target.value)} placeholder="Поиск по всему каталогу…" />
       {registryError && <p role="alert">{registryError}</p>}
@@ -130,9 +139,10 @@ export default function PhysicalApp() {
       <div className="controlBlock"><label>Дата UTC
         <input type="datetime-local" aria-label="Дата UTC" step="1" value={time.simDate.toISOString().slice(0,19)}
           onChange={e => { const date = new Date(e.target.value+'Z'); if (Number.isFinite(date.getTime())) { time.setIsPaused(true); setManualDate(date); } }} />
-      </label><p>UTC: 2000-01-01 — 2026-12-31. Вне диапазона центры скрыты.</p></div>
+      </label><p>{utcInterval ? `UTC: ${utcInterval[0].slice(0,10)} ≤ дата < ${utcInterval[1].slice(0,10)}.`
+        : 'Поддержанный UTC-интервал опубликован в реестре.'} Вне диапазона центры скрыты.</p></div>
     </aside>
-    <PhysicalScene bodies={[...bodies, ...searchBodies]} frame={frame} centerId={centerId} overview={overview} focusVersion={focusVersion} onError={onSceneError} sceneRef={sceneRef} onNeighborhood={setNeighborhood} />
+    <PhysicalScene bodies={sceneBodies} frame={frame} centerId={centerId} overview={overview} focusVersion={focusVersion} onError={onSceneError} sceneRef={sceneRef} onNeighborhood={setNeighborhood} selectedId={selected?.id} onPick={pick} />
     <div className="physicalStatus glass" role="status">
       <div>{time.simDate.toISOString()} · {!time.isPaused && nowMode && time.timeMultiplier === 1 ? 'Сейчас' : 'Симуляция'}</div>
       {initializationError || sceneError || error ? <div role="alert">{initializationError || sceneError || error}</div>

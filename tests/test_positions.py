@@ -90,6 +90,26 @@ class PositionTests(unittest.TestCase):
         self.assertEqual(parse_utc('2026-11-06T15:00:00+03:00'), parse_utc('2026-11-06T12:00:00Z'))
         self.assertEqual(parse_utc(UTC_START.isoformat()), UTC_START)
 
+    def test_2027_utc_matches_pinned_iers_table_and_stops_at_expiry(self):
+        from datetime import timedelta
+        fixture=json.loads((Path(__file__).parent/'fixtures/utc_leap_support.json').read_text())
+        self.assertEqual(UTC_STOP.date().isoformat(),fixture['table_expires'])
+        self.assertFalse(fixture['december_2026_insertion'])
+        samples=[*fixture['tai_minus_utc_seconds'][1:],['2027-01-01T00:00:00Z',37],['2027-06-27T00:00:00Z',37]]
+        for at,offset in samples:
+            date=parse_utc(at);t=self.engine.timescale.from_datetime(date)
+            utc_jd=date.toordinal()+1721424.5
+            self.assertAlmostEqual((t.tt-utc_jd)*86400,offset+32.184,delta=.0001)
+            frame=self.engine.evaluate(at=at)
+            equivalent=self.engine.evaluate(jd_tdb=frame['jd_tdb'])
+            for a,b in zip(frame['objects'],equivalent['objects']):
+                # A serialized binary64 JD has ~40 us spacing here; converting
+                # full UTC to that scalar loses low time bits (not ephemeris error).
+                self.assertLess(math.dist(a['position'],b['position']),.003)
+        self.engine.evaluate(at=(UTC_STOP-timedelta(microseconds=1)).isoformat())
+        for at in [UTC_STOP.isoformat(),'2027-07-01T00:00:00Z','2027-06-30T23:59:60Z']:
+            with self.assertRaises(ValueError):self.engine.evaluate(at=at)
+
     def test_invalid_unsupported_or_ambiguous_time_is_never_a_snapshot(self):
         for at in ['', 'now', '2026-11-06', '2026-11-06T12:00:00', '2016-12-31T23:59:60Z',
                    '1999-12-31T23:59:59Z', UTC_STOP.isoformat(), 'badTtimestamp', '9999-12-31T23:59:59-23:59']:
@@ -136,7 +156,7 @@ class PositionAPITests(unittest.TestCase):
             self.assertNotEqual(other.headers['etag'],response.headers['etag'])
             unknown = client.get('/api/positions/v1/objects/proxima_b?jd_tdb=2451545').json()
             self.assertIsNone(unknown['objects'][0]['position'])
-            for query in ['', '?at=', '?at=2027-01-01T00:00:00Z', '?jd_tdb=nan',
+            for query in ['', '?at=', '?at='+UTC_STOP.isoformat().replace('+00:00','Z'), '?jd_tdb=nan',
                           '?at=2026-01-01T00:00:00Z&jd_tdb=2451545', '?jd_tdb=banana']:
                 with self.subTest(query=query):
                     self.assertEqual(client.get('/api/positions/v1/sectors/solar:verified'+query,
@@ -176,7 +196,7 @@ class PositionAPITests(unittest.TestCase):
                     for axis, value in enumerate(row['position']):
                         self.assertLessEqual(near['sectors'][0]['min'][axis],value)
                         self.assertGreaterEqual(near['sectors'][0]['max'][axis],value)
-                rejected = client.get(f'/api/positions/v1/objects/{oid}?at=2027-01-01T00:00:00Z',
+                rejected = client.get(f'/api/positions/v1/objects/{oid}?at='+UTC_STOP.isoformat().replace('+00:00','Z'),
                     headers={'If-None-Match':'*'})
                 self.assertEqual(rejected.status_code,422)
             unknown = client.get('/api/positions/v1/objects/mars?jd_tdb=2451545').json()

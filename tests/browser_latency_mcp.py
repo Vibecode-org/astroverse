@@ -46,10 +46,34 @@ def run(catalog):
         m.click('+1 день');m.wait('('+PROBE+')()?.hierarchy?.binding.jd_tdb > '+str(paused['hierarchy']['binding']['jd_tdb']))
         final=m.evaluate(PROBE)
         assert (final['geometries'],final['textures'],final['canvasCount'])==(1,0,1)
+        # Accelerated and reverse clocks still finish delayed selections. Use a
+        # date away from interval boundaries, then restore real wall-clock Now.
+        m.evaluate("""()=>{const el=document.querySelector('[aria-label="Дата UTC"]');
+          Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'2020-04-05T12:00:00');
+          el.dispatchEvent(new Event('input',{bubbles:true}));
+          const rate=document.querySelector('#time-rate');rate.value='86400';rate.dispatchEvent(new Event('change',{bubbles:true}));}
+        """)
+        m.click('Продолжить')
+        directions=[]
+        for reverse in [False,True]:
+            if reverse:m.click('⟲')
+            observations=m.evaluate("""async()=>{const out=[];for(let i=0;i<40;i++){
+              await new Promise(resolve=>setTimeout(resolve,100));const s=(PROBE)();
+              out.push({at:s?.hierarchy?.binding.evaluated_at,status:document.querySelector('[role=status]').textContent});
+            }return out;}""".replace('PROBE',PROBE))
+            steady_motion=observations[15:]
+            dates_motion=[s['at'] for s in steady_motion if s.get('at')]
+            assert len(dates_motion)>=20 and len(set(dates_motion))>=2,observations
+            assert all(('Кадр UTC: '+s['at']) in s['status'] for s in steady_motion if s.get('at'))
+            timestamps=m.evaluate('()=>'+json.dumps(dates_motion)+'.map(x=>Date.parse(x))')
+            assert all((a>=b if reverse else a<=b) for a,b in zip(timestamps,timestamps[1:])),dates_motion
+            directions.append({'reverse':reverse,'samples':len(dates_motion),'frames':len(set(dates_motion))})
+        m.click('Сейчас');m.wait("document.querySelector('[role=status]')?.textContent.includes('Кадр UTC:')")
+        assert m.evaluate("()=>document.querySelector('[role=status]').textContent.includes('Сейчас')")
         assert m.evaluate('()=>window.__latencyErrors')==[]
         return {'catalog':catalog,'steady_nonempty':sum(s['rows']>0 for s in steady),'steady_samples':len(steady),
                 'distinct_frames':len(dates),'pause_exact':True,'manual_jump':True,
-                'requests':m.evaluate('()=>window.__latencyCount'),'resources':{'geometries':1,'textures':0}}
+                'directions':directions,'requests':m.evaluate('()=>window.__latencyCount'),'resources':{'geometries':1,'textures':0}}
 
 
 if __name__=='__main__':

@@ -40,16 +40,20 @@ Chrome/SwiftShader; Playwright/Python-пакеты не нужны.
 ```bash
 docker compose up --build -d
 python3 tests/browser_physical_mcp.py --catalog 3471
+python3 tests/browser_lod_mcp.py --catalog 3471
 python3 tests/browser_positions_recovery_mcp.py --catalog 3471
 python3 tests/browser_latency_mcp.py --catalog 3471
+python3 tests/browser_time_bounds_mcp.py --catalog 3471
 python3 tests/browser_mcp.py --catalog 3471 --report /tmp/astroverse-legacy.json
 ```
 
 | Runner | Проверка |
 |---|---|
 | browser_physical_mcp.py | /: UTC/центры, zoom/refocus/обзор, время/возврат, sources pages/ETag, поиск/карточки, synthetic growth9/129/1/0 и 20 cross-sector перестановок без роста GPU/renderer recreation |
+| browser_lod_mcp.py | L0/L1 picking/refocus, hysteresis, отсутствие HTTP при движении внутри области, подавление click после drag, Retina pixel ratio=2 |
 | browser_positions_recovery_mcp.py | Изолированные ответы: revision race/retry, повторный конфликт, malformed scale, восстановление слоя/отдельная init error; ожидаемые 409 resource errors разрешены, uncaughtJS запрещены |
-| browser_latency_mcp.py | Изолированные задержки 200–400 мс; непрерывные кадры, явный UTC/лаг, точная пауза/ручная дата, ресурсы |
+| browser_latency_mcp.py | Изолированные задержки 200–400 мс; Now, пауза/дата, ускорение/реверс, явный UTC/лаг и ресурсы |
+| browser_time_bounds_mcp.py | UI→HTTP→WebGL: январь 2027, последняя поддержанная секунда, исключённая граница UTC, восстановление Now |
 | browser_mcp.py | /?scene=legacy: v2/gzip/304, spatial nearby/page/locate/304, виды/LOD, поиск/карточки/follow, виртуализация и ресурсы |
 
 Неверный health/недоступный сервер — ошибка. `--report` сохраняет JSON с
@@ -70,6 +74,55 @@ curl -fsS http://localhost:5173/api/health
 
 Оба стека используют 5173; generated objects_100k.json не коммитить.
 100k — каталог synthetic-карточек, не 100k реальных положений/массовая физика.
+
+## Несколько физических секторов через HTTP
+
+Opt-in fixture работает отдельным Docker-проектом на :5174, не добавляет
+маршрутов/тел в обычный API :5173. Health: `synthetic:true, objects:0`. Четыре сектора по 64 искусственные
+записи, по одному unknown/null в секторе. Это не NASA и не массовая астрометрия.
+
+```bash
+ASTROVERSE_PORT=5174 ASTROVERSE_BIND=127.0.0.1 docker compose -p astroverse-sectors-fixture -f docker-compose.yml -f docker-compose.sectors-test.yml up --build -d
+python3 tests/browser_sectors_mcp.py --report /tmp/astroverse-http-sectors.json
+node --expose-gc tests/benchmark_sector_manager.mjs
+docker compose -p astroverse-sectors-fixture -f docker-compose.yml -f docker-compose.sectors-test.yml down --rmi local
+# Проверить обычный стек после stress:
+docker compose up --build -d
+curl -fsS http://localhost:5173/api/health  # objects=3471
+```
+
+Runner (--url, по умолчанию http://localhost:5174) двигает настоящую камеру/controls и использует UI времени, native HTTP,
+production PhysicalSectorManager и настоящий WebGL. Fetch не подменяется,
+layer.update напрямую не вызывается. Проверяет 48 переходов load/evict/return,
+пустую область, точные даты/JD, 409, частичный отказ, несовместимый JD, timeout,
+Now/ускорение/реверс при jitter >100 мс, остановку повторов после постоянной
+ошибки, renderer identity и GPU-счётчики.
+Private React probe читает менеджер/sceneRef, как прежние MCP runners.
+Корреляция: X-Astroverse-Client/Selection/Request проходят через nginx JSON
+access log и bounded trace provider (512 записей). Optional onRequest sink
+менеджера не хранит историю в production; runner ограничивает свои события 512.
+Сверка в report.reconciliation относится к окну после подключения observer:
+каждый fetch либо имеет уникальный request ID в provider, либо завершён cancel
+до API. Стартовые/контрольные обращения считаются отдельно. Повтор ID — ошибка.
+JSON nginx logs: `docker compose -p astroverse-sectors-fixture -f docker-compose.yml -f docker-compose.sectors-test.yml logs --no-log-prefix frontend`.
+`/api/_test/control` существует только в fixture. Ожидаемые HTTP resource errors
+409/422 разрешены; uncaught JS errors запрещены. Screenshot/report временные.
+
+Benchmark отдельно измеряет время native HTTP-менеджера, RSS процесса provider
+и RSS клиента Node. Для памяти декодированного компонента wire-строка уже
+загружена: после warmup/GC удерживаются 40 payload+PhysicalHierarchy графов,
+heap delta делится на 40. Это engine-specific retained heap, без wire-строки,
+React/WebGL/сетевого клиента; полный RSS клиента публикуется отдельно.
+Сборщика каталога в этом fixture нет: данные генерируются bounded per request.
+Расчётный decoded-бюджет менеджера публикуется отдельно от измеренного heap.
+
+`tests/test_position_http.py` поднимает настоящий uvicorn/HTTP с production
+positions API и прежним BSP, искусственно задерживает solver, разрывает TCP,
+проверяет deadline/ограничение слотов, отсутствие очереди и восстановление.
+Для быстрого теста 2 слота / 150 мс; production defaults — 4 / 8 с.
+`test_position_work.py` отдельно проверяет удержание слота зависшим native work.
+Synthetic sector fixture намеренно сохраняет fault injection 12 с для проверки
+клиентского timeout 10 с; это отдельный тестовый provider, без production guard.
 
 ## Legacy Playwright smoke
 
@@ -128,3 +181,9 @@ benchmark_streaming разделяет builder/API/client, генерирует 
 sources/positions без полного каталога/nginx/gzip. benchmark_hierarchy измеряет
 Node/V8 граф поверх готового frame, не browser/GPU RAM. Первые запросы/медианы
 не SLA и не гарантированно холодный filesystem cache.
+
+LOD: `node --expose-gc tests/benchmark_physical_lod.mjs` измеряет retained
+heap/ArrayBuffers слоя отдельно от готового входа и полного RSS клиента.
+`browser_lod_mcp.py` проверяет L0/L1 picking/refocus и отсутствие HTTP при
+движении камеры внутри прежней области. `browser_sectors_mcp.py` дополнительно
+проводит 18 zoom-переходов через production manager/HTTP/RAF/WebGL.

@@ -19,7 +19,8 @@ Commands and browser/benchmark details: `tests/README.md`.
   never feed the physical scene; unsupported dates never fall back to snapshots
   or a previous date. Validate positions numerically, not just screenshots.
 - Five opted-in DE440s centers: Sun 10, Earth 399, Moon 301, Mercury 199,
-  Venus 299. Barycenters differ from body centers. UTC 2000–2026; raw JD TDB
+  Venus 299. Barycenters differ from body centers. UTC [2000-01-01, 2027-06-28)
+  pinned to IERS C72/table expiry; raw JD TDB
   bounds in contract. Keep checksum-pinned `data/ephemeris/de440s.bsp` and
   100 Horizons vectors. Regression tolerance is not absolute uncertainty.
 
@@ -45,6 +46,8 @@ environments/caches; retain test sources, numeric fixtures, lockfiles, MCP, BSP.
 
 - `data/source_registry.py` / `backend/position_api.py` / `data/ephemeris.py`:
   opted-in capabilities and offline positions; `docs/SOURCES.md`.
+  `backend/position_work.py`: 4 admitted workers, no backlog, 8s HTTP deadline;
+  a timed-out native solver keeps its slot until it actually returns.
 - `data/physical_hierarchy.py` / `frontend/src/physical/`: default scene,
   Float64 centers, linear GPU transform; `docs/HIERARCHY.md`. One physical
   sector today; general 3.3/3.8 remain open. Legacy is `/?scene=legacy`.
@@ -53,6 +56,9 @@ environments/caches; retain test sources, numeric fixtures, lockfiles, MCP, BSP.
   reads bounded snapshot cards only.
 - `streaming_catalog.py`, `streaming_binary.py`, `incremental_catalog.py`:
   bounded JSON→SQLite/patch preparation; full legacy publication remains O(N).
+  Production target (planned, ROADMAP 3.7/10.0.1): direct bounded source→DB
+  staging ingestion, validated atomic revisions and incremental updates; no
+  mandatory full intermediate objects.json. Current builder is not yet that path.
   `backend/prepare_runtime.py` runs separately. Runtime `CATALOG` is DiskCatalog;
   never populate the test-only list `catalog_index()` from production data.
 - `backend/entrypoint.py`: offline/online/existing mode; objects.json generated.

@@ -3,6 +3,9 @@
 import hashlib
 import json
 import math
+import asyncio
+import re
+from uuid import uuid4
 from contextlib import asynccontextmanager
 from threading import Lock
 
@@ -10,15 +13,29 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import Response
 
 from backend.byte_cache import ByteLRU
+from backend.position_work import PositionWork, PositionWorkCancelled
 from data.ephemeris import Ephemeris, contract
 from data.source_registry import REGISTRY
 
 
-def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=None):
+def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=None, work_limits=None):
     targets = registry.targets
     cache = ByteLRU(1024 * 1024)
     lock = Lock()
     engine = None
+    work = PositionWork(**(work_limits or {}))
+
+    @app.middleware('http')
+    async def position_trace(request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith('/api/positions/v1/'):
+            for name in ('X-Astroverse-Client','X-Astroverse-Selection','X-Astroverse-Request'):
+                value = request.headers.get(name,'')
+                if re.fullmatch(r'[A-Za-z0-9._:-]{1,128}',value):
+                    response.headers[name] = value
+            if 'X-Astroverse-Request' not in response.headers:
+                response.headers['X-Astroverse-Request'] = uuid4().hex
+        return response
 
     @asynccontextmanager
     async def lifespan(app):
@@ -26,6 +43,7 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
         try:
             yield
         finally:
+            await asyncio.to_thread(work.close)
             with lock:
                 if engine is not None:
                     engine.close()
@@ -55,18 +73,27 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
             return Response(status_code=304, headers=headers)
         return Response(payload, media_type='application/json', headers=headers)
 
-    def evaluate(request, at, jd_tdb, ids, neighborhood=None, expected_revision=None):
+    def evaluate(request, at, jd_tdb, ids, neighborhood=None, expected_revision=None, cancelled=None):
         nonlocal engine
+        def check():
+            if cancelled is not None and cancelled.is_set():
+                raise PositionWorkCancelled()
+        check()
         if expected_revision is not None and expected_revision != contract(registry)['revision']:
             raise HTTPException(409, detail={'code': 'position_revision_changed',
                                            'message': 'Position revision changed; rediscover sectors'},
                                 headers={'Cache-Control': 'no-store'})
-        with lock:
+        # Poll the engine lock so disconnected callers cannot wait indefinitely.
+        while not lock.acquire(timeout=.025):
+            check()
+        try:
+            check()
             try:
                 if engine is None:
                     engine = engine_factory() if engine_factory else Ephemeris(registry=registry)
             except (OSError, ValueError) as exc:
                 raise HTTPException(503, 'Verified ephemeris unavailable', headers={'Cache-Control': 'no-store'}) from exc
+            check()
             # Parsing and interval validation precede validators, including *.
             try:
                 if ids is None and len(targets) > 128:
@@ -75,12 +102,17 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
                 payload = cache.get(key)
                 if payload is None:
                     result = engine.evaluate(at=at, jd_tdb=jd_tdb, ids=ids)
+                    check()
                     payload = json.dumps(result, separators=(',', ':'), allow_nan=False).encode()
                     if len(payload) > 256 * 1024:
                         raise HTTPException(413, 'Position response exceeds byte limit')
+                    check()
                     cache.put(key, payload)
             except (ValueError, OverflowError) as exc:
                 raise HTTPException(422, detail={'code': 'unsupported_simulation_time', 'message': str(exc)}) from exc
+        finally:
+            lock.release()
+        check()
         if neighborhood is not None:
             anchor, dx, dy, dz, radius = neighborhood
             result = json.loads(payload)
@@ -104,12 +136,12 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
         return Response(payload, media_type='application/json', headers=headers)
 
     @router.get('/sectors/solar:verified')
-    def solar(request: Request, at: str | None = Query(None, max_length=64), jd_tdb: float | None = None,
+    async def solar(request: Request, at: str | None = Query(None, max_length=64), jd_tdb: float | None = None,
               revision: str | None = Query(None, max_length=256)):
-        return evaluate(request, at, jd_tdb, None, expected_revision=revision)
+        return await work.run(request, lambda cancelled: evaluate(request, at, jd_tdb, None, expected_revision=revision, cancelled=cancelled))
 
     @router.get('/nearby')
-    def nearby(request: Request, anchor: str, dx: float, dy: float, dz: float,
+    async def nearby(request: Request, anchor: str, dx: float, dy: float, dz: float,
                radius: float, at: str | None = Query(None, max_length=64), jd_tdb: float | None = None,
                revision: str | None = Query(None, max_length=256)):
         # The camera offset is ICRF km relative to a confirmed moving anchor.
@@ -117,14 +149,14 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
         if (anchor not in targets or any(not math.isfinite(v) or abs(v)>1e13 for v in (dx,dy,dz,radius))
                 or radius < 0):
             raise HTTPException(422, 'Invalid physical neighborhood; expected supported anchor and finite km within 1e13')
-        return evaluate(request, at, jd_tdb, None, (anchor, dx, dy, dz, radius), expected_revision=revision)
+        return await work.run(request, lambda cancelled: evaluate(request, at, jd_tdb, None, (anchor, dx, dy, dz, radius), expected_revision=revision, cancelled=cancelled))
 
     @router.get('/objects/{object_id}')
-    def object_position(request: Request, object_id: str,
+    async def object_position(request: Request, object_id: str,
                         at: str | None = Query(None, max_length=64), jd_tdb: float | None = None,
                         revision: str | None = Query(None, max_length=256)):
         if len(object_id) > 512:
             raise HTTPException(422, 'Object ID too long')
-        return evaluate(request, at, jd_tdb, [object_id], expected_revision=revision)
+        return await work.run(request, lambda cancelled: evaluate(request, at, jd_tdb, [object_id], expected_revision=revision, cancelled=cancelled))
 
     app.include_router(router)

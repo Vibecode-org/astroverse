@@ -1,62 +1,14 @@
 import { useEffect, useRef } from 'react';
-import * as THREE from 'three';
 import { createStage } from '../scene/stage.js';
-import { renderPosition, physicalFrame, physicalOffset } from './coordinates.js';
+import { physicalOffset } from './coordinates.js';
 
-/** Incremental body membership. No orbit phases, surfaces, or catalog layout. */
-export function createPhysicalLayer(scene) {
-  let geometry = new THREE.BufferGeometry();
-  let capacity = 8;
-  // Capacity follows the explicit supported body set; no per-frame allocation.
-  let positions = new Float32Array(capacity * 3), colors = new Float32Array(capacity * 3);
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  geometry.setDrawRange(0, 0);
-  const material = new THREE.PointsMaterial({ size: 9, sizeAttenuation: false, vertexColors: true });
-  const points = new THREE.Points(geometry, material);
-  points.frustumCulled = false;
-  scene.add(points);
-  let rows = [], origin = [0, 0, 0], hierarchy = null;
-  return {
-    update(frame, centerId, overview = false, neighborhood = null, bodies = []) {
-      const COLORS = Object.fromEntries(bodies.map(body => [body.id, body.color]));
-      const parsed = frame ? physicalFrame(frame) : {rows:[],hierarchy:null};
-      rows = parsed.rows; hierarchy = parsed.hierarchy;
-      if (rows.length > 4096) throw new Error('Слишком много центров в positions/1');
-      if (rows.length > capacity) {
-        while (capacity < rows.length) capacity *= 2;
-        const old = geometry;
-        geometry = new THREE.BufferGeometry();
-        positions = new Float32Array(capacity * 3); colors = new Float32Array(capacity * 3);
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        points.geometry = geometry;
-        old.dispose();
-      }
-      if (frame) origin = rows.find(row => row.id === centerId)?.position || origin;
-      const relative = row => hierarchy?.relative(row.id,centerId) || row.position.map((v,a)=>v-origin[a]);
-      if (!overview) rows = rows.filter(row => Math.hypot(...relative(row).map((v,a)=>
-        v - (neighborhood?.offset[a] || 0))) <= (neighborhood?.radius ?? 2e6));
-      rows.forEach((row, i) => {
-        positions.set(renderPosition(relative(row), [0,0,0]), i * 3);
-        const color = new THREE.Color(COLORS[row.id] || '#ffffff');
-        colors.set([color.r, color.g, color.b], i * 3);
-      });
-      geometry.attributes.position.needsUpdate = true;
-      geometry.attributes.color.needsUpdate = true;
-      geometry.setDrawRange(0, rows.length);
-      points.visible = rows.length > 0;
-    },
-    inspect: () => ({ origin: [...origin], rows: rows.map(row => ({ id: row.id, position: [...row.position] })),
-      render: Array.from(positions.slice(0, rows.length * 3)),
-      hierarchy: hierarchy ? {binding:hierarchy.binding, addresses:rows.map(row=>hierarchy.address(row.id))} : null }),
-    dispose() { scene.remove(points); geometry.dispose(); material.dispose(); rows = []; hierarchy = null; },
-  };
-}
+export { createPhysicalLayer } from './physicalLayer.js';
+import { createPhysicalLayer } from './physicalLayer.js';
 
-export default function PhysicalScene({ frame, bodies = [], centerId, overview, onError, sceneRef, onNeighborhood, focusVersion = 0 }) {
+export default function PhysicalScene({ frame, bodies = [], centerId, overview, onError, sceneRef, onNeighborhood, focusVersion = 0, selectedId = null, onPick }) {
   const neighborhoodRef = useRef(onNeighborhood);
   neighborhoodRef.current = onNeighborhood;
+  const pickRef = useRef(onPick); pickRef.current = onPick;
   const mount = useRef(null);
   useEffect(() => {
     let stage, layer, raf;
@@ -71,7 +23,7 @@ export default function PhysicalScene({ frame, bodies = [], centerId, overview, 
       let previousNeighborhood = null;
       const animate = () => {
         raf = requestAnimationFrame(animate);
-        controls.update(); renderer.render(scene, camera);
+        controls.update(); layer.tick(camera, renderer.getPixelRatio?.() || 1); renderer.render(scene, camera);
         if (neighborhoodRef.current) {
           const offset = physicalOffset(camera.position);
           const radius = Math.max(2e6, camera.position.distanceTo(controls.target) * 2e5);
@@ -93,11 +45,37 @@ export default function PhysicalScene({ frame, bodies = [], centerId, overview, 
       };
       window.addEventListener('resize', resize);
       state.resize = resize;
+      let pointerStart = null, dragged = false;
+      const pointerDown = event => {
+        if (event.isPrimary === false) { dragged = true; return; }
+        pointerStart = [event.clientX, event.clientY]; dragged = event.button !== 0;
+      };
+      const pointerMove = event => {
+        if (pointerStart && Math.hypot(event.clientX-pointerStart[0], event.clientY-pointerStart[1]) > 5) dragged = true;
+      };
+      const pointerCancel = () => { dragged = true; };
+      el.addEventListener('pointerdown', pointerDown);
+      el.addEventListener('pointermove', pointerMove);
+      el.addEventListener('pointercancel', pointerCancel);
+      state.releaseInputs = () => {
+        el.removeEventListener('pointerdown', pointerDown);
+        el.removeEventListener('pointermove', pointerMove);
+        el.removeEventListener('pointercancel', pointerCancel);
+      };
+      const pick = event => {
+        if (dragged || event.button !== 0) return;
+        const rect = el.getBoundingClientRect();
+        const id = layer.pick(camera, event.clientX-rect.left, event.clientY-rect.top, rect.width, rect.height);
+        if (id) pickRef.current?.(id);
+      };
+      el.addEventListener('click', pick); state.pick = pick;
       onError(null, 'initialization');
     } catch (error) { onError(error.message, 'initialization'); }
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', sceneRef.current?.resize);
+      el.removeEventListener('click', sceneRef.current?.pick);
+      sceneRef.current?.releaseInputs();
       layer?.dispose();
       stage?.controls.dispose(); stage?.renderer.dispose(); stage?.renderer.domElement.remove();
       sceneRef.current = null;
@@ -107,10 +85,10 @@ export default function PhysicalScene({ frame, bodies = [], centerId, overview, 
     const state = sceneRef.current;
     if (!state) return;
     try {
-      state.layer.update(frame, centerId, overview, state.neighborhood, bodies);
+      state.layer.update(frame, centerId, overview, state.neighborhood, bodies, selectedId);
       if (frame) onError(null, 'frame');
     } catch (error) { state.layer.update(null); onError(error.message, 'frame'); }
-  }, [frame, bodies, centerId, overview, sceneRef, onError]);
+  }, [frame, bodies, centerId, overview, sceneRef, onError, selectedId]);
   useEffect(() => {
     const state = sceneRef.current;
     if (!state) return;

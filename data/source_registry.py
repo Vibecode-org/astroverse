@@ -10,13 +10,15 @@ from types import MappingProxyType
 KERNEL_SHA256 = 'c1c7feeab882263fc493a9d5a5b2ddd71b54826cdf65d8d17a76126b260a49f2'
 MODEL = {
     'id': 'jpl-de440s', 'provider': 'NASA/JPL', 'model': 'DE440s',
-    'provider_revision': 'asset-sha256-' + KERNEL_SHA256, 'revision': 'de440s-skyfield1.53-time1', 'solver': 'skyfield-bsp',
+    'provider_revision': 'asset-sha256-' + KERNEL_SHA256, 'revision': 'de440s-skyfield1.53-time2', 'solver': 'skyfield-bsp',
     'source': 'NASA/JPL DE440s',
     'source_url': 'https://ssd.jpl.nasa.gov/doc/de440_de441.html',
     'asset': 'data/ephemeris/de440s.bsp', 'sha256': KERNEL_SHA256,
     'axes': 'right-handed equatorial XYZ, native DE440 axes; no Y/Z permutation',
     'reference_system': 'ICRF', 'origin': 'solar_system_barycenter', 'unit': 'km',
-    'identity_namespace': 'NAIF', 'time_scale': 'TDB', 'utc_interval': ['2000-01-01T00:00:00+00:00', '2027-01-01T00:00:00+00:00'],
+    # IERS Bulletin C72 rules out Dec 2026 insertion. The accompanying table
+    # expires 28 June 2027: stop there, before an unconfirmed June transition.
+    'identity_namespace': 'NAIF', 'time_scale': 'TDB', 'utc_interval': ['2000-01-01T00:00:00+00:00', '2027-06-28T00:00:00+00:00'],
     'tdb_jd_interval': [2451544.5, 2462502.5], 'interval_end': 'exclusive',
     'source_epoch': None, 'source_epoch_status': 'time-dependent ephemeris, not a catalog epoch',
     'accuracy': None, 'accuracy_status': 'no per-vector physical uncertainty provided by kernel',

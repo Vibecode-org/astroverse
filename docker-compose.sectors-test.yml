@@ -1,0 +1,7 @@
+# Isolated HTTP fixture only. Never enable for ordinary use.
+# ASTROVERSE_PORT=5174 ASTROVERSE_BIND=127.0.0.1 docker compose -p astroverse-sectors-fixture -f docker-compose.yml -f docker-compose.sectors-test.yml up --build -d
+# Cleanup: docker compose -p astroverse-sectors-fixture -f docker-compose.yml -f docker-compose.sectors-test.yml down --rmi local
+services:
+  backend:
+    command: ["python", "-m", "tests.sector_provider"]
+    working_dir: /app

@@ -1,0 +1,17 @@
+{
+  "verified_at": "2026-11-09",
+  "bulletin": "IERS Bulletin C 72",
+  "issued": "2026-07-06",
+  "bulletin_url": "https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.72",
+  "table_url": "https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat",
+  "table_expires": "2027-06-28",
+  "december_2026_insertion": false,
+  "tai_minus_utc_seconds": [
+    ["1999-01-01T00:00:00Z", 32],
+    ["2006-01-01T00:00:00Z", 33],
+    ["2009-01-01T00:00:00Z", 34],
+    ["2012-07-01T00:00:00Z", 35],
+    ["2015-07-01T00:00:00Z", 36],
+    ["2017-01-01T00:00:00Z", 37]
+  ]
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, renderHook, act, waitFor } from '@testing-library/react';
+import { render, renderHook, act, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import * as THREE from 'three';
 import { useVerifiedFrame } from '../src/physical/useVerifiedFrame.js';
@@ -118,6 +118,18 @@ it('publishes camera neighborhood changes without rebuilding the renderer', () =
 });
 
 const near={offset:[0,0,0],radius:2e6};
+it('does not turn permanent parameter/date errors into retries on every continuous tick',async()=>{
+ const fetcher=vi.fn().mockResolvedValue(reply({detail:{message:'unsupported date'}},false,422));
+ vi.stubGlobal('fetch',fetcher);const start=Date.parse(at);
+ const hook=renderHook(({ms,generation=0})=>useVerifiedFrame(new Date(ms),null,'earth',{continuous:true,generation}),{initialProps:{ms:start}});
+ await waitFor(()=>expect(hook.result.current.error).toBe('unsupported date'));
+ for(let i=1;i<=10;i++)await act(async()=>hook.rerender({ms:start+i*100}));
+ expect(fetcher).toHaveBeenCalledOnce();expect(hook.result.current.frame).toBe(null);
+ fetcher.mockResolvedValue(reply({...frame,evaluated_at:new Date(start+86400000).toISOString()}));
+ await act(async()=>hook.rerender({ms:start+86400000,generation:1}));
+ await waitFor(()=>expect(hook.result.current.frame?.evaluated_at).toBe(new Date(start+86400000).toISOString()));
+ hook.unmount();
+});
 const revised=revision=>({...frame,revision,coordinates:{...frame.coordinates,revision}});
 const manifest=value=>({...value,objects:[],sectors:[{id:'solar:verified',revision:value.revision}]});
 
@@ -266,4 +278,22 @@ it('finishes both delayed manifest/sector legs during continuous jitter and canc
   await act(async()=>{await vi.advanceTimersByTimeAsync(800);});
   expect(hook.result.current.frame.evaluated_at).toBe(new Date(start-86400000).toISOString());
   hook.unmount();expect(active).toBe(0);
+});
+
+it('does not pick or refocus after dragging the physical camera',()=>{
+ vi.stubGlobal('requestAnimationFrame',vi.fn(()=>42));vi.stubGlobal('cancelAnimationFrame',vi.fn());
+ const sceneRef={current:null},onPick=vi.fn(),onError=vi.fn();
+ const view=render(<PhysicalScene frame={frame} centerId="earth" onError={onError} sceneRef={sceneRef} onPick={onPick}/>);
+ vi.spyOn(sceneRef.current.layer,'pick').mockReturnValue('earth');
+ const el=view.container.querySelector('.viewport');
+ fireEvent(el,new MouseEvent('pointerdown',{clientX:50,clientY:50,button:0,bubbles:true}));
+ fireEvent(el,new MouseEvent('pointermove',{clientX:100,clientY:50,bubbles:true}));
+ fireEvent.pointerUp(el,{clientX:100,clientY:50});
+ fireEvent.click(el,{clientX:100,clientY:50});
+ expect(onPick).not.toHaveBeenCalled();
+ fireEvent(el,new MouseEvent('pointerdown',{clientX:100,clientY:50,button:0,bubbles:true}));
+ fireEvent.click(el,{clientX:100,clientY:50});expect(onPick).toHaveBeenCalledOnce();
+ fireEvent.pointerCancel(el);fireEvent.click(el,{clientX:100,clientY:50});expect(onPick).toHaveBeenCalledOnce();
+ fireEvent(el,new MouseEvent('pointerdown',{button:2,bubbles:true}));fireEvent.click(el,{button:2});expect(onPick).toHaveBeenCalledOnce();
+ view.unmount();
 });
