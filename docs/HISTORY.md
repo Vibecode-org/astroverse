@@ -132,3 +132,10 @@ baseline; последующие циклы сохраняют строгое р
 После разделения: backend242/frontend222, coverage/build,100Horizons, golden
 wire fixtures, direct/module builder, physical13/13, navigation_regions и
 S-100k4/4 прошли. Последний прогон функциональный, не новый performance benchmark.
+
+## Приоритет следующего этапа, 2026-11-12
+
+Согласован переход к ограниченному incremental writer3.7-B сразу после
+synthetic/refactor. Расширение моделей (включая предложенный Марс) не является
+предпосылкой. DB startup/offline migration остаётся отдельным этапом;
+реализация 3.7-B ещё не начата, статусы приёмки не повышены.
