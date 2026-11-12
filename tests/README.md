@@ -53,6 +53,10 @@ Navigation:6DoF/refocus/rebase/hidden tab и 12resource cycles. Regions:
 передний picking/L0/L1/оба порядка/точные полюса/native drag. Legacy: v2/gzip/
 ETag,views/search/follow/virtualization/resources.
 
+Legacy resource baseline снимается после завершения CDN image loads/errors и
+повторного render всех трёх масштабов: загрузка image и GPU upload разнесены.
+После этого счётчики циклов обязаны совпадать строго, без допуска на рост.
+
 MCP click/fill/press_key — настоящие UI actions. `chrome_hold.mjs` нужен для
 trusted CDP held keys/drag/wheel/click: press_key не задаёт длительность.
 Private React probes только читают данные/оборачивают timing; при upgrade React
@@ -167,6 +171,8 @@ node --expose-gc tests/benchmark_physical_lod.mjs
 Последний script объединяет retained heap/ArrayBuffers и apply/LOD/picking timings
 на 4096 строках. Это Node/V8, не browser/GPU RAM. Первый запрос не является SLA.
 SBDB benchmark и source/token/graph contracts — соответствующие test_*.py.
+Catalog golden fixtures проверяют байты обоих вынесенных codecs через прежний
+API `data.catalog`; CLI suite проверяет direct-script и module entrypoints.
 Аудит: npm audit; pip-audit ставить отдельно в temp, не в production requirements.
 
 ## Legacy100k и Playwright smoke

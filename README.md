@@ -65,6 +65,10 @@ Docker modes: offline(по умолчанию),online,existing JSON,published SQ
 не заменяет прежний каталог. `catalog_seed.json` — численный/справочный fixture,
 `catalog_config.json` — источники/лимиты; оба нужны. BSP и lockfiles сохраняются.
 
+`data/catalog.py` — общий API; schema и бинарные codecs выделены в отдельные
+модули. Physical manager отделён от проверки/сборки кадра (`sectorFrame.js`);
+legacy LOD — от владения детальными мешами (`lodDetailedMeshes.js`).
+
 | Документ | Назначение |
 |---|---|
 |[ROADMAP](ROADMAP.md)|Статус и порядок следующих этапов|

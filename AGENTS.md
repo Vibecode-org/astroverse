@@ -52,6 +52,8 @@ environments/caches; retain test sources, numeric fixtures, lockfiles, MCP, BSP.
 
 ## Ownership and pitfalls
 
+- `data/catalog.py` retains the public catalog API/JSON I/O; `catalog_schema.py`
+  owns validation, `catalog_binary.py` / `catalog_binary_v2.py` own legacy codecs.
 - `data/source_registry.py` / `backend/position_api.py` / `data/ephemeris.py`:
   opted-in capabilities and offline positions; `docs/SOURCES.md`.
   `backend/position_work.py`: 4 admitted workers, no backlog, 8s HTTP deadline;

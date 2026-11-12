@@ -1,6 +1,10 @@
 # Бинарный формат каталога v2
 
-Спецификация и контракт для бинарного каталога объектов Astroverse (версия 2). Реализован в `data/catalog.py` (Python), `frontend/src/data/readBinaryCatalog.js` (JS) и `backend/app.py` (HTTP эндпоинт).
+Спецификация и контракт для бинарного каталога объектов Astroverse (версия 2).
+Python: `data/catalog_schema.py` проверяет каталог, `catalog_binary.py` содержит
+v1 и общие render/SoA primitives, `catalog_binary_v2.py` — v2. `data/catalog.py`
+сохраняет общий API и JSON I/O для существующих потребителей. JS-декодер —
+`frontend/src/data/readBinaryCatalog.js`, HTTP — `backend/app.py`.
 
 ## Зачем
 

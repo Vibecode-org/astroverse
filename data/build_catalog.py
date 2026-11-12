@@ -10,26 +10,18 @@ import json
 import logging
 from pathlib import Path
 
-try:
-    from .catalog import (
-        catalog_path, load_catalog, validate_catalog, write_catalog,
-        write_binary_catalog, write_binary_catalog_v2,
-    )
-    from .enrichment import enrich_wikipedia
-    from .normalizers import positive_limit, identity_index, SourceError
-    from .sources import JsonClient, fetch_exoplanets, fetch_small_bodies
-except ImportError:
-    # Running as script: python data/build_catalog.py
+# Direct script invocation has data/ rather than the project root on sys.path.
+if __package__ in (None, ""):
     import sys
-    from pathlib import Path
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from catalog import (
-        catalog_path, load_catalog, validate_catalog, write_catalog,
-        write_binary_catalog, write_binary_catalog_v2,
-    )
-    from enrichment import enrich_wikipedia
-    from normalizers import positive_limit, identity_index, SourceError
-    from sources import JsonClient, fetch_exoplanets, fetch_small_bodies
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from data.catalog import (
+    catalog_path, load_catalog, validate_catalog, write_catalog,
+    write_binary_catalog, write_binary_catalog_v2,
+)
+from data.enrichment import enrich_wikipedia
+from data.normalizers import positive_limit, identity_index, SourceError
+from data.sources import JsonClient, fetch_exoplanets, fetch_small_bodies
 
 DATA_DIR = Path(__file__).resolve().parent
 DEFAULT_CONFIG = DATA_DIR / "catalog_config.json"

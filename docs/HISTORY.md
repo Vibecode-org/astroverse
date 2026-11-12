@@ -113,3 +113,22 @@ JSON без округления измерений; полные старые �
 существующий physical benchmark. Убраны подтверждённые неиспользуемые импорты,
 генерируемые build/coverage/cache файлы. Runtime-контракты, сценарии проверок,
 численные fixtures, BSP, конфигурации и lockfiles сохранены.
+
+## Разделение модулей
+
+Каталог разделён на schema/validation, JSON I/O и бинарные v1/v2 codecs;
+`data/catalog.py` сохраняет существующие exports. Прямой запуск builder теперь
+использует тот же package import, что и module mode, без широкого ImportError.
+Из physical manager выделены validation и согласованная сборка кадра;
+transport/admission/cancellation/publication остаются единой машиной состояний.
+Из legacy LOD выделено владение L2 meshes/materials/pins. Алгоритмы, лимиты,
+форматы и физические контракты сохранены; старые performance-отчёты не обновлялись.
+
+Legacy resource regression выявил преждевременный baseline: три CDN image loads
+ещё выполнялись, GPU textures позднее выросли 37→39 при неизменных scene resources.
+Runner теперь ждёт завершения loads/errors и прогревает все масштабы перед
+baseline; последующие циклы сохраняют строгое равенство счётчиков (10/10 PASS).
+
+После разделения: backend242/frontend222, coverage/build,100Horizons, golden
+wire fixtures, direct/module builder, physical13/13, navigation_regions и
+S-100k4/4 прошли. Последний прогон функциональный, не новый performance benchmark.

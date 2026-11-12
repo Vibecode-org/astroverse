@@ -10,12 +10,13 @@
 | Проверка | Результат |
 |---|---|
 | Backend/Docker |242 теста, OK|
-| Backend coverage с branches |98.38%; sectors100%|
+| Backend coverage с branches |98.39%; sectors100%|
 | Frontend |222 теста, OK|
-| V8 statements/lines/branches/functions |97.83/99.09/91.41/98.22%|
+| V8 statements/lines/branches/functions |97.83/99.03/91.41/98.23%|
 | Vite/Docker build |OK; известный chunk>500kB|
 | Независимые Horizons/DE441 |100 векторов, max0.002420538km|
 | GitHub CI7f66098 |backend/frontend success|
+| GitHub CI очистки fd0b1ca |backend/frontend success|
 
 CI требует backend≥95%, sectors100%; frontend statements/lines/functions/
 branches≥95/96/96/85 и build. Unit canvas/WebGL заменены; настоящие GPU,
@@ -94,3 +95,12 @@ Power-loss durability, общий временной индекс, полный 
 Docker build и physical Chrome MCP13/13. Проверены ссылки, точное сохранение
 чисел в сводных JSON и PASS оценщика архивного стресса. Сам performance stress
 повторно не запускался; указанные timing-результаты остаются измерениями7f66098.
+
+После разделения модулей повторены backend242/242 с coverage98.39%/sectors100%,
+frontend222/222 с coverage/build, golden v1/v2 и оба builder entrypoints.
+Chrome: physical13/13, legacy10/10 после корректного CDN/GPU прогрева,
+navigation_regions (Земля и три дальних цикла Меркурия), synthetic S-100k4/4.
+В initial/final S-100k по100000 identities/numeric/resident/computed/submitted/
+in-frustum,1draw call, тот же renderer,1geometry/0textures/28listeners.
+Now/ускорение/реверс прогрессируют; partial failure/revision conflict проходят.
+Это функциональный прогон с probes, без новой приёмки performance/fps.

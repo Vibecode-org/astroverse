@@ -1,4 +1,5 @@
-import { verifiedRows, yieldPhysicalWork } from './coordinates.js';
+import { POSITION_COORDINATE_FIELDS, validPositionId, validatePositionFrame,
+  combinePositionFrames, combineLargePositionFrames } from './sectorFrame.js';
 
 export const frameReadyAt = new WeakMap();
 
@@ -12,8 +13,6 @@ export const SECTOR_LIMITS = Object.freeze({ concurrency:4, queue:128, objects:4
 const abortError = () => new DOMException('cancelled', 'AbortError');
 const fail = message => { throw new Error(message); };
 const emptyCost = () => ({objects:0, serialized:0, decoded:0});
-const fields = ['reference_system','origin','unit','time_scale','corrections','representation','axes','position_type'];
-const validId = id => typeof id === 'string' && id.length > 0 && id.length <= 512;
 const clientIdentity = () => {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
   // getRandomValues also works for an HTTP LAN origin without randomUUID.
@@ -25,67 +24,6 @@ const clientIdentity = () => {
 // Allowance for UTF-16 strings, property/array slots, parsed hierarchy and its
 // Float64/Map copies (including the scene). Engine dependent; NOT a browser RSS cap.
 export const decodedEstimate = bytes => bytes * 8 + 4096;
-
-function validate(body, milliseconds) {
-  verifiedRows(body);
-  if (typeof body.revision !== 'string' || !body.revision || body.revision.length > 256
-      || body.coordinates.revision !== body.revision) fail('Некорректная ревизия положений');
-  if (Date.parse(body.evaluated_at) !== milliseconds) fail('Эфемерида относится к другому моменту');
-  if (body.registry_revision !== undefined && (typeof body.registry_revision !== 'string'
-      || !body.registry_revision || body.registry_revision.length > 256)) fail('Некорректная ревизия реестра');
-  const ids = new Set(), targets = new Set();
-  for (const row of body.objects) {
-    if (!validId(row.id) || ids.has(row.id)) fail('Дубликат или неверный ID физического тела');
-    ids.add(row.id);
-    if (row.status === 'unknown' ? row.position !== null : row.status !== 'computed'
-        || !Array.isArray(row.position) || row.position.length !== 3 || !row.position.every(Number.isFinite)) fail('Некорректное положение тела');
-    if (row.target != null) {
-      const identity = JSON.stringify([row.model_id ?? null, row.target]);
-      if (targets.has(identity)) fail('Дубликат идентичности физического тела');
-      targets.add(identity);
-    }
-  }
-}
-
-function combine(manifest, bodies, milliseconds) {
-  if (bodies.length === 1) return bodies[0]; // Keep the compatible single-sector wire shape.
-  const frame = {...manifest, objects:bodies.flatMap(body => body.objects)};
-  delete frame.sector;
-  if (bodies.some(body => body.hierarchy)) {
-    if (bodies.some(body => !body.hierarchy)) fail('Несовместимая физическая иерархия');
-    frame.hierarchy = {...bodies[0].hierarchy};
-    for (const key of ['sectors','systems','bodies']) {
-      const rows = new Map();
-      for (const body of bodies) for (const row of body.hierarchy[key]) {
-        if (rows.has(row.id) && JSON.stringify(rows.get(row.id)) !== JSON.stringify(row)) fail('Конфликт физических адресов');
-        rows.set(row.id, row);
-      }
-      frame.hierarchy[key] = [...rows.values()];
-    }
-  }
-  validate(frame, milliseconds); // Global IDs, source identities and parent closure.
-  return frame;
-}
-
-// Sector payloads have already passed bounded contract/time validation. Global
-// identity closure and array assembly are staged, never published piecemeal.
-async function combineLarge(manifest,bodies,check,onSlice) {
-  if(bodies.some(b=>b.hierarchy)) throw new Error('Large hierarchy exceeds decoder budget');
-  const objects=[],ids=new Set(),targets=new Set();
-  for(const body of bodies) for(let offset=0;offset<body.objects.length;){
-    await yieldPhysicalWork();check();
-    const start=performance.now();let count=0;
-    while(offset<body.objects.length && count++<500 && performance.now()-start<2){
-      const row=body.objects[offset++];
-      if(ids.has(row.id))fail('Дубликат или неверный ID физического тела');ids.add(row.id);
-      if(row.target!=null){const identity=JSON.stringify([row.model_id??null,row.target]);
-        if(targets.has(identity))fail('Дубликат идентичности физического тела');targets.add(identity);}
-      objects.push(row);
-    }
-    onSlice(performance.now()-start);
-  }
-  check();const frame={...manifest,objects};delete frame.sector;return frame;
-}
 
 /** One atomic selection, bounded workers and no partial scene publication.
  * The caller coalesces continuous clock ticks. Explicit contexts evict the old
@@ -218,7 +156,7 @@ export class PhysicalSectorManager {
         if (!body) fail('Некорректный ответ сервера эфемерид');
         if (body.objects?.length > this.limits.sectorObjects) fail('Превышен размер физического сектора');
         const validationStart=performance.now();
-        validate(body, state.milliseconds);
+        validatePositionFrame(body, state.milliseconds);
         this.onPhase?.({kind:"validation_cpu",ms:performance.now()-validationStart});
         if (body.objects.length > this.limits.sectorObjects) fail('Превышен размер физического сектора');
         // Transfer the reservation to decoded residency without double counting.
@@ -307,7 +245,7 @@ export class PhysicalSectorManager {
           if (manifest.sectors.length > 1 && !manifest.registry_revision) fail('Нет ревизии реестра многосекторной выборки');
           const ids = new Set();
           for (const sector of manifest.sectors) {
-            if (!validId(sector.id) || ids.has(sector.id)) fail('Некорректный ID сектора');
+            if (!validPositionId(sector.id) || ids.has(sector.id)) fail('Некорректный ID сектора');
             ids.add(sector.id);
             if (sector.revision !== manifest.revision) throw new PositionRevisionChanged();
           }
@@ -327,7 +265,7 @@ export class PhysicalSectorManager {
                 if (body.revision !== manifest.revision || body.registry_revision !== manifest.registry_revision) throw new PositionRevisionChanged();
                 if (body.sector !== sector.id || body.jd_tdb !== manifest.jd_tdb
                     || body.evaluated_at !== manifest.evaluated_at
-                    || fields.some(key => body.coordinates[key] !== manifest.coordinates[key])) fail('Несогласованный сектор или момент положений');
+                    || POSITION_COORDINATE_FIELDS.some(key => body.coordinates[key] !== manifest.coordinates[key])) fail('Несогласованный сектор или момент положений');
                 bodies[index] = body; state.pending++; this.account(state);
               }
             } catch (error) { if (!failure) failure = error; controller.abort(); }
@@ -340,8 +278,8 @@ export class PhysicalSectorManager {
           state.cost.decoded += state.cost.objects * 512; this.account(state);
           const mergeStart=performance.now();
           const large=state.cost.objects>4096;
-          const frame = large ? await combineLarge(manifest,bodies,()=>this.check(state),
-            ms=>this.onPhase?.({kind:'merge_slice_cpu',ms})) : combine(manifest, bodies, state.milliseconds);
+          const frame = large ? await combineLargePositionFrames(manifest,bodies,()=>this.check(state),
+            ms=>this.onPhase?.({kind:'merge_slice_cpu',ms})) : combinePositionFrames(manifest, bodies, state.milliseconds);
           this.onPhase?.({kind:large?"merge_elapsed":"merge_cpu",ms:performance.now()-mergeStart});
           return this.publish(state, frame);
         } catch (error) {

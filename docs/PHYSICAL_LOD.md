@@ -4,6 +4,11 @@
 5 CSS px, L1 — центр с кольцом 15 CSS px. Размер shader учитывает pixel ratio renderer. Это не физические размеры/поверхности.
 Источники, пять центров DE440s, Float64 и physical-hierarchy/1 не меняются.
 
+`physical/sectorFrame.js` проверяет payload и собирает согласованный кадр;
+`sectorManager.js` владеет HTTP, admission, отменой и атомарной публикацией.
+В legacy-сцене `scene/lodController.js` выбирает уровни и обрабатывает picking,
+а `lodDetailedMeshes.js` владеет L2 meshes, cloned materials и selection pins.
+
 Вход L1 при расстоянии камеры до центра ≤20 render units (2 млн км), выход
 ≥28 (2.8 млн км). Выбранный загруженный центр имеет приоритет. До 32 L1;
 при заполнении остальные остаются L0, без скрытия или перемещения.

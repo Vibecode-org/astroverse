@@ -19,6 +19,29 @@ import time
 from browser_smoke.common import INSTALL_PROBE, VIEW_LABELS
 
 
+# Detached TextureLoader images do not appear in document.images. Track their
+# real completion (including errors) before taking a GPU-resource baseline.
+TRACK_IMAGES = r"""
+window.__imageLoads = {pending:0, completed:0};
+const imageSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+Object.defineProperty(HTMLImageElement.prototype, 'src', {
+    ...imageSrc,
+    set(value) {
+        window.__imageLoads.pending++;
+        const done = () => {
+            this.removeEventListener('load', done);
+            this.removeEventListener('error', done);
+            window.__imageLoads.pending--;
+            window.__imageLoads.completed++;
+        };
+        this.addEventListener('load', done);
+        this.addEventListener('error', done);
+        imageSrc.set.call(this, value);
+    },
+});
+"""
+
+
 class MCP:
     def __init__(self, slow=False, browser_url=None):
         self.slow = slow
@@ -177,7 +200,7 @@ def run(catalog, report_path=None):
 
     with MCP(slow=catalog == 100000) as mcp:
         mcp.call("navigate_page", url="http://localhost:5173/?scene=legacy", timeout=45000,
-                 initScript="window.__regressionErrors=[];addEventListener('error',e=>window.__regressionErrors.push(e.message));addEventListener('unhandledrejection',e=>window.__regressionErrors.push(String(e.reason)));")
+                 initScript=TRACK_IMAGES+"window.__regressionErrors=[];addEventListener('error',e=>window.__regressionErrors.push(e.message));addEventListener('unhandledrejection',e=>window.__regressionErrors.push(String(e.reason)));")
         health = mcp.evaluate("async () => (await fetch('/api/health')).json()")
         assert health["objects"] == catalog, health
         mcp.wait(f"document.querySelector('.topmeta')?.textContent.includes('{catalog}') && document.querySelector('.viewport canvas')")
@@ -246,6 +269,16 @@ def run(catalog, report_path=None):
             state = mcp.wait("s && s.view === " + json.dumps(view))
             assert sum(state["visible"].values()) == 1, state["visible"]
         passed("all three scales remain mutually exclusive")
+
+        # A loaded image only acquires a GPU texture when its scale is rendered.
+        # Warm every scale after CDN completion; keep the later equality strict.
+        report["images_before_warmup"] = mcp.evaluate("() => window.__imageLoads")
+        mcp.wait("window.__imageLoads.pending===0")
+        for view, label in VIEW_LABELS.items():
+            mcp.click(label)
+            mcp.wait("s && s.view === " + json.dumps(view))
+            mcp.settled()
+        report["images_after_warmup"] = mcp.evaluate("() => window.__imageLoads")
 
         mcp.click(VIEW_LABELS["local"])
         expected_local = 100000 if catalog == 100000 else 2733
