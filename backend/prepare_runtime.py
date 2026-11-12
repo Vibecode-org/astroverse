@@ -18,6 +18,12 @@ def signature(source):
 
 def ensure_runtime(source):
     target = Path(os.environ.get("ASTROVERSE_SECTOR_PATH") or source.with_suffix(".runtime.sqlite"))
+    if os.environ.get("ASTROVERSE_CATALOG_MODE") == "published":
+        if not os.environ.get("ASTROVERSE_SECTOR_PATH"):
+            raise ValueError("published mode requires ASTROVERSE_SECTOR_PATH")
+        from data.runtime_catalog import DiskCatalog
+        DiskCatalog(target)
+        return target
     expected = signature(source)
     try:
         metadata = SectorIndex(target).metadata

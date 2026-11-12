@@ -1,0 +1,5366 @@
+{
+  "status": "synthetic_functional_passed_hardware_milestone_open",
+  "profile": {
+    "synthetic": true,
+    "catalog": 100000,
+    "sectors": 100,
+    "objects_per_sector": 1000,
+    "distribution": "400x250 ICRF X/Z lattice, 4000 km spacing, Y=0; paired IDs 50000 and 50001 share one center",
+    "time": "stationary synthetic centers for each requested UTC in unchanged supported interval; no measured physics",
+    "camera": "same physical scene, synthetic overview [0,8,24] render units aimed at lattice origin; all centers inside initial frustum",
+    "database": "isolated generated SQLite, immutable revision; no mandatory JSON catalog",
+    "unique_physical_positions": 99999,
+    "exactly_coincident_pair_count": 1
+  },
+  "budgets_declared_before_implementation": {
+    "rationale": "16.67 ms per 60 Hz frame: camera 1 ms, LOD 1 ms, preparation 4 ms leaves ~10 ms render/browser. Click is occasional. Startup permits 100 bounded HTTP sectors on four workers. Memory includes two coherent sets for continuous time and four reserved responses.",
+    "camera_p95_ms": 1,
+    "camera_max_ms": 8,
+    "lod_p95_ms": 1,
+    "lod_max_ms": 8,
+    "preparation_slice_target_ms": 4,
+    "preparation_slice_max_ms": 16,
+    "picking_p95_ms": 16,
+    "picking_max_ms": 50,
+    "cold_interactive_ms": 15000,
+    "frame_p95_ms": 16.667,
+    "frame_p99_ms": 33.334,
+    "long_pause_ms": 50,
+    "draw_calls_max": 1,
+    "manager_objects": 200000,
+    "manager_serialized_bytes": 67108864,
+    "manager_decoded_estimate_bytes": 536870912,
+    "http_workers": 4,
+    "response_bytes": 1048576,
+    "gpu_attribute_bytes_max": 7340032,
+    "precision": {
+      "canonical_centers": "bitwise unchanged at paused time",
+      "cpu_km": 1e-06,
+      "gpu_render_absolute": 1e-06,
+      "gpu_render_relative": 1e-07,
+      "rebase_css_px": 0.05
+    }
+  },
+  "baseline": {
+    "kind": "Node CPU microbenchmark before changes, no WebGL",
+    "node": "v26.13.0",
+    "objects": 4096,
+    "warmup_iterations": 5,
+    "samples": 35,
+    "apply_ms": {
+      "p95": 3.036541,
+      "max": 3.142583
+    },
+    "lod_ms": {
+      "p95": 0.036208,
+      "max": 0.049
+    },
+    "picking_ms": {
+      "p95": 0.406167,
+      "max": 0.433333
+    },
+    "attribute_bytes": 114688,
+    "reproduction": "node tests/benchmark_physical_baseline.mjs (current implementation, original output retained here)"
+  },
+  "measurements": {
+    "hardware": {
+      "action_timing_includes_readonly_diagnostics": true,
+      "marker_footprints": "5px L0 / 15px L1 overlap densely; pixel_center_collisions counts centers only, not marker footprint pairs",
+      "complete": true,
+      "hardware_criterion_passed": false,
+      "checks": [
+        "100000 identities, known centers, submitted and in frustum via ordinary page load",
+        "search/card selection across sector boundaries and exact overlapping centers",
+        "manual/Now/acceleration/reverse; permanent partial failure clears; revision conflict retries atomically",
+        "three trusted yaw/pitch/roll/move/refocus/overview cycles, stable renderer/resources/listeners"
+      ],
+      "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
+      "cold_interactive_ms": 2307.699999988079,
+      "initial": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 100000,
+        "lod1": 0,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.30000001192092896,
+          "maxApplyMs": 1.7000000178813934,
+          "lodMs": 0.29999998211860657,
+          "maxLodMs": 0.29999998211860657,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 564.4000000059605,
+          "sliceMaxMs": 3,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 0
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 65611027,
+          "total": 125298551
+        },
+        "manager": {
+          "requests": 228,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 26588968,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 1,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 123000,
+          "peakSerialized": 18651202,
+          "peakDecoded": 200921616,
+          "clientId": "c7706dfa-1715-41cb-94e1-115e3a9e07c3",
+          "generation": 5,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "listeners": 28,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      },
+      "steady": {
+        "frame": {
+          "n": 1807,
+          "p50": 16.69999999999709,
+          "p95": 16.700000000004366,
+          "p99": 16.80000000000109,
+          "max": 16.80000000000291,
+          "over50ms": 0,
+          "fraction_60hz": 0.37797454344216935
+        },
+        "camera": {
+          "n": 1814,
+          "p50": 0,
+          "p95": 0.19999998807907104,
+          "p99": 0.30000001192092896,
+          "max": 1.2999999821186066,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod": {
+          "n": 1814,
+          "p50": 0.09999999403953552,
+          "p95": 0.30000001192092896,
+          "p99": 0.5999999940395355,
+          "max": 3.2999999821186066,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "apply": null,
+        "pick": null,
+        "commit": null,
+        "preparation_wall": null,
+        "preparation_slice_max": null
+      },
+      "steady_seconds": 30,
+      "warmup_seconds": 3,
+      "actions_start": 38595,
+      "cycles": [
+        {
+          "resident": 100000,
+          "computed": 100000,
+          "submitted": 100000,
+          "allocated_slots": 100000,
+          "in_frustum": 100000,
+          "numeric": 100000,
+          "identities": 100000,
+          "pixel_center_collisions": 1,
+          "hidden_by_policy": 0,
+          "raster_occlusion": "marker footprints overlap; centers counted separately",
+          "lod0": 99999,
+          "lod1": 1,
+          "calls": 1,
+          "stats": {
+            "applyMs": 0.5999999940395355,
+            "maxApplyMs": 1.7000000178813934,
+            "lodMs": 0.19999998807907104,
+            "maxLodMs": 3.2999999821186066,
+            "visited": 128,
+            "pickMs": 1.100000023841858,
+            "prepareMs": 609.0999999940395,
+            "sliceMaxMs": 7.5,
+            "slots": 100000,
+            "capacity": 131072,
+            "bufferBytes": 3670016,
+            "detailed": 1
+          },
+          "memory": {
+            "geometries": 1,
+            "textures": 0
+          },
+          "heap": {
+            "used": 145277838,
+            "total": 190283406
+          },
+          "manager": {
+            "requests": 1304,
+            "active": 0,
+            "peakActive": 4,
+            "responseBytes": 151454136,
+            "retries": 0,
+            "conflicts": 0,
+            "evictions": 11,
+            "peakQueue": 100,
+            "peakPending": 100,
+            "peakObjects": 123000,
+            "peakSerialized": 18651202,
+            "peakDecoded": 200921616,
+            "clientId": "c7706dfa-1715-41cb-94e1-115e3a9e07c3",
+            "generation": 48,
+            "queue": 0,
+            "pending": 0,
+            "residentObjects": 100000,
+            "objects": 100000,
+            "serialized": 12132070,
+            "decoded": 148670256
+          },
+          "listeners": 28,
+          "sameRenderer": true,
+          "framebuffer": [
+            1920,
+            1080
+          ],
+          "dpr": 1,
+          "environment": {
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+            "cores": 10,
+            "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+          }
+        },
+        {
+          "resident": 100000,
+          "computed": 100000,
+          "submitted": 100000,
+          "allocated_slots": 100000,
+          "in_frustum": 100000,
+          "numeric": 100000,
+          "identities": 100000,
+          "pixel_center_collisions": 1,
+          "hidden_by_policy": 0,
+          "raster_occlusion": "marker footprints overlap; centers counted separately",
+          "lod0": 99999,
+          "lod1": 1,
+          "calls": 1,
+          "stats": {
+            "applyMs": 0.699999988079071,
+            "maxApplyMs": 1.7000000178813934,
+            "lodMs": 0.19999998807907104,
+            "maxLodMs": 3.2999999821186066,
+            "visited": 128,
+            "pickMs": 0,
+            "prepareMs": 580.5999999940395,
+            "sliceMaxMs": 7.5,
+            "slots": 100000,
+            "capacity": 131072,
+            "bufferBytes": 3670016,
+            "detailed": 1
+          },
+          "memory": {
+            "geometries": 1,
+            "textures": 0
+          },
+          "heap": {
+            "used": 168439222,
+            "total": 234469066
+          },
+          "manager": {
+            "requests": 1639,
+            "active": 0,
+            "peakActive": 4,
+            "responseBytes": 187850346,
+            "retries": 0,
+            "conflicts": 0,
+            "evictions": 14,
+            "peakQueue": 100,
+            "peakPending": 100,
+            "peakObjects": 123000,
+            "peakSerialized": 18651202,
+            "peakDecoded": 200921616,
+            "clientId": "c7706dfa-1715-41cb-94e1-115e3a9e07c3",
+            "generation": 83,
+            "queue": 0,
+            "pending": 0,
+            "residentObjects": 100000,
+            "objects": 100000,
+            "serialized": 12132070,
+            "decoded": 148670256
+          },
+          "listeners": 28,
+          "sameRenderer": true,
+          "framebuffer": [
+            1920,
+            1080
+          ],
+          "dpr": 1,
+          "environment": {
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+            "cores": 10,
+            "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+          }
+        },
+        {
+          "resident": 100000,
+          "computed": 100000,
+          "submitted": 100000,
+          "allocated_slots": 100000,
+          "in_frustum": 100000,
+          "numeric": 100000,
+          "identities": 100000,
+          "pixel_center_collisions": 1,
+          "hidden_by_policy": 0,
+          "raster_occlusion": "marker footprints overlap; centers counted separately",
+          "lod0": 99999,
+          "lod1": 1,
+          "calls": 1,
+          "stats": {
+            "applyMs": 0.20000001788139343,
+            "maxApplyMs": 1.7000000178813934,
+            "lodMs": 0.10000002384185791,
+            "maxLodMs": 3.2999999821186066,
+            "visited": 128,
+            "pickMs": 0,
+            "prepareMs": 586.9000000059605,
+            "sliceMaxMs": 7.5,
+            "slots": 100000,
+            "capacity": 131072,
+            "bufferBytes": 3670016,
+            "detailed": 1
+          },
+          "memory": {
+            "geometries": 1,
+            "textures": 0
+          },
+          "heap": {
+            "used": 140083290,
+            "total": 187039374
+          },
+          "manager": {
+            "requests": 1974,
+            "active": 0,
+            "peakActive": 4,
+            "responseBytes": 224246556,
+            "retries": 0,
+            "conflicts": 0,
+            "evictions": 17,
+            "peakQueue": 100,
+            "peakPending": 100,
+            "peakObjects": 123000,
+            "peakSerialized": 18651202,
+            "peakDecoded": 200921616,
+            "clientId": "c7706dfa-1715-41cb-94e1-115e3a9e07c3",
+            "generation": 118,
+            "queue": 0,
+            "pending": 0,
+            "residentObjects": 100000,
+            "objects": 100000,
+            "serialized": 12132070,
+            "decoded": 148670256
+          },
+          "listeners": 28,
+          "sameRenderer": true,
+          "framebuffer": [
+            1920,
+            1080
+          ],
+          "dpr": 1,
+          "environment": {
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+            "cores": 10,
+            "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+          }
+        }
+      ],
+      "displayed_time_progress": [
+        {
+          "mode": "Сейчас",
+          "from": "2026-11-12T08:14:36.790000+00:00",
+          "to": "2026-11-12T08:14:38.654000+00:00"
+        },
+        {
+          "mode": "Ускорить",
+          "from": "2026-11-12T08:14:41.553000+00:00",
+          "to": "2026-11-12T08:16:27.356000+00:00"
+        },
+        {
+          "mode": "⟲",
+          "from": "2026-11-12T08:19:36.344000+00:00",
+          "to": "2026-11-12T08:17:53.804000+00:00"
+        }
+      ],
+      "actions": {
+        "frame": {
+          "n": 4087,
+          "p50": 16.69999999999709,
+          "p95": 16.79999999998836,
+          "p99": 16.80000000000291,
+          "max": 266.8000000000029,
+          "over50ms": 7,
+          "fraction_60hz": 0.38536824076339615
+        },
+        "camera": {
+          "n": 4093,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.4000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod": {
+          "n": 4093,
+          "p50": 0,
+          "p95": 0.19999998807907104,
+          "p99": 0.20000001788139343,
+          "max": 0.4000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "apply": {
+          "n": 43,
+          "p50": 0.09999999403953552,
+          "p95": 0.19999998807907104,
+          "p99": 0.20000001788139343,
+          "max": 0.20000001788139343,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "pick": {
+          "n": 4,
+          "p50": 1.100000023841858,
+          "p95": 3.0999999940395355,
+          "p99": 3.0999999940395355,
+          "max": 3.0999999940395355,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "commit": {
+          "n": 25,
+          "p50": 0.5,
+          "p95": 0.800000011920929,
+          "p99": 0.800000011920929,
+          "max": 0.800000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "preparation_wall": {
+          "n": 25,
+          "p50": 586.8000000119209,
+          "p95": 1120.0999999940395,
+          "p99": 1138.0999999940395,
+          "max": 1138.0999999940395,
+          "over50ms": 25,
+          "fraction_60hz": 0.0
+        },
+        "preparation_slice_max": {
+          "n": 25,
+          "p50": 7.5,
+          "p95": 7.5,
+          "p99": 7.5,
+          "max": 7.5,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        }
+      },
+      "final": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 99999,
+        "lod1": 1,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.5,
+          "maxApplyMs": 1.7000000178813934,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 3.2999999821186066,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 599.1999999880791,
+          "sliceMaxMs": 7.5,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 127829831,
+          "total": 204261663
+        },
+        "manager": {
+          "requests": 3051,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 350413921,
+          "retries": 0,
+          "conflicts": 1,
+          "evictions": 26,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974596,
+          "peakDecoded": 297340512,
+          "clientId": "c7706dfa-1715-41cb-94e1-115e3a9e07c3",
+          "generation": 135,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12131161,
+          "decoded": 148662984
+        },
+        "listeners": 28,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      },
+      "rebase_proof": [
+        {
+          "max_css_px": 0,
+          "bitwise_centers": true
+        },
+        {
+          "max_css_px": 0,
+          "bitwise_centers": true
+        },
+        {
+          "max_css_px": 0,
+          "bitwise_centers": true
+        }
+      ],
+      "provider": {
+        "requests": 3056,
+        "active": 0,
+        "peak_active": 4,
+        "bytes": 354048387,
+        "max_bytes": 122062,
+        "statuses": {
+          "200": 3051,
+          "409": 4,
+          "422": 1
+        },
+        "total_ms": 80499.89994500227,
+        "max_ms": 127.96674999981406,
+        "provider_rss_kib": 131384,
+        "builder": "none; generated per bounded request"
+      },
+      "errors": [],
+      "hardware_renderer": true
+    },
+    "swiftshader": {
+      "action_timing_includes_readonly_diagnostics": true,
+      "marker_footprints": "5px L0 / 15px L1 overlap densely; pixel_center_collisions counts centers only, not marker footprint pairs",
+      "complete": true,
+      "hardware_criterion_passed": false,
+      "checks": [
+        "100000 identities, known centers, submitted and in frustum via ordinary page load",
+        "search/card selection across sector boundaries and exact overlapping centers",
+        "manual/Now/acceleration/reverse; permanent partial failure clears; revision conflict retries atomically",
+        "three trusted yaw/pitch/roll/move/refocus/overview cycles, stable renderer/resources/listeners"
+      ],
+      "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
+      "cold_interactive_ms": 4419,
+      "initial": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 100000,
+        "lod1": 0,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.29999998211860657,
+          "maxApplyMs": 0.9000000059604645,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 0.10000002384185791,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 514.1999999880791,
+          "sliceMaxMs": 2.4000000059604645,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 0
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 61978218,
+          "total": 128645326
+        },
+        "manager": {
+          "requests": 298,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 35065638,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 1,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 193000,
+          "peakSerialized": 27127872,
+          "peakDecoded": 269021696,
+          "clientId": "16ea7cd8-e773-493b-91a7-249423e9bdf6",
+          "generation": 5,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "listeners": 28,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+        }
+      },
+      "steady": {
+        "frame": {
+          "n": 189,
+          "p50": 100,
+          "p95": 116.70000000000073,
+          "p99": 133.39999999999782,
+          "max": 216.59999999999854,
+          "over50ms": 188,
+          "fraction_60hz": 0.0
+        },
+        "camera": {
+          "n": 190,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.20000001788139343,
+          "max": 0.20000001788139343,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod": {
+          "n": 190,
+          "p50": 0.09999999403953552,
+          "p95": 0.10000002384185791,
+          "p99": 0.20000001788139343,
+          "max": 0.20000001788139343,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "apply": null,
+        "pick": null,
+        "commit": null,
+        "preparation_wall": null,
+        "preparation_slice_max": null
+      },
+      "steady_seconds": 20,
+      "warmup_seconds": 3,
+      "actions_start": 32594.40000000596,
+      "cycles": [
+        {
+          "resident": 100000,
+          "computed": 100000,
+          "submitted": 100000,
+          "allocated_slots": 100000,
+          "in_frustum": 100000,
+          "numeric": 100000,
+          "identities": 100000,
+          "pixel_center_collisions": 1,
+          "hidden_by_policy": 0,
+          "raster_occlusion": "marker footprints overlap; centers counted separately",
+          "lod0": 99999,
+          "lod1": 1,
+          "calls": 1,
+          "stats": {
+            "applyMs": 0.20000001788139343,
+            "maxApplyMs": 0.9000000059604645,
+            "lodMs": 0,
+            "maxLodMs": 0.20000001788139343,
+            "visited": 128,
+            "pickMs": 1.300000011920929,
+            "prepareMs": 507.59999999403954,
+            "sliceMaxMs": 2.7000000178813934,
+            "slots": 100000,
+            "capacity": 131072,
+            "bufferBytes": 3670016,
+            "detailed": 1
+          },
+          "memory": {
+            "geometries": 1,
+            "textures": 0
+          },
+          "heap": {
+            "used": 67524019,
+            "total": 135085583
+          },
+          "manager": {
+            "requests": 1403,
+            "active": 0,
+            "peakActive": 4,
+            "responseBytes": 163853020,
+            "retries": 0,
+            "conflicts": 0,
+            "evictions": 20,
+            "peakQueue": 100,
+            "peakPending": 100,
+            "peakObjects": 193000,
+            "peakSerialized": 27127872,
+            "peakDecoded": 269021696,
+            "clientId": "16ea7cd8-e773-493b-91a7-249423e9bdf6",
+            "generation": 29,
+            "queue": 0,
+            "pending": 0,
+            "residentObjects": 100000,
+            "objects": 100000,
+            "serialized": 12132070,
+            "decoded": 148670256
+          },
+          "listeners": 28,
+          "sameRenderer": true,
+          "framebuffer": [
+            1920,
+            1080
+          ],
+          "dpr": 1,
+          "environment": {
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+            "cores": 10,
+            "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+          }
+        },
+        {
+          "resident": 100000,
+          "computed": 100000,
+          "submitted": 100000,
+          "allocated_slots": 100000,
+          "in_frustum": 100000,
+          "numeric": 100000,
+          "identities": 100000,
+          "pixel_center_collisions": 1,
+          "hidden_by_policy": 0,
+          "raster_occlusion": "marker footprints overlap; centers counted separately",
+          "lod0": 99999,
+          "lod1": 1,
+          "calls": 1,
+          "stats": {
+            "applyMs": 0.4000000059604645,
+            "maxApplyMs": 0.9000000059604645,
+            "lodMs": 0.09999999403953552,
+            "maxLodMs": 0.20000001788139343,
+            "visited": 128,
+            "pickMs": 0,
+            "prepareMs": 506.7999999821186,
+            "sliceMaxMs": 2.7000000178813934,
+            "slots": 100000,
+            "capacity": 131072,
+            "bufferBytes": 3670016,
+            "detailed": 1
+          },
+          "memory": {
+            "geometries": 1,
+            "textures": 0
+          },
+          "heap": {
+            "used": 102178021,
+            "total": 147962249
+          },
+          "manager": {
+            "requests": 1629,
+            "active": 0,
+            "peakActive": 4,
+            "responseBytes": 188742819,
+            "retries": 0,
+            "conflicts": 0,
+            "evictions": 36,
+            "peakQueue": 100,
+            "peakPending": 100,
+            "peakObjects": 193000,
+            "peakSerialized": 27127872,
+            "peakDecoded": 269021696,
+            "clientId": "16ea7cd8-e773-493b-91a7-249423e9bdf6",
+            "generation": 46,
+            "queue": 0,
+            "pending": 0,
+            "residentObjects": 100000,
+            "objects": 100000,
+            "serialized": 12132070,
+            "decoded": 148670256
+          },
+          "listeners": 28,
+          "sameRenderer": true,
+          "framebuffer": [
+            1920,
+            1080
+          ],
+          "dpr": 1,
+          "environment": {
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+            "cores": 10,
+            "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+          }
+        },
+        {
+          "resident": 100000,
+          "computed": 100000,
+          "submitted": 100000,
+          "allocated_slots": 100000,
+          "in_frustum": 100000,
+          "numeric": 100000,
+          "identities": 100000,
+          "pixel_center_collisions": 1,
+          "hidden_by_policy": 0,
+          "raster_occlusion": "marker footprints overlap; centers counted separately",
+          "lod0": 99999,
+          "lod1": 1,
+          "calls": 1,
+          "stats": {
+            "applyMs": 0.20000001788139343,
+            "maxApplyMs": 0.9000000059604645,
+            "lodMs": 0.09999999403953552,
+            "maxLodMs": 0.20000001788139343,
+            "visited": 128,
+            "pickMs": 0,
+            "prepareMs": 501.40000000596046,
+            "sliceMaxMs": 2.7000000178813934,
+            "slots": 100000,
+            "capacity": 131072,
+            "bufferBytes": 3670016,
+            "detailed": 1
+          },
+          "memory": {
+            "geometries": 1,
+            "textures": 0
+          },
+          "heap": {
+            "used": 131085095,
+            "total": 188845387
+          },
+          "manager": {
+            "requests": 1854,
+            "active": 0,
+            "peakActive": 4,
+            "responseBytes": 213510557,
+            "retries": 0,
+            "conflicts": 0,
+            "evictions": 52,
+            "peakQueue": 100,
+            "peakPending": 100,
+            "peakObjects": 193000,
+            "peakSerialized": 27127872,
+            "peakDecoded": 269021696,
+            "clientId": "16ea7cd8-e773-493b-91a7-249423e9bdf6",
+            "generation": 63,
+            "queue": 0,
+            "pending": 0,
+            "residentObjects": 100000,
+            "objects": 100000,
+            "serialized": 12132070,
+            "decoded": 148670256
+          },
+          "listeners": 28,
+          "sameRenderer": true,
+          "framebuffer": [
+            1920,
+            1080
+          ],
+          "dpr": 1,
+          "environment": {
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+            "cores": 10,
+            "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+          }
+        }
+      ],
+      "displayed_time_progress": [
+        {
+          "mode": "Сейчас",
+          "from": "2026-11-12T08:16:26.301000+00:00",
+          "to": "2026-11-12T08:16:28.111000+00:00"
+        },
+        {
+          "mode": "Ускорить",
+          "from": "2026-11-12T08:16:31.476000+00:00",
+          "to": "2026-11-12T08:18:17.217000+00:00"
+        },
+        {
+          "mode": "⟲",
+          "from": "2026-11-12T08:21:44.211000+00:00",
+          "to": "2026-11-12T08:19:56.667000+00:00"
+        }
+      ],
+      "actions": {
+        "frame": {
+          "n": 919,
+          "p50": 66.70000000000437,
+          "p95": 133.3000000000029,
+          "p99": 166.6999999999971,
+          "max": 400,
+          "over50ms": 749,
+          "fraction_60hz": 0.00544069640914037
+        },
+        "camera": {
+          "n": 920,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.5999999940395355,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod": {
+          "n": 920,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.19999998807907104,
+          "max": 0.20000001788139343,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "apply": {
+          "n": 113,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.19999998807907104,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "pick": {
+          "n": 4,
+          "p50": 1.300000011920929,
+          "p95": 3.7000000178813934,
+          "p99": 3.7000000178813934,
+          "max": 3.7000000178813934,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "commit": {
+          "n": 23,
+          "p50": 0.30000001192092896,
+          "p95": 0.4000000059604645,
+          "p99": 0.5,
+          "max": 0.5,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "preparation_wall": {
+          "n": 23,
+          "p50": 515.5,
+          "p95": 974,
+          "p99": 976.1000000238419,
+          "max": 976.1000000238419,
+          "over50ms": 23,
+          "fraction_60hz": 0.0
+        },
+        "preparation_slice_max": {
+          "n": 23,
+          "p50": 2.7000000178813934,
+          "p95": 2.7000000178813934,
+          "p99": 2.7000000178813934,
+          "max": 2.7000000178813934,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        }
+      },
+      "final": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 99999,
+        "lod1": 1,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.20000001788139343,
+          "maxApplyMs": 0.9000000059604645,
+          "lodMs": 0,
+          "maxLodMs": 0.20000001788139343,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 504.5,
+          "sliceMaxMs": 2.7000000178813934,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 76177725,
+          "total": 151787689
+        },
+        "manager": {
+          "requests": 2999,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 347921017,
+          "retries": 0,
+          "conflicts": 1,
+          "evictions": 61,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974699,
+          "peakDecoded": 297340512,
+          "clientId": "16ea7cd8-e773-493b-91a7-249423e9bdf6",
+          "generation": 80,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12131161,
+          "decoded": 148662984
+        },
+        "listeners": 28,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+        }
+      },
+      "rebase_proof": [
+        {
+          "max_css_px": 0,
+          "bitwise_centers": true
+        },
+        {
+          "max_css_px": 0,
+          "bitwise_centers": true
+        },
+        {
+          "max_css_px": 0,
+          "bitwise_centers": true
+        }
+      ],
+      "provider": {
+        "requests": 6060,
+        "active": 0,
+        "peak_active": 4,
+        "bytes": 708199565,
+        "max_bytes": 122062,
+        "statuses": {
+          "200": 6050,
+          "409": 8,
+          "422": 2
+        },
+        "total_ms": 154531.44031399526,
+        "max_ms": 127.96674999981406,
+        "provider_rss_kib": 131720,
+        "builder": "none; generated per bounded request"
+      },
+      "errors": [],
+      "hardware_renderer": false
+    }
+  },
+  "open_criteria": [
+    "hardware60+fps/full S-100k open: steady p95=16.70ms exceeds declared16.667ms; headless RAF quantization",
+    "clean dynamic benchmark required: action max=266.8ms includes full-set probes; remaining synchronous manager validation/merge needs isolated profiling",
+    "Complete synthetic S-100k performance acceptance remains open."
+  ],
+  "hardware": {
+    "gpu": "Apple M1 Pro, 16 GPU cores, Metal supported",
+    "cpu_cores_reported": 10,
+    "source": "system_profiler SPDisplaysDataType; navigator.hardwareConcurrency",
+    "note": "hardware model known; no dedicated driver memory query",
+    "additional_hardware": {
+      "chip_type": "Apple M1 Pro",
+      "number_processors": "proc 10:8:2",
+      "physical_memory": "16 GB"
+    }
+  },
+  "precision_evidence": {
+    "unit": "frontend/tests/s100k.test.js: all100k canonical/linear transforms; rebase preserves canonical centers; cancel and reuse",
+    "existing_regressions": "hierarchy/flight tests: large common origins1e18km and small supplied offsets; original tolerances unchanged; 100 Horizons vectors in backend/frontend suites"
+  },
+  "memory_model": {
+    "active_gpu_attributes_bytes": 3670016,
+    "active_cpu_attributes_bytes": 3670016,
+    "staging_attributes_bytes_per_preparation": 3670016,
+    "note": "Maps, JSON, hierarchy, canonical double arrays extra; manager decoded estimate not RSS; cancelled staging reclaimed by JS GC; driver memory unknown; heap metrics sampled without forced GC"
+  },
+  "verification": {
+    "backend_tests": 242,
+    "backend_branch_coverage_percent": 98.38,
+    "sectors_branch_coverage_percent": 100,
+    "frontend_tests": 215,
+    "frontend_coverage": {
+      "lines": {
+        "total": 2938,
+        "covered": 2908,
+        "skipped": 0,
+        "pct": 98.97
+      },
+      "statements": {
+        "total": 3744,
+        "covered": 3661,
+        "skipped": 0,
+        "pct": 97.78
+      },
+      "functions": {
+        "total": 557,
+        "covered": 544,
+        "skipped": 0,
+        "pct": 97.66
+      },
+      "branches": {
+        "total": 1961,
+        "covered": 1793,
+        "skipped": 0,
+        "pct": 91.43
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "frontend_build": "passed; existing >500kB chunk warning",
+    "horizons": {
+      "vectors": 100,
+      "max_3d_km": 0.002420538,
+      "regression_tolerance_km": 1,
+      "absolute_uncertainty": null
+    },
+    "ordinary_mcp": [
+      {
+        "runner": "browser_physical_mcp.py",
+        "exit_code": 0,
+        "duration_seconds": 18.157852584001375,
+        "report": {
+          "catalog": 3471,
+          "checks": [
+            "physical scene: Earth/Moon, one draw call, one renderer",
+            "displayed UTC and Float64 geometric positions agree",
+            "far overview loads all five centers; eviction/reload preserves centers and resources",
+            "floating origin follows selected body without modifying physical positions",
+            "Mercury/Venus selection, camera zoom and refocus preserve body centers and renderer",
+            "server search finds unloaded cards; paged sector read preserves unknown status",
+            "no full JSON/v2 catalog and no legacy live-ephemeris request",
+            "Mercury/Venus change with time and reverse return restores exact vectors",
+            "date changes and reverse return restore exactly the same centers",
+            "bounded registry pages, model metadata, pinned revision and 304",
+            "synthetic membership beyond five grows/reuses buffers without GPU resource growth",
+            "hierarchy cross-sector repartition preserves centers, render positions and GPU resources; stale epoch rejected",
+            "no uncaught JavaScript errors or console errors"
+          ],
+          "initial": {
+            "frames": 14,
+            "canvasCount": 1,
+            "camera": [
+              0,
+              8,
+              12
+            ],
+            "calls": 1,
+            "geometries": 1,
+            "textures": 0,
+            "origin": [
+              95871815.60760842,
+              102747686.46760273,
+              44553299.01730004
+            ],
+            "rows": [
+              {
+                "id": "earth",
+                "position": [
+                  95871815.60760842,
+                  102747686.46760273,
+                  44553299.01730004
+                ]
+              },
+              {
+                "id": "moon",
+                "position": [
+                  95826239.43477288,
+                  102392241.59340812,
+                  44365336.349859454
+                ]
+              }
+            ],
+            "render": [
+              0,
+              0,
+              0,
+              -0.45576173067092896,
+              -1.8796266317367554,
+              3.5544488430023193
+            ],
+            "hierarchy": {
+              "binding": {
+                "revision": "positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+                "jd_tdb": 2461356.8395460383,
+                "evaluated_at": "2026-11-12T08:07:47.595000+00:00"
+              },
+              "addresses": [
+                {
+                  "sector_id": "solar:verified",
+                  "system_id": "solar:verified:ssb",
+                  "id": "earth"
+                },
+                {
+                  "sector_id": "solar:verified",
+                  "system_id": "solar:verified:ssb",
+                  "id": "moon"
+                }
+              ]
+            }
+          },
+          "sector_requests": [
+            {
+              "url": "http://localhost:5173/api/spatial/v1/objects/proxima_cen_b/sector",
+              "bytes": 793,
+              "ms": 6.5
+            },
+            {
+              "url": "http://localhost:5173/api/spatial/v1/sectors/local%3Aequatorial%3A-1%3A-1%3A-1?limit=512&snapshot=b1c80ec9de4f095970c830d935a3dc5fef1971083b490f346b382a0d5bf1d380",
+              "bytes": 23059,
+              "ms": 5.700000017881393
+            }
+          ],
+          "registry_revision": "4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0",
+          "dynamic_resources": {
+            "baseline": {
+              "geometries": 1,
+              "textures": 0
+            },
+            "samples": [
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              },
+              {
+                "geometries": 1,
+                "textures": 0
+              }
+            ],
+            "final": {
+              "geometries": 1,
+              "textures": 0
+            },
+            "sameRenderer": true,
+            "physicalRestored": true
+          },
+          "hierarchy": {
+            "before": {
+              "origin": [
+                1000000000000.5,
+                2000000000012.25,
+                -2999999999990.75
+              ],
+              "rows": [
+                {
+                  "id": "a",
+                  "position": [
+                    1000000000000.5,
+                    2000000000012.25,
+                    -2999999999990.75
+                  ]
+                },
+                {
+                  "id": "b",
+                  "position": [
+                    1000000000000.625,
+                    2000000000012.75,
+                    -2999999999989.75
+                  ]
+                },
+                {
+                  "id": "c",
+                  "position": [
+                    1000000000050,
+                    2000000000020,
+                    -3000000000010
+                  ]
+                },
+                {
+                  "id": "d",
+                  "position": [
+                    1000000000100,
+                    2000000000030,
+                    -3000000000020
+                  ]
+                }
+              ],
+              "render": [
+                0,
+                0,
+                0,
+                1.249999968422344e-06,
+                9.999999747378752e-06,
+                -4.999999873689376e-06,
+                0.0004949999856762588,
+                -0.00019249999604653567,
+                -7.750000077066943e-05,
+                0.0009950000094249845,
+                -0.0002924999862443656,
+                -0.00017749999824445695
+              ],
+              "hierarchy": {
+                "binding": {
+                  "revision": "synthetic-hierarchy-1",
+                  "jd_tdb": 2451545,
+                  "evaluated_at": null
+                },
+                "addresses": [
+                  {
+                    "sector_id": "s1",
+                    "system_id": "sys1",
+                    "id": "a"
+                  },
+                  {
+                    "sector_id": "s1",
+                    "system_id": "sys1",
+                    "id": "b"
+                  },
+                  {
+                    "sector_id": "s1",
+                    "system_id": "sys2",
+                    "id": "c"
+                  },
+                  {
+                    "sector_id": "s2",
+                    "system_id": "sys3",
+                    "id": "d"
+                  }
+                ]
+              }
+            },
+            "memory": {
+              "geometries": 1,
+              "textures": 0
+            },
+            "after": {
+              "geometries": 1,
+              "textures": 0
+            },
+            "preserved": true,
+            "rejected": true,
+            "sameRenderer": true,
+            "sameGeometry": true,
+            "realHierarchy": {
+              "binding": {
+                "revision": "positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+                "jd_tdb": 2458945.00080076,
+                "evaluated_at": "2020-04-05T12:00:00+00:00"
+              },
+              "addresses": [
+                {
+                  "sector_id": "solar:verified",
+                  "system_id": "solar:verified:ssb",
+                  "id": "venus"
+                }
+              ]
+            }
+          },
+          "final": {
+            "frames": 141,
+            "canvasCount": 1,
+            "camera": [
+              0,
+              8,
+              12
+            ],
+            "calls": 1,
+            "geometries": 1,
+            "textures": 0,
+            "origin": [
+              -100294016.71560952,
+              35257042.18205732,
+              22157630.71606648
+            ],
+            "rows": [
+              {
+                "id": "venus",
+                "position": [
+                  -100294016.71560952,
+                  35257042.18205732,
+                  22157630.71606648
+                ]
+              }
+            ],
+            "render": [
+              0,
+              0,
+              0
+            ],
+            "hierarchy": {
+              "binding": {
+                "revision": "positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+                "jd_tdb": 2458945.00080076,
+                "evaluated_at": "2020-04-05T12:00:00+00:00"
+              },
+              "addresses": [
+                {
+                  "sector_id": "solar:verified",
+                  "system_id": "solar:verified:ssb",
+                  "id": "venus"
+                }
+              ]
+            }
+          },
+          "api_resources": [
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A42.932Z&anchor=earth&dx=0&dy=0&dz=0&radius=10000000000000",
+            "http://localhost:5173/api/sources/v1/objects?limit=128",
+            "http://localhost:5173/api/health",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A42.932Z&anchor=earth&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A42.932Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/health",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A44.968Z&anchor=earth&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A44.968Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A44.982Z&anchor=earth&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A44.982Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.538Z&anchor=earth&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.538Z&anchor=earth&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=earth&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/sectors/solar:verified?at=2026-11-12T08%3A07%3A47.595Z",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=earth&dx=0&dy=-240000000&dz=180000000&radius=600000000",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=earth&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=moon&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=mercury&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=mercury&dx=0&dy=-1718367.3372629145&dz=1145578.2248419428&radius=4130441.02972264",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=mercury&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=venus&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=venus&dx=0&dy=-1718367.3372629145&dz=1145578.2248419428&radius=4130441.02972264",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/positions/v1/nearby?at=2026-11-12T08%3A07%3A47.595Z&anchor=venus&dx=0&dy=-1200000&dz=800000&radius=2884441.020371191",
+            "http://localhost:5173/api/positions/v1/sectors/solar%3Averified?at=2026-11-12T08%3A07%3A47.595Z&revision=positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1",
+            "http://localhost:5173/api/search?q=proxima",
+            "http://localhost:5173/api/sources/v1/objects?limit=128&q=proxima",
+            "http://localhost:5173/api/spatial/v1/objects/proxima_cen_b/sector",
+            "http://localhost:5173/api/spatial/v1/sectors/local%3Aequatorial%3A-1%3A-1%3A-1?limit=512&snapshot=b1c80ec9de4f095970c830d935a3dc5fef1971083b490f346b382a0d5bf1d380"
+          ],
+          "console": "## Console messages\nShowing 1-2 of 2 (Page 1 of 1).\nmsgid=1 [warn] [.WebGL-0x13c00572600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (0 args) [3 times]\nmsgid=4 [warn] [.WebGL-0x13c00572600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat) (0 args)"
+        }
+      },
+      {
+        "runner": "browser_lod_mcp.py",
+        "exit_code": 0,
+        "duration_seconds": 20.446091083984356,
+        "report": {
+          "catalog": 3471,
+          "checks": 5,
+          "requests_during_lod_only": 0,
+          "near": {
+            "applyMs": 0.09999999403953552,
+            "maxApplyMs": 0.5,
+            "lodMs": 0,
+            "maxLodMs": 0.10000002384185791,
+            "visited": 2,
+            "pickMs": 0,
+            "prepareMs": 0,
+            "sliceMaxMs": 0,
+            "capacity": 8,
+            "bufferBytes": 224,
+            "slots": 2,
+            "detailed": 2,
+            "assignments": [
+              {
+                "id": "earth",
+                "slot": 0,
+                "level": 1
+              },
+              {
+                "id": "moon",
+                "slot": 1,
+                "level": 1
+              }
+            ]
+          },
+          "far": {
+            "applyMs": 0.19999998807907104,
+            "maxApplyMs": 0.5,
+            "lodMs": 0,
+            "maxLodMs": 0.10000002384185791,
+            "visited": 2,
+            "pickMs": 0,
+            "prepareMs": 0,
+            "sliceMaxMs": 0,
+            "capacity": 8,
+            "bufferBytes": 224,
+            "slots": 2,
+            "detailed": 0,
+            "assignments": [
+              {
+                "id": "earth",
+                "slot": 0,
+                "level": 0
+              },
+              {
+                "id": "moon",
+                "slot": 1,
+                "level": 0
+              }
+            ]
+          },
+          "final": {
+            "applyMs": 0.09999999403953552,
+            "maxApplyMs": 0.5,
+            "lodMs": 0,
+            "maxLodMs": 0.10000002384185791,
+            "visited": 2,
+            "pickMs": 0,
+            "prepareMs": 0,
+            "sliceMaxMs": 0,
+            "capacity": 8,
+            "bufferBytes": 224,
+            "slots": 2,
+            "detailed": 2,
+            "assignments": [
+              {
+                "id": "earth",
+                "slot": 0,
+                "level": 1
+              },
+              {
+                "id": "moon",
+                "slot": 1,
+                "level": 1
+              }
+            ]
+          }
+        }
+      },
+      {
+        "runner": "browser_positions_recovery_mcp.py",
+        "exit_code": 0,
+        "duration_seconds": 13.504499166010646,
+        "report": {
+          "catalog": 3471,
+          "checks": [
+            "revision race: pinned 409 restarts discovery once and recovers",
+            "repeated conflict: bounded retry, visible error and no stale positions",
+            "next valid request restores positions after conflict",
+            "flat positions/1 with UTC model scale is rejected",
+            "successful frame clears transient scene error",
+            "frame recovery cannot hide initialization failure",
+            "no renderer rebuild, GPU resource growth or uncaught JavaScript errors"
+          ],
+          "race": [
+            {
+              "kind": "manifest",
+              "status": 200,
+              "pin": null
+            },
+            {
+              "kind": "sector",
+              "status": 409,
+              "pin": "audit-previous-positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1"
+            },
+            {
+              "kind": "manifest",
+              "status": 200,
+              "pin": null
+            },
+            {
+              "kind": "sector",
+              "status": 200,
+              "pin": "positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1"
+            }
+          ],
+          "repeat": [
+            {
+              "kind": "manifest",
+              "status": 200,
+              "pin": null
+            },
+            {
+              "kind": "sector",
+              "status": 409,
+              "pin": "audit-previous-positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1"
+            },
+            {
+              "kind": "manifest",
+              "status": 200,
+              "pin": null
+            },
+            {
+              "kind": "sector",
+              "status": 409,
+              "pin": "audit-previous-positions1-4668aefc5b760cde74a56a0b35c48471eb2c1cbcd50ab185d0b2227eae3afae0-hierarchy1-ssb1"
+            }
+          ],
+          "resources": {
+            "geometries": 1,
+            "textures": 0,
+            "same_renderer": true
+          }
+        }
+      },
+      {
+        "runner": "browser_time_bounds_mcp.py",
+        "exit_code": 0,
+        "duration_seconds": 8.090744582994375,
+        "report": {
+          "catalog": 3471,
+          "checks": [
+            "2027-01-01 exact UTC/JD/centers",
+            "last supported UTC second",
+            "exclusive upper bound clears scene",
+            "Now recovers without GPU growth"
+          ],
+          "utc_interval": [
+            "2000-01-01T00:00:00+00:00",
+            "2027-06-28T00:00:00+00:00"
+          ]
+        }
+      },
+      {
+        "runner": "browser_latency_mcp.py",
+        "exit_code": 0,
+        "duration_seconds": 20.13270083302632,
+        "report": {
+          "catalog": 3471,
+          "steady_nonempty": 20,
+          "steady_samples": 20,
+          "distinct_frames": 3,
+          "pause_exact": true,
+          "manual_jump": true,
+          "directions": [
+            {
+              "reverse": false,
+              "samples": 25,
+              "frames": 5
+            },
+            {
+              "reverse": true,
+              "samples": 25,
+              "frames": 6
+            }
+          ],
+          "requests": 52,
+          "resources": {
+            "geometries": 1,
+            "textures": 0
+          }
+        }
+      },
+      {
+        "runner": "browser_navigation_mcp.py",
+        "exit_code": 0,
+        "duration_seconds": 52.794528583996,
+        "report": {
+          "complete": true,
+          "synthetic": false,
+          "checks": [
+            "overview → flight transfers controls and rebases without a physical camera jump",
+            "trusted held keys rotate yaw/pitch/roll and move along local forward; frozen centers unchanged",
+            "trusted mouse drag rotates flight without selection or OrbitControls movement",
+            "search typing is isolated; selecting a body opens its card without teleporting",
+            "explicit refocus restores observation; stop/manual date/Now/pause leave free camera fixed",
+            "native tab switch during held flight clears keys; hidden/resume has no camera catch-up",
+            "12 flight/exit/refocus cycles retain renderer, canvas, GPU resources and listener count"
+          ],
+          "budgets_ms": {
+            "camera": [
+              1,
+              8
+            ],
+            "apply": [
+              16,
+              50
+            ],
+            "lod": [
+              1,
+              8
+            ]
+          },
+          "tolerances": {
+            "cpu_roundoff_km": 1e-06,
+            "gpu_relative": 1e-07,
+            "gpu_absolute_render": 1e-06,
+            "rebase_screen_css_px": 0.05
+          },
+          "environment": {
+            "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
+            "renderer": "SwiftShader (functional, not hardware fps)",
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+            "cores": 10,
+            "width": 1440,
+            "height": 913,
+            "dpr": 1
+          },
+          "numeric_centers": 5,
+          "local_forward_error": 6.148553535865066e-14,
+          "time_modes": [
+            {
+              "reverse": false,
+              "multiplier": 86400,
+              "distance_km": 36670.00000000243,
+              "hold_seconds": 0.35
+            },
+            {
+              "reverse": true,
+              "multiplier": -86400,
+              "distance_km": 36659.99999999582,
+              "hold_seconds": 0.35
+            }
+          ],
+          "resources_warm": {
+            "listeners": 28,
+            "memory": {
+              "geometries": 1,
+              "textures": 0
+            }
+          },
+          "resource_cycles": 12,
+          "resources_final": {
+            "listeners": 28,
+            "memory": {
+              "geometries": 1,
+              "textures": 0
+            }
+          },
+          "timing_ms": {
+            "camera": {
+              "n": 701,
+              "mean": 0.027817403751501175,
+              "p95": 0.10000002384185791,
+              "max": 4.5
+            },
+            "apply": {
+              "n": 149,
+              "mean": 0.08322147815019493,
+              "p95": 0.20000001788139343,
+              "max": 2.300000011920929
+            },
+            "lod": {
+              "n": 701,
+              "mean": 0.010699001298991487,
+              "p95": 0.09999999403953552,
+              "max": 0.5999999940395355
+            }
+          },
+          "rebase_projection": [
+            {
+              "n": 5,
+              "max_css_px": 3.1603695716965126e-05
+            }
+          ],
+          "budget_passed": {
+            "camera": true,
+            "apply": true,
+            "lod": true
+          }
+        }
+      },
+      {
+        "runner": "browser_depth_mcp.py",
+        "exit_code": 0,
+        "duration_seconds": 16.027107166999485,
+        "report": {
+          "complete": true,
+          "checks": [
+            "12 WebGL pixel + picking cases: both orders, L0/L1, 1e7/1e9/1e12 km",
+            "both exact poles preserve physical eye/orientation through exit/idle; native drag resumes orbit"
+          ],
+          "tolerances": {
+            "handoff_eye_km": 1e-06,
+            "handoff_quaternion_components": 1e-12
+          },
+          "depth": {
+            "results": [
+              {
+                "distance_km": 10000000,
+                "reversed": false,
+                "detail": false,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 10000000,
+                "reversed": false,
+                "detail": true,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 10000000,
+                "reversed": true,
+                "detail": false,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 10000000,
+                "reversed": true,
+                "detail": true,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 1000000000,
+                "reversed": false,
+                "detail": false,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 1000000000,
+                "reversed": false,
+                "detail": true,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 1000000000,
+                "reversed": true,
+                "detail": false,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 1000000000,
+                "reversed": true,
+                "detail": true,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 1000000000000,
+                "reversed": false,
+                "detail": false,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 1000000000000,
+                "reversed": false,
+                "detail": true,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 1000000000000,
+                "reversed": true,
+                "detail": false,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              },
+              {
+                "distance_km": 1000000000000,
+                "reversed": true,
+                "detail": true,
+                "pixel": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "picked": "synthetic-depth-near",
+                "centers_unchanged": true
+              }
+            ],
+            "logarithmic_depth": true,
+            "depth_bits": 24,
+            "near": 1e-05,
+            "far": 1000000000000,
+            "gl_error": 0,
+            "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+          },
+          "handoff": [
+            {
+              "pole": 1,
+              "eye_error_km": 0.0,
+              "quaternion_component_error": 0.0,
+              "native_orbit_resumed": true
+            },
+            {
+              "pole": -1,
+              "eye_error_km": 0.0,
+              "quaternion_component_error": 0.0,
+              "native_orbit_resumed": true
+            }
+          ]
+        }
+      },
+      {
+        "runner": "browser_mcp.py",
+        "exit_code": 0,
+        "duration_seconds": 45.80560383302509,
+        "report": {
+          "catalog": 3471,
+          "complete": true,
+          "checks": [
+            "catalog, WebGL canvas and rendered frame",
+            "binary v2, gzip and ETag revalidation",
+            "spatial snapshot API, bounded page, ID lookup and ETag revalidation",
+            "paused date jumps and deterministic orbit return",
+            "all three scales remain mutually exclusive",
+            "LOD draw-call budget and virtualized list",
+            "no geometry/material/texture growth after scale-switch cycles",
+            "search, lazy detail card, tabs, follow toggle and close",
+            "empty search results and recovery",
+            "no uncaught browser errors"
+          ],
+          "measures_ms": {
+            "astroverse:catalog-load": 37.19999998807907,
+            "astroverse:binary-parse": 6.5999999940395355
+          },
+          "transport": {
+            "status": 200,
+            "encoding": "gzip",
+            "version": 2,
+            "count": 3471,
+            "bytes": 319979,
+            "revalidation": 304
+          },
+          "spatial": {
+            "contract": "coordinates/1",
+            "simulationTime": false,
+            "sectors": 27,
+            "objects": 2,
+            "positionStatus": "unverified",
+            "simulationPosition": null,
+            "sameSector": true,
+            "cached": 304
+          },
+          "local": {
+            "metrics": {
+              "calls": 30,
+              "triangles": 189378,
+              "points": 12733,
+              "lines": 0
+            },
+            "lodCounts": [
+              1465,
+              1251,
+              17
+            ],
+            "resources": {
+              "geometries": 100,
+              "materials": 134,
+              "textures": 53,
+              "rendererGeometries": 81,
+              "rendererTextures": 40
+            }
+          },
+          "runtime_errors": [],
+          "console": "## Console messages\nShowing 1-2 of 2 (Page 1 of 1).\nmsgid=1 [warn] [.WebGL-0x13c005a5c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (0 args) [3 times]\nmsgid=4 [warn] [.WebGL-0x13c005a5c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat) (0 args)",
+          "network": "## Network requests\nShowing 1-13 of 13 (Page 1 of 1).\nreqid=4 GET http://localhost:5173/api/objects?scale=solar [200]\nreqid=6 GET http://localhost:5173/api/objects?format=v2 [200]\nreqid=22 GET http://localhost:5173/api/health [200]\nreqid=23 GET http://localhost:5173/api/objects?format=v2 [304]\nreqid=24 GET http://localhost:5173/api/objects?format=v2 [304]\nreqid=25 GET http://localhost:5173/api/spatial/v1/contract [200]\nreqid=26 GET http://localhost:5173/api/spatial/v1/nearby?scale=local&frame=equatorial&x=0&y=0&z=0&radius=32 [200]\nreqid=27 GET http://localhost:5173/api/spatial/v1/sectors/local%3Aequatorial%3A-1%3A-1%3A-1?limit=2 [200]\nreqid=28 GET http://localhost:5173/api/spatial/v1/sectors/local%3Aequatorial%3A-1%3A-1%3A-1?limit=2 [304]\nreqid=29 GET http://localhost:5173/api/spatial/v1/objects/61_vir/sector [200]\nreqid=30 GET http://localhost:5173/api/search?q=Proxima%20Cen [200]\nreqid=31 GET http://localhost:5173/api/objects/proxima_cen [200]\nreqid=32 GET http://localhost:5173/api/search?q=impossible-object-astroverse-xyz [200]"
+        }
+      }
+    ],
+    "nonempty_rebase": {
+      "complete": true,
+      "kind": "functional nonempty rebase; no FPS claim",
+      "checks": [
+        "trusted OrbitControls wheel -> flight -> rebase with all100000 centers; canonical bits unchanged"
+      ],
+      "proof": [
+        {
+          "centers": 100000,
+          "screen_samples": 16,
+          "max_css_px": 2.9976021664879227e-14,
+          "bitwise_centers": true
+        }
+      ],
+      "tolerance_css_px": 0.05,
+      "actions": "native MCP Pause/flight; trusted CDP wheel; camera clones for projection only"
+    }
+  },
+  "inherited_apply_budget_ms": {
+    "p95": 16,
+    "max": 50,
+    "source": "docs/NAVIGATION.md and PHYSICAL_LOD.md existed before this task"
+  },
+  "footprint_accounting": {
+    "objects": 100000,
+    "nominal_disk_diameter_css_px": 5,
+    "objects_with_overlapping_footprints": 100000,
+    "overlapping_pairs": 1126913,
+    "scope": "Offline projected Float32 centers, initial declared camera/1080p/DPR1; nominal circular footprints, not measured raster occlusion."
+  },
+  "metric_scopes": {
+    "cold": "Fresh isolated Chrome navigation, empty browser cache; existing running SQLite fixture. First100k submitted/published render observed via MCP; native Pause subsequently verifies interaction. Not Docker build/startup, GPU fence or monitor presentation.",
+    "steady": "30-second requested sleep plus MCP sample boundary overhead, after3-second warmup; all100k submitted. No builds/tests concurrently.",
+    "actions": "Population follows actual camera, includes empty region and return; includes read-only full-set numeric/frustum/resource probes; not a clean dynamic hardware SLA.",
+    "apply": "Synchronous layer.update, including explicit eviction; large staged commit measured separately.",
+    "preparation_wall": "Promise wall duration including yields, not CPU stall.",
+    "preparation_slice_max": "Distribution of sampled cumulative sliceMaxMs at successful commits; not a per-slice histogram.",
+    "heap": "Chrome performance.memory without forced GC; not browser RSS/driver memory.",
+    "footprint": "Offline nominal circles, not raster occlusion.",
+    "provider": "Cumulative since isolated fixture startup; hardware/software share the provider. Builder label means no active catalog builder during measurements; fixture SQLite was generated before serving."
+  },
+  "source_context": {
+    "branch": "develop",
+    "head_at_verification": "7af7ea796d636d4016a01d8f08b55abe436b8da8",
+    "dirty_worktree": true,
+    "commit_and_push_performed": false,
+    "runtime_sha256": {
+      "frontend/src/physical/PhysicalApp.jsx": "554a0a8aefedcdf1751fe802fef358dfb45c1f5a1db582c61e9b3cdc6d8962d5",
+      "frontend/src/physical/PhysicalScene.jsx": "c917b15869e1971f8c7ba8eb16eed3e8fd8dd99d58ad99e49e7b9135e80c810c",
+      "frontend/src/physical/physicalLayer.js": "93d054df6f0ddaccd67cbcbb79b50a31ee0d0900730c48621e717a6adb96d188",
+      "frontend/src/physical/sectorManager.js": "c6cbddbce9768cacd53680595f44e9562617213ea2392b08a2ac7e4fd36c297f",
+      "frontend/src/physical/useVerifiedFrame.js": "8573870a108bbe0409dbfa57e92aad00d08787c52e8e912f75b9ca09f4312278",
+      "frontend/src/physical/coordinates.js": "a69f4dc0c1e7c48923341f24d6dae047b7f53468a0b26e2ffa6f0f8ea4ee5a16",
+      "frontend/src/physical/hierarchy.js": "2d14cb8325e9d244f77c1153251a313321e0ff09162080684e196aef1a08e036",
+      "frontend/src/physical/flight.js": "967bf2b27a327e2e2f4d39a809287e74dc2ba4687d1d278cda1857d021fa5d76",
+      "tests/s100k_provider.py": "217084aaa6f71fdae9a760522bfc8ff39d5bf2162a08a19c094666d6cf89c460",
+      "tests/browser_s100k_mcp.py": "5300856be7f815c3a38669d3f4ceff325e85cbd500613005b1710b9e51d5605b",
+      "docker-compose.s100k-test.yml": "9c05f701b37786d308f33453710f7dae7873f1ba4b7ae382696e045f9a4de394",
+      "tests/chrome_hold.mjs": "87c5238fd58c0e03ee266b751e99fcaa8cb003db3821605c608abc7fabea57c6",
+      "tests/s100k_overlap.mjs": "9090057be04ca344d02cdac8b868920828c073b833a57216f402d02362ad70f4",
+      "frontend/tests/s100k.test.js": "6d325e8bd92ec16448490afb6d665e143fb9894b1366366423edeaabf6e7c83b",
+      "frontend/tests/physical-hooks.test.jsx": "b719a5ab82f7048d210164df5deccb5bbac066176114c89c0b9ad9ad55f6a75b"
+    }
+  },
+  "restoration": {
+    "ordinary_compose_without_override": true,
+    "fixture_containers_network_and_local_images_removed": true,
+    "health": {
+      "status": "ok",
+      "objects": 3471
+    },
+    "task_temporary_artifacts_removed": true,
+    "removed_file_count": 42
+  },
+  "acceptance_milestone_closed": false,
+  "limitations": [
+    "Driver memory not measured; nominal GPU attribute bytes exclude framebuffer/driver allocation.",
+    "JS heap samples without forced GC do not prove arbitrary leak freedom.",
+    "Steady timing uses headless RAF with quantized timestamps; dynamic samples include whole-set diagnostics.",
+    "Full LOD scan at100000 is up to782 RAF; selected center is prioritized immediately."
+  ],
+  "long_term_open": [
+    "real S-100k",
+    "mass physical streaming",
+    "broader phase8, L2/physical models",
+    "3.7-B incremental writer"
+  ],
+  "dynamic_update_stage": {
+    "status": "synthetic_dynamic_budgets_passed_full_milestone_open",
+    "budget_scope": "Before optimized measurements: validation and merge slices target <=4ms/max16ms (same event-loop share as renderer preparation); commit inherits synchronous apply p95<=16ms/max50ms. Prelude also target4/max16. Aggregate CPU is reported separately, not compared with a per-slice budget. Original camera/LOD/picking/frame/cold/memory/precision thresholds unchanged. render submission is not GPU completion.",
+    "baseline": "s100k_dynamic_baseline.json",
+    "intermediate_hardware_attempt": "s100k_dynamic_attempt1.json",
+    "final": "s100k_dynamic_result.json",
+    "unchanged_memory_and_precision_budgets": true,
+    "known_measurement_limits": [
+      "Synchronous performance.now spans include preemption/GC, not thread CPU counters",
+      "GPU upload completion/driver memory unknown",
+      "Baseline browser did not expose private validation/merge CPU phases; admitted-selection elapsed must not be called CPU merge",
+      "Desired coalescing queue wait is not isolated from admitted selection latency",
+      "Headless RAF does not measure monitor presentation"
+    ],
+    "assessment": {
+      "camera_cpu": {
+        "p95_budget_ms": 1,
+        "max_budget_ms": 8,
+        "windows": {
+          "steady": {
+            "n": 607,
+            "p95": 0.09999999403953552,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "picking": {
+            "n": 730,
+            "p95": 0.10000002384185791,
+            "max": 0.800000011920929,
+            "passed": true
+          },
+          "flight": {
+            "n": 757,
+            "p95": 0.09999999403953552,
+            "max": 0.7999999821186066,
+            "passed": true
+          },
+          "rebase_eviction": {
+            "n": 723,
+            "p95": 0.09999999403953552,
+            "max": 0.4000000059604645,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 624,
+            "p95": 0.10000002384185791,
+            "max": 0.5,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 690,
+            "p95": 0.10000002384185791,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "⟲": {
+            "n": 649,
+            "p95": 0.10000002384185791,
+            "max": 0.800000011920929,
+            "passed": true
+          },
+          "cycles": {
+            "n": 1923,
+            "p95": 0.10000002384185791,
+            "max": 4.799999982118607,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "lod_cpu": {
+        "p95_budget_ms": 1,
+        "max_budget_ms": 8,
+        "windows": {
+          "steady": {
+            "n": 607,
+            "p95": 0.19999998807907104,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "picking": {
+            "n": 730,
+            "p95": 0.29999998211860657,
+            "max": 2.0999999940395355,
+            "passed": true
+          },
+          "flight": {
+            "n": 757,
+            "p95": 0.20000001788139343,
+            "max": 1.4000000059604645,
+            "passed": true
+          },
+          "rebase_eviction": {
+            "n": 723,
+            "p95": 0.09999999403953552,
+            "max": 0.4000000059604645,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 624,
+            "p95": 0.20000001788139343,
+            "max": 0.7000000178813934,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 690,
+            "p95": 0.19999998807907104,
+            "max": 0.5,
+            "passed": true
+          },
+          "⟲": {
+            "n": 649,
+            "p95": 0.19999998807907104,
+            "max": 0.9000000059604645,
+            "passed": true
+          },
+          "cycles": {
+            "n": 1923,
+            "p95": 0.19999998807907104,
+            "max": 2.699999988079071,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "preparation_slice_cpu": {
+        "p95_budget_ms": 4,
+        "max_budget_ms": 16,
+        "windows": {
+          "picking": {
+            "n": 1182,
+            "p95": 0.30000001192092896,
+            "max": 3.300000011920929,
+            "passed": true
+          },
+          "flight": {
+            "n": 557,
+            "p95": 0.4000000059604645,
+            "max": 3.800000011920929,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 2295,
+            "p95": 0.7000000178813934,
+            "max": 4.799999982118607,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 3538,
+            "p95": 0.4000000059604645,
+            "max": 8.699999988079071,
+            "passed": true
+          },
+          "⟲": {
+            "n": 2696,
+            "p95": 0.4000000059604645,
+            "max": 4.700000017881393,
+            "passed": true
+          },
+          "cycles": {
+            "n": 1992,
+            "p95": 0.699999988079071,
+            "max": 4.800000011920929,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "merge_slice_cpu": {
+        "p95_budget_ms": 4,
+        "max_budget_ms": 16,
+        "windows": {
+          "picking": {
+            "n": 200,
+            "p95": 0.20000001788139343,
+            "max": 0.5,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 601,
+            "p95": 0.9000000059604645,
+            "max": 2,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 880,
+            "p95": 0.5,
+            "max": 2.300000011920929,
+            "passed": true
+          },
+          "⟲": {
+            "n": 689,
+            "p95": 0.6000000238418579,
+            "max": 2.899999976158142,
+            "passed": true
+          },
+          "cycles": {
+            "n": 606,
+            "p95": 0.8999999761581421,
+            "max": 2.9000000059604645,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "validation_cpu": {
+        "p95_budget_ms": 4,
+        "max_budget_ms": 16,
+        "windows": {
+          "picking": {
+            "n": 101,
+            "p95": 0.30000001192092896,
+            "max": 0.3999999761581421,
+            "passed": true
+          },
+          "rebase_eviction": {
+            "n": 1,
+            "p95": 0.09999999403953552,
+            "max": 0.09999999403953552,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 303,
+            "p95": 0.5,
+            "max": 0.6000000238418579,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 455,
+            "p95": 0.5,
+            "max": 1.300000011920929,
+            "passed": true
+          },
+          "⟲": {
+            "n": 404,
+            "p95": 0.4000000059604645,
+            "max": 1.2000000178813934,
+            "passed": true
+          },
+          "cycles": {
+            "n": 436,
+            "p95": 0.4000000059604645,
+            "max": 1.0999999940395355,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "prepare_prelude_cpu": {
+        "p95_budget_ms": 4,
+        "max_budget_ms": 16,
+        "windows": {
+          "picking": {
+            "n": 2,
+            "p95": 0.09999999403953552,
+            "max": 0.09999999403953552,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 3,
+            "p95": 0.29999998211860657,
+            "max": 0.29999998211860657,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 4,
+            "p95": 0.5999999940395355,
+            "max": 0.5999999940395355,
+            "passed": true
+          },
+          "⟲": {
+            "n": 3,
+            "p95": 0.10000002384185791,
+            "max": 0.10000002384185791,
+            "passed": true
+          },
+          "cycles": {
+            "n": 4,
+            "p95": 0.29999998211860657,
+            "max": 0.29999998211860657,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "commit_cpu": {
+        "p95_budget_ms": 16,
+        "max_budget_ms": 50,
+        "windows": {
+          "picking": {
+            "n": 2,
+            "p95": 0.30000001192092896,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "flight": {
+            "n": 1,
+            "p95": 0.4000000059604645,
+            "max": 0.4000000059604645,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 2,
+            "p95": 0.699999988079071,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 4,
+            "p95": 0.30000001192092896,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "⟲": {
+            "n": 3,
+            "p95": 0.5999999940395355,
+            "max": 0.5999999940395355,
+            "passed": true
+          },
+          "cycles": {
+            "n": 3,
+            "p95": 0.5999999940395355,
+            "max": 0.5999999940395355,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "picking_cpu": {
+        "p95_budget_ms": 16,
+        "max_budget_ms": 50,
+        "windows": {
+          "picking": {
+            "n": 20,
+            "p95": 1.5,
+            "max": 2.5,
+            "passed": true
+          },
+          "cycles": {
+            "n": 3,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "frame": {
+        "p95_budget_ms": 16.8,
+        "max_budget_ms": 33.334,
+        "windows": {
+          "steady": {
+            "n": 606,
+            "p95": 16.700000000000728,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "picking": {
+            "n": 729,
+            "p95": 16.700000000004366,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "flight": {
+            "n": 756,
+            "p95": 16.799999999995634,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "rebase_eviction": {
+            "n": 722,
+            "p95": 16.700000000004366,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 623,
+            "p95": 16.70000000001164,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 689,
+            "p95": 16.70000000001164,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "⟲": {
+            "n": 648,
+            "p95": 16.70000000001164,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "cycles": {
+            "n": 1922,
+            "p95": 16.70000000001164,
+            "max": 16.800000000017462,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "cold": {
+        "ms": 2965.5999999940395,
+        "budget_ms": 15000,
+        "passed": true
+      },
+      "draw_calls": {
+        "maximum_observed": 1,
+        "budget": 1,
+        "passed": true
+      }
+    },
+    "hardware": "Apple M1 Pro / ANGLE Metal, headless Chrome; no monitor presentation claim",
+    "baseline_metal": "s100k_dynamic_baseline_metal.json",
+    "final_source_sha256": {
+      "frontend/src/physical/sectorManager.js": "3f52ad2690aabda04e239395d03e41ed4571d6ea87cca31ddd9c6071eca9ffb9",
+      "frontend/src/physical/flight.js": "967bf2b27a327e2e2f4d39a809287e74dc2ba4687d1d278cda1857d021fa5d76",
+      "frontend/src/physical/hierarchy.js": "2d14cb8325e9d244f77c1153251a313321e0ff09162080684e196aef1a08e036",
+      "frontend/src/physical/PhysicalApp.jsx": "554a0a8aefedcdf1751fe802fef358dfb45c1f5a1db582c61e9b3cdc6d8962d5",
+      "frontend/src/physical/physicalLayer.js": "f2f38a9f27bd45a67ce714237b2f8c693cb0a143763516b5719f8b3db725f6b3",
+      "frontend/src/physical/coordinates.js": "05a89edf381735398d7dda891b7498ade28e0cd6aea1725a4a22d6d2451d6277",
+      "frontend/src/physical/useVerifiedFrame.js": "8573870a108bbe0409dbfa57e92aad00d08787c52e8e912f75b9ca09f4312278",
+      "frontend/src/physical/PhysicalScene.jsx": "ee1f17fa19486115dae38567e257d3fe2e7b1548bebf5cf7c7e5916f20484067"
+    },
+    "final_served_scripts": [
+      {
+        "url": "http://localhost:5174/assets/index-CeKNjtcF.js",
+        "sha256": "59f933e1b98946d8c318adcefb0e8c16d5d2b9298a679d12ccddab592bc03dd3"
+      }
+    ],
+    "functional_counts": {
+      "resident": 100000,
+      "computed": 100000,
+      "submitted": 100000,
+      "in_frustum": 100000,
+      "numeric": 100000,
+      "identities": 100000,
+      "calls": 1,
+      "sameRenderer": true,
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      },
+      "listeners": 26
+    },
+    "open_criteria": [
+      "GPU upload completion, driver memory and monitor presentation unavailable",
+      "Baseline private validation/merge CPU phases unavailable",
+      "Pre-admission desired coalescing wait not isolated"
+    ],
+    "unpaced_failed_attempt": "s100k_dynamic_unpaced.json",
+    "comparison_same_metal": {
+      "cold_ms": [
+        2058.4000000059605,
+        2965.5999999940395
+      ],
+      "windows": {
+        "steady": {
+          "baseline": {
+            "camera_cpu": {
+              "n": 607,
+              "p50": 0,
+              "p95": 0.10000002384185791,
+              "p99": 0.29999998211860657,
+              "max": 1.5999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 607,
+              "p50": 0.09999999403953552,
+              "p95": 0.20000001788139343,
+              "p99": 0.4000000059604645,
+              "max": 0.5999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 607,
+              "p50": 0.09999999403953552,
+              "p95": 0.3999999761581421,
+              "p99": 0.6000000238418579,
+              "max": 1.7999999821186066,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 606,
+              "p50": 16.69999999999891,
+              "p95": 16.799999999999272,
+              "p99": 16.80000000000109,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.3943894389438944
+            }
+          },
+          "result": {
+            "camera_cpu": {
+              "n": 607,
+              "p50": 0,
+              "p95": 0.09999999403953552,
+              "p99": 0.19999998807907104,
+              "max": 0.30000001192092896,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 607,
+              "p50": 0.09999999403953552,
+              "p95": 0.19999998807907104,
+              "p99": 0.20000001788139343,
+              "max": 0.30000001192092896,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 607,
+              "p50": 0.09999999403953552,
+              "p95": 0.30000001192092896,
+              "p99": 0.5,
+              "max": 1.699999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 606,
+              "p50": 16.69999999999891,
+              "p95": 16.700000000000728,
+              "p99": 16.80000000000109,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.37458745874587457
+            }
+          }
+        },
+        "picking": {
+          "baseline": {
+            "camera_cpu": {
+              "n": 731,
+              "p50": 0,
+              "p95": 0.10000002384185791,
+              "p99": 0.29999998211860657,
+              "max": 0.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 731,
+              "p50": 0.09999999403953552,
+              "p95": 0.29999998211860657,
+              "p99": 0.4000000059604645,
+              "max": 1.2000000178813934,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 731,
+              "p50": 0.09999999403953552,
+              "p95": 0.3999999761581421,
+              "p99": 0.800000011920929,
+              "max": 4.0999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 730,
+              "p50": 16.700000000000728,
+              "p95": 16.799999999999272,
+              "p99": 16.799999999999272,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.38767123287671235
+            },
+            "picking_cpu": {
+              "n": 20,
+              "p50": 0,
+              "p95": 1.4000000059604645,
+              "p99": 2.5,
+              "max": 2.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "selection_elapsed": {
+              "n": 1,
+              "p50": 1069.0999999940395,
+              "p95": 1069.0999999940395,
+              "p99": 1069.0999999940395,
+              "max": 1069.0999999940395,
+              "over50ms": 1,
+              "fraction_60hz": 0.0
+            },
+            "prepare_prelude_cpu": {
+              "n": 2,
+              "p50": 2.7999999821186066,
+              "p95": 2.7999999821186066,
+              "p99": 2.7999999821186066,
+              "max": 2.7999999821186066,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "commit_cpu": {
+              "n": 2,
+              "p50": 0.5999999940395355,
+              "p95": 0.5999999940395355,
+              "p99": 0.5999999940395355,
+              "max": 0.5999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 2,
+              "p50": 549.5999999940395,
+              "p95": 549.5999999940395,
+              "p99": 549.5999999940395,
+              "max": 549.5999999940395,
+              "over50ms": 2,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 2,
+              "p50": 5.200000017881393,
+              "p95": 5.200000017881393,
+              "p99": 5.200000017881393,
+              "max": 5.200000017881393,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 1,
+              "p50": 1094.9000000059605,
+              "p95": 1094.9000000059605,
+              "p99": 1094.9000000059605,
+              "max": 1094.9000000059605,
+              "over50ms": 1,
+              "fraction_60hz": 0.0
+            }
+          },
+          "result": {
+            "camera_cpu": {
+              "n": 730,
+              "p50": 0,
+              "p95": 0.10000002384185791,
+              "p99": 0.30000001192092896,
+              "max": 0.800000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 730,
+              "p50": 0.09999999403953552,
+              "p95": 0.29999998211860657,
+              "p99": 0.5,
+              "max": 2.0999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 730,
+              "p50": 0.09999999403953552,
+              "p95": 0.30000001192092896,
+              "p99": 0.5,
+              "max": 1.2000000178813934,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 729,
+              "p50": 16.69999999999709,
+              "p95": 16.700000000004366,
+              "p99": 16.80000000000291,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.37448559670781895
+            },
+            "picking_cpu": {
+              "n": 20,
+              "p50": 0,
+              "p95": 1.5,
+              "p99": 2.5,
+              "max": 2.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "http_elapsed": {
+              "n": 102,
+              "p50": 36,
+              "p95": 49.79999998211861,
+              "p99": 59.69999998807907,
+              "max": 80.7000000178814,
+              "over50ms": 5,
+              "fraction_60hz": 0.00980392156862745
+            },
+            "decode_cpu": {
+              "n": 101,
+              "p50": 0.29999998211860657,
+              "p95": 0.30000001192092896,
+              "p99": 0.30000001192092896,
+              "max": 0.4000000059604645,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "validation_cpu": {
+              "n": 101,
+              "p50": 0.20000001788139343,
+              "p95": 0.30000001192092896,
+              "p99": 0.30000001192092896,
+              "max": 0.3999999761581421,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "merge_slice_cpu": {
+              "n": 200,
+              "p50": 0.09999999403953552,
+              "p95": 0.20000001788139343,
+              "p99": 0.30000001192092896,
+              "max": 0.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "merge_elapsed": {
+              "n": 1,
+              "p50": 212.10000002384186,
+              "p95": 212.10000002384186,
+              "p99": 212.10000002384186,
+              "max": 212.10000002384186,
+              "over50ms": 1,
+              "fraction_60hz": 0.0
+            },
+            "selection_elapsed": {
+              "n": 1,
+              "p50": 1300.2000000178814,
+              "p95": 1300.2000000178814,
+              "p99": 1300.2000000178814,
+              "max": 1300.2000000178814,
+              "over50ms": 1,
+              "fraction_60hz": 0.0
+            },
+            "prepare_prelude_cpu": {
+              "n": 2,
+              "p50": 0.09999999403953552,
+              "p95": 0.09999999403953552,
+              "p99": 0.09999999403953552,
+              "max": 0.09999999403953552,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "preparation_slice_cpu": {
+              "n": 1182,
+              "p50": 0.09999999403953552,
+              "p95": 0.30000001192092896,
+              "p99": 1.2000000178813934,
+              "max": 3.300000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "commit_cpu": {
+              "n": 2,
+              "p50": 0.30000001192092896,
+              "p95": 0.30000001192092896,
+              "p99": 0.30000001192092896,
+              "max": 0.30000001192092896,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 2,
+              "p50": 1039.5,
+              "p95": 1039.5,
+              "p99": 1039.5,
+              "max": 1039.5,
+              "over50ms": 2,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 2,
+              "p50": 3.300000011920929,
+              "p95": 3.300000011920929,
+              "p99": 3.300000011920929,
+              "max": 3.300000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 2,
+              "p50": 1672.2999999821186,
+              "p95": 1672.2999999821186,
+              "p99": 1672.2999999821186,
+              "max": 1672.2999999821186,
+              "over50ms": 2,
+              "fraction_60hz": 0.0
+            }
+          }
+        },
+        "flight": {
+          "baseline": {
+            "camera_cpu": {
+              "n": 760,
+              "p50": 0,
+              "p95": 0.09999999403953552,
+              "p99": 0.10000002384185791,
+              "max": 0.30000001192092896,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 760,
+              "p50": 0.09999999403953552,
+              "p95": 0.20000001788139343,
+              "p99": 0.30000001192092896,
+              "max": 3.699999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 760,
+              "p50": 0.09999999403953552,
+              "p95": 0.30000001192092896,
+              "p99": 0.4000000059604645,
+              "max": 2.9000000059604645,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 759,
+              "p50": 16.69999999999709,
+              "p95": 16.700000000004366,
+              "p99": 16.80000000000291,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.3675889328063241
+            },
+            "commit_cpu": {
+              "n": 1,
+              "p50": 0.29999998211860657,
+              "p95": 0.29999998211860657,
+              "p99": 0.29999998211860657,
+              "max": 0.29999998211860657,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 1,
+              "p50": 636.4000000059605,
+              "p95": 636.4000000059605,
+              "p99": 636.4000000059605,
+              "max": 636.4000000059605,
+              "over50ms": 1,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 1,
+              "p50": 12.400000005960464,
+              "p95": 12.400000005960464,
+              "p99": 12.400000005960464,
+              "max": 12.400000005960464,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 1,
+              "p50": 641.1999999880791,
+              "p95": 641.1999999880791,
+              "p99": 641.1999999880791,
+              "max": 641.1999999880791,
+              "over50ms": 1,
+              "fraction_60hz": 0.0
+            }
+          },
+          "result": {
+            "camera_cpu": {
+              "n": 757,
+              "p50": 0,
+              "p95": 0.09999999403953552,
+              "p99": 0.10000002384185791,
+              "max": 0.7999999821186066,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 757,
+              "p50": 0.09999999403953552,
+              "p95": 0.20000001788139343,
+              "p99": 0.5,
+              "max": 1.4000000059604645,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 757,
+              "p50": 0.09999999403953552,
+              "p95": 0.3999999761581421,
+              "p99": 1.100000023841858,
+              "max": 3,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "preparation_slice_cpu": {
+              "n": 557,
+              "p50": 0.09999999403953552,
+              "p95": 0.4000000059604645,
+              "p99": 0.5,
+              "max": 3.800000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 756,
+              "p50": 16.69999999999709,
+              "p95": 16.799999999995634,
+              "p99": 16.80000000000291,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.38227513227513227
+            },
+            "commit_cpu": {
+              "n": 1,
+              "p50": 0.4000000059604645,
+              "p95": 0.4000000059604645,
+              "p99": 0.4000000059604645,
+              "max": 0.4000000059604645,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 1,
+              "p50": 799.1999999880791,
+              "p95": 799.1999999880791,
+              "p99": 799.1999999880791,
+              "max": 799.1999999880791,
+              "over50ms": 1,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 1,
+              "p50": 3.800000011920929,
+              "p95": 3.800000011920929,
+              "p99": 3.800000011920929,
+              "max": 3.800000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 1,
+              "p50": 816.2000000178814,
+              "p95": 816.2000000178814,
+              "p99": 816.2000000178814,
+              "max": 816.2000000178814,
+              "over50ms": 1,
+              "fraction_60hz": 0.0
+            }
+          }
+        },
+        "Сейчас": {
+          "baseline": {
+            "camera_cpu": {
+              "n": 595,
+              "p50": 0,
+              "p95": 0.19999998807907104,
+              "p99": 0.5,
+              "max": 11.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 595,
+              "p50": 0.09999999403953552,
+              "p95": 0.5999999940395355,
+              "p99": 2.9000000059604645,
+              "max": 13.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 595,
+              "p50": 0.09999999403953552,
+              "p95": 0.800000011920929,
+              "p99": 3.9000000059604645,
+              "max": 12.600000023841858,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 594,
+              "p50": 16.69999999999709,
+              "p95": 16.80000000000291,
+              "p99": 33.40000000000873,
+              "max": 66.69999999999709,
+              "over50ms": 3,
+              "fraction_60hz": 0.37373737373737376
+            },
+            "selection_elapsed": {
+              "n": 3,
+              "p50": 1075,
+              "p95": 1075.800000011921,
+              "p99": 1075.800000011921,
+              "max": 1075.800000011921,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_prelude_cpu": {
+              "n": 3,
+              "p50": 7.5999999940395355,
+              "p95": 7.799999982118607,
+              "p99": 7.799999982118607,
+              "max": 7.799999982118607,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "commit_cpu": {
+              "n": 3,
+              "p50": 0.800000011920929,
+              "p95": 1.100000023841858,
+              "p99": 1.100000023841858,
+              "max": 1.100000023841858,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 3,
+              "p50": 2043,
+              "p95": 2396.5999999940395,
+              "p99": 2396.5999999940395,
+              "max": 2396.5999999940395,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 3,
+              "p50": 51.30000001192093,
+              "p95": 51.30000001192093,
+              "p99": 51.30000001192093,
+              "max": 51.30000001192093,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 3,
+              "p50": 2052.0999999940395,
+              "p95": 2414.399999976158,
+              "p99": 2414.399999976158,
+              "max": 2414.399999976158,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            }
+          },
+          "result": {
+            "camera_cpu": {
+              "n": 624,
+              "p50": 0,
+              "p95": 0.10000002384185791,
+              "p99": 0.20000001788139343,
+              "max": 0.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 624,
+              "p50": 0.09999999403953552,
+              "p95": 0.20000001788139343,
+              "p99": 0.30000001192092896,
+              "max": 0.7000000178813934,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 624,
+              "p50": 0.09999999403953552,
+              "p95": 0.30000001192092896,
+              "p99": 0.5,
+              "max": 2,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 623,
+              "p50": 16.69999999999709,
+              "p95": 16.70000000001164,
+              "p99": 16.80000000000291,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.3852327447833066
+            },
+            "decode_cpu": {
+              "n": 303,
+              "p50": 0.29999998211860657,
+              "p95": 1.0999999940395355,
+              "p99": 1.5,
+              "max": 1.699999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "validation_cpu": {
+              "n": 303,
+              "p50": 0.20000001788139343,
+              "p95": 0.5,
+              "p99": 0.5999999940395355,
+              "max": 0.6000000238418579,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "http_elapsed": {
+              "n": 303,
+              "p50": 33.89999997615814,
+              "p95": 46.70000001788139,
+              "p99": 55.5,
+              "max": 69.30000001192093,
+              "over50ms": 6,
+              "fraction_60hz": 0.009900990099009901
+            },
+            "merge_slice_cpu": {
+              "n": 601,
+              "p50": 0.20000001788139343,
+              "p95": 0.9000000059604645,
+              "p99": 1.2000000178813934,
+              "max": 2,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "merge_elapsed": {
+              "n": 3,
+              "p50": 736.5999999940395,
+              "p95": 745.5999999940395,
+              "p99": 745.5999999940395,
+              "max": 745.5999999940395,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "selection_elapsed": {
+              "n": 3,
+              "p50": 1729.5999999940395,
+              "p95": 1742.4000000059605,
+              "p99": 1742.4000000059605,
+              "max": 1742.4000000059605,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_prelude_cpu": {
+              "n": 3,
+              "p50": 0.09999999403953552,
+              "p95": 0.29999998211860657,
+              "p99": 0.29999998211860657,
+              "max": 0.29999998211860657,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "preparation_slice_cpu": {
+              "n": 2295,
+              "p50": 0.10000002384185791,
+              "p95": 0.7000000178813934,
+              "p99": 1.2000000178813934,
+              "max": 4.799999982118607,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "commit_cpu": {
+              "n": 2,
+              "p50": 0.699999988079071,
+              "p95": 0.699999988079071,
+              "p99": 0.699999988079071,
+              "max": 0.699999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 2,
+              "p50": 2330.399999976158,
+              "p95": 2330.399999976158,
+              "p99": 2330.399999976158,
+              "max": 2330.399999976158,
+              "over50ms": 2,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 2,
+              "p50": 4.799999982118607,
+              "p95": 4.799999982118607,
+              "p99": 4.799999982118607,
+              "max": 4.799999982118607,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 2,
+              "p50": 2349.899999976158,
+              "p95": 2349.899999976158,
+              "p99": 2349.899999976158,
+              "max": 2349.899999976158,
+              "over50ms": 2,
+              "fraction_60hz": 0.0
+            }
+          }
+        },
+        "Ускорить": {
+          "baseline": {
+            "camera_cpu": {
+              "n": 593,
+              "p50": 0,
+              "p95": 0.10000002384185791,
+              "p99": 0.699999988079071,
+              "max": 5.700000017881393,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 593,
+              "p50": 0.09999999403953552,
+              "p95": 0.3999999761581421,
+              "p99": 5.0999999940395355,
+              "max": 10.299999982118607,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 593,
+              "p50": 0.09999999403953552,
+              "p95": 0.9000000059604645,
+              "p99": 4.5,
+              "max": 15.800000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 592,
+              "p50": 16.69999999999709,
+              "p95": 16.80000000000291,
+              "p99": 50,
+              "max": 100,
+              "over50ms": 4,
+              "fraction_60hz": 0.35135135135135137
+            },
+            "selection_elapsed": {
+              "n": 3,
+              "p50": 1077.2999999821186,
+              "p95": 1101.4000000059605,
+              "p99": 1101.4000000059605,
+              "max": 1101.4000000059605,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_prelude_cpu": {
+              "n": 3,
+              "p50": 10.799999982118607,
+              "p95": 12.5,
+              "p99": 12.5,
+              "max": 12.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "commit_cpu": {
+              "n": 3,
+              "p50": 0.800000011920929,
+              "p95": 5.0999999940395355,
+              "p99": 5.0999999940395355,
+              "max": 5.0999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 3,
+              "p50": 2546.9000000059605,
+              "p95": 2614.7999999821186,
+              "p99": 2614.7999999821186,
+              "max": 2614.7999999821186,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 3,
+              "p50": 51.30000001192093,
+              "p95": 51.30000001192093,
+              "p99": 51.30000001192093,
+              "max": 51.30000001192093,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 3,
+              "p50": 2558.800000011921,
+              "p95": 2638.600000023842,
+              "p99": 2638.600000023842,
+              "max": 2638.600000023842,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            }
+          },
+          "result": {
+            "camera_cpu": {
+              "n": 690,
+              "p50": 0,
+              "p95": 0.10000002384185791,
+              "p99": 0.19999998807907104,
+              "max": 0.30000001192092896,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 690,
+              "p50": 0,
+              "p95": 0.19999998807907104,
+              "p99": 0.20000001788139343,
+              "max": 0.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 690,
+              "p50": 0.09999999403953552,
+              "p95": 0.20000001788139343,
+              "p99": 0.30000001192092896,
+              "max": 1.5,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "decode_cpu": {
+              "n": 455,
+              "p50": 0.29999998211860657,
+              "p95": 1,
+              "p99": 1.4000000059604645,
+              "max": 2.9000000059604645,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "validation_cpu": {
+              "n": 455,
+              "p50": 0.20000001788139343,
+              "p95": 0.5,
+              "p99": 0.699999988079071,
+              "max": 1.300000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "http_elapsed": {
+              "n": 455,
+              "p50": 35.5,
+              "p95": 49.5,
+              "p99": 62.5,
+              "max": 72.5,
+              "over50ms": 22,
+              "fraction_60hz": 0.006593406593406593
+            },
+            "frame": {
+              "n": 689,
+              "p50": 16.69999999999709,
+              "p95": 16.70000000001164,
+              "p99": 16.80000000000291,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.38461538461538464
+            },
+            "merge_slice_cpu": {
+              "n": 880,
+              "p50": 0.09999999403953552,
+              "p95": 0.5,
+              "p99": 0.800000011920929,
+              "max": 2.300000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "merge_elapsed": {
+              "n": 4,
+              "p50": 339.59999999403954,
+              "p95": 426.19999998807907,
+              "p99": 426.19999998807907,
+              "max": 426.19999998807907,
+              "over50ms": 4,
+              "fraction_60hz": 0.0
+            },
+            "selection_elapsed": {
+              "n": 4,
+              "p50": 1433.199999988079,
+              "p95": 1480.5,
+              "p99": 1480.5,
+              "max": 1480.5,
+              "over50ms": 4,
+              "fraction_60hz": 0.0
+            },
+            "prepare_prelude_cpu": {
+              "n": 4,
+              "p50": 0.29999998211860657,
+              "p95": 0.5999999940395355,
+              "p99": 0.5999999940395355,
+              "max": 0.5999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "preparation_slice_cpu": {
+              "n": 3538,
+              "p50": 0.09999999403953552,
+              "p95": 0.4000000059604645,
+              "p99": 0.800000011920929,
+              "max": 8.699999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "commit_cpu": {
+              "n": 4,
+              "p50": 0.30000001192092896,
+              "p95": 0.30000001192092896,
+              "p99": 0.30000001192092896,
+              "max": 0.30000001192092896,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 4,
+              "p50": 1345.4000000059605,
+              "p95": 1549.699999988079,
+              "p99": 1549.699999988079,
+              "max": 1549.699999988079,
+              "over50ms": 4,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 4,
+              "p50": 2.2999999821186066,
+              "p95": 8.699999988079071,
+              "p99": 8.699999988079071,
+              "max": 8.699999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 4,
+              "p50": 1365.0999999940395,
+              "p95": 1565.199999988079,
+              "p99": 1565.199999988079,
+              "max": 1565.199999988079,
+              "over50ms": 4,
+              "fraction_60hz": 0.0
+            }
+          }
+        },
+        "⟲": {
+          "baseline": {
+            "camera_cpu": {
+              "n": 570,
+              "p50": 0,
+              "p95": 0.19999998807907104,
+              "p99": 0.7000000178813934,
+              "max": 13.200000017881393,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 570,
+              "p50": 0.09999999403953552,
+              "p95": 0.4000000059604645,
+              "p99": 3.0999999940395355,
+              "max": 16.399999976158142,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 570,
+              "p50": 0.09999999403953552,
+              "p95": 0.5999999940395355,
+              "p99": 5.799999982118607,
+              "max": 8.400000005960464,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 569,
+              "p50": 16.69999999999709,
+              "p95": 16.80000000000291,
+              "p99": 83.30000000000291,
+              "max": 316.6999999999971,
+              "over50ms": 9,
+              "fraction_60hz": 0.351493848857645
+            },
+            "selection_elapsed": {
+              "n": 3,
+              "p50": 1098.0999999940395,
+              "p95": 1377.0999999940395,
+              "p99": 1377.0999999940395,
+              "max": 1377.0999999940395,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_prelude_cpu": {
+              "n": 3,
+              "p50": 14.5,
+              "p95": 19.200000017881393,
+              "p99": 19.200000017881393,
+              "max": 19.200000017881393,
+              "over50ms": 0,
+              "fraction_60hz": 0.6666666666666666
+            },
+            "commit_cpu": {
+              "n": 2,
+              "p50": 0.5999999940395355,
+              "p95": 0.5999999940395355,
+              "p99": 0.5999999940395355,
+              "max": 0.5999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 2,
+              "p50": 2597,
+              "p95": 2597,
+              "p99": 2597,
+              "max": 2597,
+              "over50ms": 2,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 2,
+              "p50": 96.5,
+              "p95": 96.5,
+              "p99": 96.5,
+              "max": 96.5,
+              "over50ms": 2,
+              "fraction_60hz": 0.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 2,
+              "p50": 2607.9000000059605,
+              "p95": 2607.9000000059605,
+              "p99": 2607.9000000059605,
+              "max": 2607.9000000059605,
+              "over50ms": 2,
+              "fraction_60hz": 0.0
+            }
+          },
+          "result": {
+            "camera_cpu": {
+              "n": 649,
+              "p50": 0,
+              "p95": 0.10000002384185791,
+              "p99": 0.10000002384185791,
+              "max": 0.800000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 649,
+              "p50": 0,
+              "p95": 0.19999998807907104,
+              "p99": 0.29999998211860657,
+              "max": 0.9000000059604645,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 649,
+              "p50": 0.09999999403953552,
+              "p95": 0.20000001788139343,
+              "p99": 0.3999999761581421,
+              "max": 2.199999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "preparation_slice_cpu": {
+              "n": 2696,
+              "p50": 0.09999999403953552,
+              "p95": 0.4000000059604645,
+              "p99": 0.9000000059604645,
+              "max": 4.700000017881393,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 648,
+              "p50": 16.69999999999709,
+              "p95": 16.70000000001164,
+              "p99": 16.80000000000291,
+              "max": 16.80000000000291,
+              "over50ms": 0,
+              "fraction_60hz": 0.37808641975308643
+            },
+            "decode_cpu": {
+              "n": 404,
+              "p50": 0.29999998211860657,
+              "p95": 0.9000000059604645,
+              "p99": 1.2000000178813934,
+              "max": 6.0999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "validation_cpu": {
+              "n": 404,
+              "p50": 0.20000001788139343,
+              "p95": 0.4000000059604645,
+              "p99": 0.5,
+              "max": 1.2000000178813934,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "http_elapsed": {
+              "n": 404,
+              "p50": 34.60000002384186,
+              "p95": 48.20000001788139,
+              "p99": 51.599999994039536,
+              "max": 70.90000000596046,
+              "over50ms": 9,
+              "fraction_60hz": 0.01485148514851485
+            },
+            "merge_slice_cpu": {
+              "n": 689,
+              "p50": 0.19999998807907104,
+              "p95": 0.6000000238418579,
+              "p99": 1.5999999940395355,
+              "max": 2.899999976158142,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "merge_elapsed": {
+              "n": 3,
+              "p50": 517.0999999940395,
+              "p95": 581.4000000059605,
+              "p99": 581.4000000059605,
+              "max": 581.4000000059605,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "selection_elapsed": {
+              "n": 3,
+              "p50": 1527,
+              "p95": 1599.2000000178814,
+              "p99": 1599.2000000178814,
+              "max": 1599.2000000178814,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_prelude_cpu": {
+              "n": 3,
+              "p50": 0.09999999403953552,
+              "p95": 0.10000002384185791,
+              "p99": 0.10000002384185791,
+              "max": 0.10000002384185791,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "commit_cpu": {
+              "n": 3,
+              "p50": 0.5999999940395355,
+              "p95": 0.5999999940395355,
+              "p99": 0.5999999940395355,
+              "max": 0.5999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 3,
+              "p50": 1598,
+              "p95": 1730.4000000059605,
+              "p99": 1730.4000000059605,
+              "max": 1730.4000000059605,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 3,
+              "p50": 4.5,
+              "p95": 4.700000017881393,
+              "p99": 4.700000017881393,
+              "max": 4.700000017881393,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 3,
+              "p50": 1616,
+              "p95": 1747.800000011921,
+              "p99": 1747.800000011921,
+              "max": 1747.800000011921,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            }
+          }
+        },
+        "cycles": {
+          "baseline": {
+            "camera_cpu": {
+              "n": 1745,
+              "p50": 0,
+              "p95": 0.19999998807907104,
+              "p99": 2.5,
+              "max": 11.400000005960464,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 1745,
+              "p50": 0,
+              "p95": 0.5999999940395355,
+              "p99": 4.700000017881393,
+              "max": 17.400000005960464,
+              "over50ms": 0,
+              "fraction_60hz": 0.9994269340974212
+            },
+            "render_submission_cpu": {
+              "n": 1745,
+              "p50": 0.09999999403953552,
+              "p95": 0.7999999821186066,
+              "p99": 5.4000000059604645,
+              "max": 13,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 1744,
+              "p50": 16.69999999999709,
+              "p95": 16.70000000001164,
+              "p99": 16.800000000017462,
+              "max": 66.69999999999709,
+              "over50ms": 1,
+              "fraction_60hz": 0.36754587155963303
+            },
+            "prepare_prelude_cpu": {
+              "n": 4,
+              "p50": 14.5,
+              "p95": 15.199999988079071,
+              "p99": 15.199999988079071,
+              "max": 15.199999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "picking_cpu": {
+              "n": 3,
+              "p50": 0,
+              "p95": 0,
+              "p99": 0,
+              "max": 0,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "selection_elapsed": {
+              "n": 3,
+              "p50": 1232.7000000178814,
+              "p95": 1238.5,
+              "p99": 1238.5,
+              "max": 1238.5,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "commit_cpu": {
+              "n": 3,
+              "p50": 1,
+              "p95": 1.0999999940395355,
+              "p99": 1.0999999940395355,
+              "max": 1.0999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 3,
+              "p50": 1299.8999999761581,
+              "p95": 1324.5,
+              "p99": 1324.5,
+              "max": 1324.5,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 3,
+              "p50": 96.5,
+              "p95": 96.5,
+              "p99": 96.5,
+              "max": 96.5,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 3,
+              "p50": 1304.199999988079,
+              "p95": 1333.2999999821186,
+              "p99": 1333.2999999821186,
+              "max": 1333.2999999821186,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            }
+          },
+          "result": {
+            "camera_cpu": {
+              "n": 1923,
+              "p50": 0,
+              "p95": 0.10000002384185791,
+              "p99": 0.20000001788139343,
+              "max": 4.799999982118607,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "lod_cpu": {
+              "n": 1923,
+              "p50": 0,
+              "p95": 0.19999998807907104,
+              "p99": 0.29999998211860657,
+              "max": 2.699999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "render_submission_cpu": {
+              "n": 1923,
+              "p50": 0.09999999403953552,
+              "p95": 0.29999998211860657,
+              "p99": 0.5,
+              "max": 5.699999988079071,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "frame": {
+              "n": 1922,
+              "p50": 16.69999999999709,
+              "p95": 16.70000000001164,
+              "p99": 16.80000000000291,
+              "max": 16.800000000017462,
+              "over50ms": 0,
+              "fraction_60hz": 0.3761706555671176
+            },
+            "prepare_prelude_cpu": {
+              "n": 4,
+              "p50": 0.29999998211860657,
+              "p95": 0.29999998211860657,
+              "p99": 0.29999998211860657,
+              "max": 0.29999998211860657,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "preparation_slice_cpu": {
+              "n": 1992,
+              "p50": 0.19999998807907104,
+              "p95": 0.699999988079071,
+              "p99": 1.4000000059604645,
+              "max": 4.800000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "http_elapsed": {
+              "n": 619,
+              "p50": 34.5,
+              "p95": 51.099999994039536,
+              "p99": 106,
+              "max": 293.80000001192093,
+              "over50ms": 35,
+              "fraction_60hz": 0.022617124394184167
+            },
+            "decode_cpu": {
+              "n": 436,
+              "p50": 0.29999998211860657,
+              "p95": 0.9000000059604645,
+              "p99": 1.399999976158142,
+              "max": 4.300000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "validation_cpu": {
+              "n": 436,
+              "p50": 0.20000001788139343,
+              "p95": 0.4000000059604645,
+              "p99": 0.5999999940395355,
+              "max": 1.0999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "merge_cpu": {
+              "n": 3,
+              "p50": 0,
+              "p95": 0,
+              "p99": 0,
+              "max": 0,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "selection_elapsed": {
+              "n": 6,
+              "p50": 1767.300000011921,
+              "p95": 1986.1000000238419,
+              "p99": 1986.1000000238419,
+              "max": 1986.1000000238419,
+              "over50ms": 5,
+              "fraction_60hz": 0.0
+            },
+            "ready_to_display_elapsed": {
+              "n": 6,
+              "p50": 1450.0999999940395,
+              "p95": 1550.4000000059605,
+              "p99": 1550.4000000059605,
+              "max": 1550.4000000059605,
+              "over50ms": 3,
+              "fraction_60hz": 0.5
+            },
+            "picking_cpu": {
+              "n": 3,
+              "p50": 0,
+              "p95": 0,
+              "p99": 0,
+              "max": 0,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "merge_slice_cpu": {
+              "n": 606,
+              "p50": 0.20000001788139343,
+              "p95": 0.8999999761581421,
+              "p99": 1.7999999821186066,
+              "max": 2.9000000059604645,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "merge_elapsed": {
+              "n": 3,
+              "p50": 638.8000000119209,
+              "p95": 739.5,
+              "p99": 739.5,
+              "max": 739.5,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "commit_cpu": {
+              "n": 3,
+              "p50": 0.5,
+              "p95": 0.5999999940395355,
+              "p99": 0.5999999940395355,
+              "max": 0.5999999940395355,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            },
+            "prepare_elapsed": {
+              "n": 3,
+              "p50": 1444.8999999761581,
+              "p95": 1531.5999999940395,
+              "p99": 1531.5999999940395,
+              "max": 1531.5999999940395,
+              "over50ms": 3,
+              "fraction_60hz": 0.0
+            },
+            "prepare_slice_max": {
+              "n": 3,
+              "p50": 4.4000000059604645,
+              "p95": 4.800000011920929,
+              "p99": 4.800000011920929,
+              "max": 4.800000011920929,
+              "over50ms": 0,
+              "fraction_60hz": 1.0
+            }
+          }
+        }
+      },
+      "limitations": "Single sequential runs, no CPU isolation. Baseline replay after implementation uses original served bundle hash. Rebase baseline excluded due missing focus."
+    },
+    "hardware_details": {
+      "machine_name": "MacBook Pro",
+      "machine_model": "MacBookPro18,3",
+      "chip_type": "Apple M1 Pro",
+      "physical_memory": "16 GB",
+      "number_processors": "proc 10:8:2"
+    },
+    "functional_report": "s100k_update_functional.json",
+    "nonempty_rebase_report": "s100k_update_rebase.json",
+    "paced_repeat": "s100k_dynamic_paced_first.json",
+    "verification": {
+      "backend_tests": 242,
+      "backend_coverage_percent": 98.38,
+      "sectors_coverage_percent": 100,
+      "frontend_tests": 222,
+      "frontend_coverage_percent": {
+        "statements": 97.83,
+        "branches": 91.41,
+        "functions": 98.22,
+        "lines": 99.09
+      },
+      "build": "passed; existing >500kB chunk warning",
+      "horizons_vectors": 100,
+      "horizons_max_km": 0.002420538
+    },
+    "memory": {
+      "manager_objects_peak": 200000,
+      "serialized_peak_bytes": 27974796,
+      "decoded_estimate_peak_bytes": 297340512,
+      "gpu_attributes_bytes": 3670016,
+      "gpu_staging_nominal_bytes": 3670016,
+      "driver_memory": null,
+      "heap_snapshot_initial_bytes": 81209190,
+      "heap_snapshot_final_bytes": 91099366,
+      "limits": "unchanged; heap samples include diagnostic allocations and are not RSS or leak proof"
+    },
+    "instrumentation": {
+      "iterations": 10000,
+      "total": 2.9000000059604645
+    },
+    "reproduction_sha256": {
+      "tests/browser_s100k_dynamic_mcp.py": "14c65004d188202e60e270a2da925593e436e09f9ead71b49a96ada77f114fe3",
+      "tests/s100k_provider.py": "217084aaa6f71fdae9a760522bfc8ff39d5bf2162a08a19c094666d6cf89c460",
+      "tests/chrome_hold.mjs": "87c5238fd58c0e03ee266b751e99fcaa8cb003db3821605c608abc7fabea57c6",
+      "frontend/package-lock.json": "92f9d4266df5316f10b719054767c58f8e78661d47ba1ab9b29b318cb831e3ce",
+      "backend/requirements.txt": "b1afce6c949b74e07a67f8b53f32712670cdc3a58ce16c8a20a7ba8626ebc492",
+      "docker-compose.yml": "75327966e4196b89ee93471d390e7540a67da9bf002b849cbde1e570cc890e67",
+      "docker-compose.s100k-test.yml": "9c05f701b37786d308f33453710f7dae7873f1ba4b7ae382696e045f9a4de394"
+    },
+    "regressions": "s100k_update_regressions.json",
+    "navigation_regions": "navigation_regions_update_report.json",
+    "ordinary_navigation_budget_failure": {
+      "camera_p95_ms": 0.1,
+      "camera_max_ms": 11,
+      "budget_max_ms": 8,
+      "report": "navigation_update_budget_report.json",
+      "functional_checks_passed": true,
+      "current_recheck": {
+        "report": "navigation_stress_recheck.json",
+        "camera_p95_ms": 0.1,
+        "camera_max_ms": 1,
+        "all_budgets_passed": true,
+        "interpretation": "Previous11ms wall-time outlier not reproduced; original failed report retained, cause not claimed fixed"
+      }
+    },
+    "restored_health": {
+      "status": "ok",
+      "objects": 3471
+    },
+    "budget_amendment": {
+      "approved_by": "user",
+      "date": "2026-11-12",
+      "frame_p95_ms": 16.8,
+      "previous_frame_p95_ms": 16.667,
+      "comparison_epsilon_ms": 1e-06,
+      "scope": "Headless RAF synthetic profile only; no monitor presentation claim or changes to other budgets"
+    },
+    "historical_frame_assessment_16_667": {
+      "budget_ms": 16.667,
+      "windows": {
+        "steady": {
+          "p95": 16.700000000000728,
+          "passed": false
+        },
+        "picking": {
+          "p95": 16.700000000004366,
+          "passed": false
+        },
+        "flight": {
+          "p95": 16.799999999995634,
+          "passed": false
+        },
+        "rebase_eviction": {
+          "p95": 16.700000000004366,
+          "passed": false
+        },
+        "Сейчас": {
+          "p95": 16.70000000001164,
+          "passed": false
+        },
+        "Ускорить": {
+          "p95": 16.70000000001164,
+          "passed": false
+        },
+        "⟲": {
+          "p95": 16.70000000001164,
+          "passed": false
+        },
+        "cycles": {
+          "p95": 16.70000000001164,
+          "passed": false
+        }
+      },
+      "superseded_by": "user-approved16.8ms threshold; raw samples/percentiles unchanged"
+    },
+    "stress_report": "s100k_stress_report.json"
+  },
+  "active_budgets": {
+    "rationale": "16.67 ms per 60 Hz frame: camera 1 ms, LOD 1 ms, preparation 4 ms leaves ~10 ms render/browser. Click is occasional. Startup permits 100 bounded HTTP sectors on four workers. Memory includes two coherent sets for continuous time and four reserved responses.",
+    "camera_p95_ms": 1,
+    "camera_max_ms": 8,
+    "lod_p95_ms": 1,
+    "lod_max_ms": 8,
+    "preparation_slice_target_ms": 4,
+    "preparation_slice_max_ms": 16,
+    "picking_p95_ms": 16,
+    "picking_max_ms": 50,
+    "cold_interactive_ms": 15000,
+    "frame_p95_ms": 16.8,
+    "frame_p99_ms": 33.334,
+    "long_pause_ms": 50,
+    "draw_calls_max": 1,
+    "manager_objects": 200000,
+    "manager_serialized_bytes": 67108864,
+    "manager_decoded_estimate_bytes": 536870912,
+    "http_workers": 4,
+    "response_bytes": 1048576,
+    "gpu_attribute_bytes_max": 7340032,
+    "precision": {
+      "canonical_centers": "bitwise unchanged at paused time",
+      "cpu_km": 1e-06,
+      "gpu_render_absolute": 1e-06,
+      "gpu_render_relative": 1e-07,
+      "rebase_css_px": 0.05
+    },
+    "amendment": "User explicitly accepted frame p95 16.8ms on2026-11-12. Other thresholds unchanged; epsilon1e-6ms only for IEEE timestamp subtraction noise."
+  },
+  "stress_acceptance": {
+    "complete": true,
+    "report": "s100k_stress_report.json",
+    "budget_frame_p95_ms": 16.8,
+    "assessment": {
+      "camera_cpu": {
+        "p95_budget_ms": 1,
+        "max_budget_ms": 8,
+        "windows": {
+          "steady": {
+            "n": 308,
+            "p95": 0.10000002384185791,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "picking": {
+            "n": 426,
+            "p95": 0.10000002384185791,
+            "max": 1.199999988079071,
+            "passed": true
+          },
+          "flight": {
+            "n": 461,
+            "p95": 0.10000002384185791,
+            "max": 2.0999999940395355,
+            "passed": true
+          },
+          "rebase_eviction": {
+            "n": 425,
+            "p95": 0.09999999403953552,
+            "max": 0.10000002384185791,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 324,
+            "p95": 0.19999998807907104,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 331,
+            "p95": 0.10000002384185791,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "⟲": {
+            "n": 323,
+            "p95": 0.10000002384185791,
+            "max": 0.20000001788139343,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 734,
+            "p95": 0.10000002384185791,
+            "max": 0.5,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 763,
+            "p95": 0.10000002384185791,
+            "max": 0.6000000238418579,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 726,
+            "p95": 0.10000002384185791,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 745,
+            "p95": 0.10000002384185791,
+            "max": 0.4000000059604645,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 696,
+            "p95": 0.10000002384185791,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 762,
+            "p95": 0.10000002384185791,
+            "max": 1.2000000178813934,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 751,
+            "p95": 0.10000002384185791,
+            "max": 0.5,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 755,
+            "p95": 0.10000002384185791,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 736,
+            "p95": 0.10000002384185791,
+            "max": 1.0999999940395355,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 744,
+            "p95": 0.10000002384185791,
+            "max": 0.5,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 753,
+            "p95": 0.10000002384185791,
+            "max": 1.5999999940395355,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 731,
+            "p95": 0.10000002384185791,
+            "max": 0.5999999940395355,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "lod_cpu": {
+        "p95_budget_ms": 1,
+        "max_budget_ms": 8,
+        "windows": {
+          "steady": {
+            "n": 308,
+            "p95": 0.29999998211860657,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "picking": {
+            "n": 426,
+            "p95": 0.30000001192092896,
+            "max": 0.5,
+            "passed": true
+          },
+          "flight": {
+            "n": 461,
+            "p95": 0.20000001788139343,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "rebase_eviction": {
+            "n": 425,
+            "p95": 0.09999999403953552,
+            "max": 0.20000001788139343,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 324,
+            "p95": 0.20000001788139343,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 331,
+            "p95": 0.10000002384185791,
+            "max": 0.4000000059604645,
+            "passed": true
+          },
+          "⟲": {
+            "n": 323,
+            "p95": 0.10000002384185791,
+            "max": 0.800000011920929,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 734,
+            "p95": 0.29999998211860657,
+            "max": 0.6000000238418579,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 763,
+            "p95": 0.29999998211860657,
+            "max": 0.7000000178813934,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 726,
+            "p95": 0.20000001788139343,
+            "max": 0.5999999940395355,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 745,
+            "p95": 0.29999998211860657,
+            "max": 0.7999999821186066,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 696,
+            "p95": 0.29999998211860657,
+            "max": 0.7000000178813934,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 762,
+            "p95": 0.20000001788139343,
+            "max": 2.2999999821186066,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 751,
+            "p95": 0.19999998807907104,
+            "max": 1.7999999821186066,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 755,
+            "p95": 0.19999998807907104,
+            "max": 0.6000000238418579,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 736,
+            "p95": 0.20000001788139343,
+            "max": 2.2000000178813934,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 744,
+            "p95": 0.20000001788139343,
+            "max": 1.2999999821186066,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 753,
+            "p95": 0.20000001788139343,
+            "max": 1.7999999821186066,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 731,
+            "p95": 0.29999998211860657,
+            "max": 0.5999999940395355,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "preparation_slice_cpu": {
+        "p95_budget_ms": 4,
+        "max_budget_ms": 16,
+        "windows": {
+          "picking": {
+            "n": 1182,
+            "p95": 0.5,
+            "max": 5,
+            "passed": true
+          },
+          "flight": {
+            "n": 591,
+            "p95": 0.30000001192092896,
+            "max": 2.699999988079071,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 795,
+            "p95": 0.800000011920929,
+            "max": 5.200000017881393,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 822,
+            "p95": 0.6000000238418579,
+            "max": 2.699999988079071,
+            "passed": true
+          },
+          "⟲": {
+            "n": 738,
+            "p95": 0.800000011920929,
+            "max": 3.5999999940395355,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 743,
+            "p95": 0.5,
+            "max": 2.2000000178813934,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 591,
+            "p95": 0.9000000059604645,
+            "max": 3.699999988079071,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 591,
+            "p95": 0.800000011920929,
+            "max": 4.9000000059604645,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 591,
+            "p95": 0.9000000059604645,
+            "max": 4.699999988079071,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 591,
+            "p95": 0.5,
+            "max": 3.300000011920929,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 591,
+            "p95": 0.9000000059604645,
+            "max": 2.600000023841858,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 591,
+            "p95": 0.6000000238418579,
+            "max": 3.5999999940395355,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 591,
+            "p95": 0.3999999761581421,
+            "max": 2.0999999940395355,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 591,
+            "p95": 0.7999999821186066,
+            "max": 4.4000000059604645,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 591,
+            "p95": 0.9000000059604645,
+            "max": 4.0999999940395355,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 592,
+            "p95": 0.9000000059604645,
+            "max": 3.5999999940395355,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 591,
+            "p95": 0.800000011920929,
+            "max": 4.4000000059604645,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "merge_slice_cpu": {
+        "p95_budget_ms": 4,
+        "max_budget_ms": 16,
+        "windows": {
+          "picking": {
+            "n": 200,
+            "p95": 0.19999998807907104,
+            "max": 0.5,
+            "passed": true
+          },
+          "flight": {
+            "n": 30,
+            "p95": 1,
+            "max": 1.699999988079071,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 401,
+            "p95": 0.800000011920929,
+            "max": 2.7000000178813934,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 401,
+            "p95": 0.800000011920929,
+            "max": 2.600000023841858,
+            "passed": true
+          },
+          "⟲": {
+            "n": 401,
+            "p95": 0.7999999821186066,
+            "max": 3.0999999940395355,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 200,
+            "p95": 0.9000000059604645,
+            "max": 1.9000000059604645,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 201,
+            "p95": 1.0999999940395355,
+            "max": 2.300000011920929,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 200,
+            "p95": 0.7000000178813934,
+            "max": 1.5999999940395355,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 201,
+            "p95": 0.9000000059604645,
+            "max": 2.2000000178813934,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 200,
+            "p95": 0.5999999940395355,
+            "max": 1.2999999821186066,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 201,
+            "p95": 0.9000000059604645,
+            "max": 2,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 200,
+            "p95": 0.6000000238418579,
+            "max": 1.2999999821186066,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 200,
+            "p95": 0.6000000238418579,
+            "max": 0.9000000059604645,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 202,
+            "p95": 0.7000000178813934,
+            "max": 2.2000000178813934,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 203,
+            "p95": 0.800000011920929,
+            "max": 2,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 201,
+            "p95": 0.800000011920929,
+            "max": 2,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 200,
+            "p95": 0.5,
+            "max": 0.9000000059604645,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "validation_cpu": {
+        "p95_budget_ms": 4,
+        "max_budget_ms": 16,
+        "windows": {
+          "picking": {
+            "n": 101,
+            "p95": 0.30000001192092896,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "rebase_eviction": {
+            "n": 1,
+            "p95": 0.09999999403953552,
+            "max": 0.09999999403953552,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 202,
+            "p95": 0.5,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 222,
+            "p95": 0.5,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "⟲": {
+            "n": 220,
+            "p95": 0.5,
+            "max": 1,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 147,
+            "p95": 0.5,
+            "max": 0.800000011920929,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 148,
+            "p95": 0.5,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 149,
+            "p95": 0.5,
+            "max": 1,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 147,
+            "p95": 0.5,
+            "max": 0.7999999821186066,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 149,
+            "p95": 0.5,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 144,
+            "p95": 0.5,
+            "max": 1.199999988079071,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 150,
+            "p95": 0.5,
+            "max": 0.5999999940395355,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 144,
+            "p95": 0.5999999940395355,
+            "max": 0.9000000059604645,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 146,
+            "p95": 0.4000000059604645,
+            "max": 1.5,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 146,
+            "p95": 0.5,
+            "max": 0.800000011920929,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 149,
+            "p95": 0.5,
+            "max": 1,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 146,
+            "p95": 0.5999999940395355,
+            "max": 0.7000000178813934,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "prepare_prelude_cpu": {
+        "p95_budget_ms": 4,
+        "max_budget_ms": 16,
+        "windows": {
+          "picking": {
+            "n": 2,
+            "p95": 0.19999998807907104,
+            "max": 0.19999998807907104,
+            "passed": true
+          },
+          "flight": {
+            "n": 1,
+            "p95": 0.20000001788139343,
+            "max": 0.20000001788139343,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 2,
+            "p95": 0.09999999403953552,
+            "max": 0.09999999403953552,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 2,
+            "p95": 0.3999999761581421,
+            "max": 0.3999999761581421,
+            "passed": true
+          },
+          "⟲": {
+            "n": 2,
+            "p95": 0.20000001788139343,
+            "max": 0.20000001788139343,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 2,
+            "p95": 0.19999998807907104,
+            "max": 0.19999998807907104,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 1,
+            "p95": 0.19999998807907104,
+            "max": 0.19999998807907104,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 1,
+            "p95": 0.09999999403953552,
+            "max": 0.09999999403953552,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 1,
+            "p95": 0.09999999403953552,
+            "max": 0.09999999403953552,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 1,
+            "p95": 0.19999998807907104,
+            "max": 0.19999998807907104,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 1,
+            "p95": 0.09999999403953552,
+            "max": 0.09999999403953552,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 1,
+            "p95": 0.20000001788139343,
+            "max": 0.20000001788139343,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 1,
+            "p95": 0.10000002384185791,
+            "max": 0.10000002384185791,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 1,
+            "p95": 0.20000001788139343,
+            "max": 0.20000001788139343,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 1,
+            "p95": 0.30000001192092896,
+            "max": 0.30000001192092896,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 1,
+            "p95": 0.3999999761581421,
+            "max": 0.3999999761581421,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "commit_cpu": {
+        "p95_budget_ms": 16,
+        "max_budget_ms": 50,
+        "windows": {
+          "picking": {
+            "n": 2,
+            "p95": 2,
+            "max": 2,
+            "passed": true
+          },
+          "flight": {
+            "n": 1,
+            "p95": 0.5,
+            "max": 0.5,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 1,
+            "p95": 0.9000000059604645,
+            "max": 0.9000000059604645,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 1,
+            "p95": 0.7000000178813934,
+            "max": 0.7000000178813934,
+            "passed": true
+          },
+          "⟲": {
+            "n": 1,
+            "p95": 0.699999988079071,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 1,
+            "p95": 0.29999998211860657,
+            "max": 0.29999998211860657,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 1,
+            "p95": 0.6000000238418579,
+            "max": 0.6000000238418579,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 1,
+            "p95": 0.5999999940395355,
+            "max": 0.5999999940395355,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 1,
+            "p95": 0.5,
+            "max": 0.5,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 1,
+            "p95": 1.199999988079071,
+            "max": 1.199999988079071,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 1,
+            "p95": 1.4000000059604645,
+            "max": 1.4000000059604645,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 1,
+            "p95": 0.699999988079071,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 1,
+            "p95": 0.5,
+            "max": 0.5,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 1,
+            "p95": 0.7000000178813934,
+            "max": 0.7000000178813934,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 1,
+            "p95": 0.699999988079071,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 1,
+            "p95": 0.699999988079071,
+            "max": 0.699999988079071,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 1,
+            "p95": 0.800000011920929,
+            "max": 0.800000011920929,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "picking_cpu": {
+        "p95_budget_ms": 16,
+        "max_budget_ms": 50,
+        "windows": {
+          "picking": {
+            "n": 20,
+            "p95": 1.199999988079071,
+            "max": 2.4000000059604645,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 1,
+            "p95": 0.09999999403953552,
+            "max": 0.09999999403953552,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 1,
+            "p95": 0.10000002384185791,
+            "max": 0.10000002384185791,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 1,
+            "p95": 0,
+            "max": 0,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "frame": {
+        "p95_budget_ms": 16.8,
+        "max_budget_ms": 33.334,
+        "windows": {
+          "steady": {
+            "n": 307,
+            "p95": 16.799999999999272,
+            "max": 16.80000000000109,
+            "passed": true
+          },
+          "picking": {
+            "n": 425,
+            "p95": 16.700000000000728,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "flight": {
+            "n": 460,
+            "p95": 16.799999999999272,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "rebase_eviction": {
+            "n": 424,
+            "p95": 16.700000000004366,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "Сейчас": {
+            "n": 323,
+            "p95": 16.700000000004366,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "Ускорить": {
+            "n": 330,
+            "p95": 16.799999999995634,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "⟲": {
+            "n": 322,
+            "p95": 16.70000000001164,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "cycle_01": {
+            "n": 733,
+            "p95": 16.70000000001164,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "cycle_02": {
+            "n": 762,
+            "p95": 16.79999999998836,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "cycle_03": {
+            "n": 725,
+            "p95": 16.79999999998836,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "cycle_04": {
+            "n": 744,
+            "p95": 16.70000000001164,
+            "max": 16.80000000000291,
+            "passed": true
+          },
+          "cycle_05": {
+            "n": 695,
+            "p95": 16.70000000001164,
+            "max": 16.800000000017462,
+            "passed": true
+          },
+          "cycle_06": {
+            "n": 761,
+            "p95": 16.70000000001164,
+            "max": 16.800000000017462,
+            "passed": true
+          },
+          "cycle_07": {
+            "n": 750,
+            "p95": 16.70000000001164,
+            "max": 16.800000000017462,
+            "passed": true
+          },
+          "cycle_08": {
+            "n": 754,
+            "p95": 16.70000000001164,
+            "max": 16.800000000017462,
+            "passed": true
+          },
+          "cycle_09": {
+            "n": 735,
+            "p95": 16.70000000001164,
+            "max": 16.800000000017462,
+            "passed": true
+          },
+          "cycle_10": {
+            "n": 743,
+            "p95": 16.79999999998836,
+            "max": 16.800000000017462,
+            "passed": true
+          },
+          "cycle_11": {
+            "n": 752,
+            "p95": 16.79999999998836,
+            "max": 16.800000000017462,
+            "passed": true
+          },
+          "cycle_12": {
+            "n": 730,
+            "p95": 16.70000000001164,
+            "max": 16.800000000017462,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "cold": {
+        "ms": 3298.199999988079,
+        "budget_ms": 15000,
+        "passed": true
+      },
+      "draw_calls": {
+        "maximum_observed": 1,
+        "budget": 1,
+        "passed": true
+      }
+    },
+    "cycles": 12,
+    "measured_windows": 19,
+    "measured_frame_samples": 11475,
+    "measured_duration_seconds": 191.59343566492316,
+    "long_pauses": 0,
+    "frame_p95_max_ms": 16.799999999999272,
+    "frame_p99_max_ms": 16.800000000017462,
+    "frame_max_ms": 16.800000000017462,
+    "cold_interactive_ms": 3298.199999988079,
+    "final_counts": {
+      "resident": 100000,
+      "computed": 100000,
+      "submitted": 100000,
+      "in_frustum": 100000,
+      "numeric": 100000,
+      "identities": 100000,
+      "calls": 1,
+      "sameRenderer": true,
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      },
+      "listeners": 28
+    },
+    "manager_peaks": {
+      "peakActive": 4,
+      "peakQueue": 100,
+      "peakPending": 100,
+      "peakObjects": 200000,
+      "peakSerialized": 27974499,
+      "peakDecoded": 297339704
+    },
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+    "hardware_display_acceptance": false,
+    "scope": "Synthetic S-100k headless RAF on actual Metal GPU; full real-body S-100k/monitor presentation remain open",
+    "interrupted_attempt": "s100k_stress_interrupted.json",
+    "navigation_recheck": "navigation_stress_recheck.json",
+    "functional_report": "s100k_stress_functional.json",
+    "rebase_report": "s100k_stress_rebase.json",
+    "publish_checks_report": "publish_checks_report.json",
+    "publish_checks_passed": true,
+    "ordinary_health": {
+      "status": "ok",
+      "objects": 3471
+    },
+    "navigation_regions_report": "navigation_regions_stress_report.json",
+    "depth_report": "depth_stress_report.json",
+    "reproduction_sha256": {
+      "tests/browser_s100k_dynamic_mcp.py": "14c65004d188202e60e270a2da925593e436e09f9ead71b49a96ada77f114fe3",
+      "tests/report_s100k_dynamic.py": "eba6c01262331867e3b70483a803034799eae593fdf02600244c524eb0437b69",
+      "tests/s100k_provider.py": "217084aaa6f71fdae9a760522bfc8ff39d5bf2162a08a19c094666d6cf89c460",
+      "tests/chrome_hold.mjs": "87c5238fd58c0e03ee266b751e99fcaa8cb003db3821605c608abc7fabea57c6",
+      "frontend/package-lock.json": "92f9d4266df5316f10b719054767c58f8e78661d47ba1ab9b29b318cb831e3ce",
+      "backend/requirements.txt": "b1afce6c949b74e07a67f8b53f32712670cdc3a58ce16c8a20a7ba8626ebc492"
+    }
+  }
+}

@@ -1,0 +1,506 @@
+{
+  "version": "debug-regression/1",
+  "recorded_at": "2026-11-11T08:55:29.901295+00:00",
+  "scope": "render depth, coincident picking, pole handoff; backend/import/manager reviewed and baseline-tested",
+  "pre_fix_observation": {
+    "webgl_pixel_rgba": [
+      0,
+      0,
+      255,
+      255
+    ],
+    "expected_front_pixel_rgba": [
+      255,
+      0,
+      0,
+      255
+    ],
+    "near_marker_km": 1000000000.0,
+    "far_marker_km": 2000000000.0,
+    "renderer_log_depth_enabled": true,
+    "depth_bits": 24,
+    "pole_exit_camera_jump_km": 1.2
+  },
+  "verification": {
+    "backend_tests": 240,
+    "backend_sources_changed": false,
+    "frontend_tests": 209,
+    "frontend_coverage_percent": {
+      "statements": 98.25,
+      "lines": 99.15,
+      "branches": 92.72,
+      "functions": 98.52
+    },
+    "frontend_build": "passed; known >500 kB chunk warning",
+    "horizons_vectors": 100,
+    "horizons_regression_tolerance_km": 1,
+    "hardware_fps_verified": false,
+    "physical_screenshot_reviewed": true
+  },
+  "depth_and_handoff": {
+    "complete": true,
+    "checks": [
+      "12 WebGL pixel + picking cases: both orders, L0/L1, 1e7/1e9/1e12 km",
+      "both exact poles preserve physical eye/orientation through exit/idle; native drag resumes orbit"
+    ],
+    "tolerances": {
+      "handoff_eye_km": 1e-06,
+      "handoff_quaternion_components": 1e-12
+    },
+    "depth": {
+      "results": [
+        {
+          "distance_km": 10000000,
+          "reversed": false,
+          "detail": false,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 10000000,
+          "reversed": false,
+          "detail": true,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 10000000,
+          "reversed": true,
+          "detail": false,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 10000000,
+          "reversed": true,
+          "detail": true,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000,
+          "reversed": false,
+          "detail": false,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000,
+          "reversed": false,
+          "detail": true,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000,
+          "reversed": true,
+          "detail": false,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000,
+          "reversed": true,
+          "detail": true,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000000,
+          "reversed": false,
+          "detail": false,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000000,
+          "reversed": false,
+          "detail": true,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000000,
+          "reversed": true,
+          "detail": false,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000000,
+          "reversed": true,
+          "detail": true,
+          "pixel": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        }
+      ],
+      "logarithmic_depth": true,
+      "depth_bits": 24,
+      "near": 1e-05,
+      "far": 1000000000000,
+      "gl_error": 0,
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+    },
+    "handoff": [
+      {
+        "pole": 1,
+        "eye_error_km": 0.0,
+        "quaternion_component_error": 0.0,
+        "native_orbit_resumed": true
+      },
+      {
+        "pole": -1,
+        "eye_error_km": 0.0,
+        "quaternion_component_error": 0.0,
+        "native_orbit_resumed": true
+      }
+    ]
+  },
+  "navigation": {
+    "complete": true,
+    "synthetic": false,
+    "checks": [
+      "overview → flight transfers controls and rebases without a physical camera jump",
+      "trusted held keys rotate yaw/pitch/roll and move along local forward; frozen centers unchanged",
+      "trusted mouse drag rotates flight without selection or OrbitControls movement",
+      "search typing is isolated; selecting a body opens its card without teleporting",
+      "explicit refocus restores observation; stop/manual date/Now/pause leave free camera fixed",
+      "native tab switch during held flight clears keys; hidden/resume has no camera catch-up",
+      "12 flight/exit/refocus cycles retain renderer, canvas, GPU resources and listener count"
+    ],
+    "budgets_ms": {
+      "camera": [
+        1,
+        8
+      ],
+      "apply": [
+        16,
+        50
+      ],
+      "lod": [
+        1,
+        8
+      ]
+    },
+    "tolerances": {
+      "cpu_roundoff_km": 1e-06,
+      "gpu_relative": 1e-07,
+      "gpu_absolute_render": 1e-06,
+      "rebase_screen_css_px": 0.05
+    },
+    "environment": {
+      "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
+      "renderer": "SwiftShader (functional, not hardware fps)",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "cores": 10,
+      "width": 1440,
+      "height": 913,
+      "dpr": 1
+    },
+    "numeric_centers": 5,
+    "local_forward_error": 1.0557523403542424e-13,
+    "time_modes": [
+      {
+        "reverse": false,
+        "multiplier": 86400,
+        "distance_km": 31659.99999999664,
+        "hold_seconds": 0.35
+      },
+      {
+        "reverse": true,
+        "multiplier": -86400,
+        "distance_km": 30000.000000005446,
+        "hold_seconds": 0.35
+      }
+    ],
+    "resources_warm": {
+      "listeners": 28,
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      }
+    },
+    "resource_cycles": 12,
+    "resources_final": {
+      "listeners": 28,
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      }
+    },
+    "timing_ms": {
+      "camera": {
+        "n": 789,
+        "mean": 0.023574144460251426,
+        "p95": 0.10000000894069672,
+        "max": 2.0999999940395355
+      },
+      "apply": {
+        "n": 153,
+        "mean": 0.10261437929923238,
+        "p95": 0.20000000298023224,
+        "max": 3.7999999970197678
+      },
+      "lod": {
+        "n": 789,
+        "mean": 0.02420785798394937,
+        "p95": 0.09999999403953552,
+        "max": 8
+      }
+    },
+    "rebase_projection": [
+      {
+        "n": 5,
+        "max_css_px": 3.21278384282265e-05
+      }
+    ],
+    "budget_passed": {
+      "camera": true,
+      "apply": true,
+      "lod": true
+    }
+  },
+  "navigation_synthetic": {
+    "complete": true,
+    "synthetic": true,
+    "checks": [
+      "overview → flight transfers controls and rebases without a physical camera jump",
+      "trusted held keys rotate yaw/pitch/roll and move along local forward; frozen centers unchanged",
+      "trusted mouse drag rotates flight without selection or OrbitControls movement",
+      "search typing is isolated; selecting a body opens its card without teleporting",
+      "explicit refocus restores observation; stop/manual date/Now/pause leave free camera fixed",
+      "native tab switch during held flight clears keys; hidden/resume has no camera catch-up",
+      "native flight loads/evicts HTTP sectors; explicit return and transport failure recover atomically",
+      "12 flight/exit/refocus cycles retain renderer, canvas, GPU resources and listener count"
+    ],
+    "budgets_ms": {
+      "camera": [
+        1,
+        8
+      ],
+      "apply": [
+        16,
+        50
+      ],
+      "lod": [
+        1,
+        8
+      ]
+    },
+    "tolerances": {
+      "cpu_roundoff_km": 1e-06,
+      "gpu_relative": 1e-07,
+      "gpu_absolute_render": 1e-06,
+      "rebase_screen_css_px": 0.05
+    },
+    "environment": {
+      "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
+      "renderer": "SwiftShader (functional, not hardware fps)",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "cores": 10,
+      "width": 1440,
+      "height": 913,
+      "dpr": 1
+    },
+    "numeric_centers": 2016,
+    "local_forward_error": 6.685349703749831e-15,
+    "time_modes": [
+      {
+        "reverse": false,
+        "multiplier": 86400,
+        "distance_km": 34999.999999999985,
+        "hold_seconds": 0.35
+      },
+      {
+        "reverse": true,
+        "multiplier": -86400,
+        "distance_km": 34999.99999999995,
+        "hold_seconds": 0.35
+      }
+    ],
+    "resources_warm": {
+      "listeners": 28,
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      }
+    },
+    "resource_cycles": 12,
+    "resources_final": {
+      "listeners": 28,
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      }
+    },
+    "timing_ms": {
+      "camera": {
+        "n": 1176,
+        "mean": 0.0375850340034686,
+        "p95": 0.10000000894069672,
+        "max": 5
+      },
+      "apply": {
+        "n": 79,
+        "mean": 0.6063291138108773,
+        "p95": 3.800000011920929,
+        "max": 19.799999997019768
+      },
+      "lod": {
+        "n": 1176,
+        "mean": 0.01020408158196884,
+        "p95": 0.09999999403953552,
+        "max": 0.5
+      }
+    },
+    "rebase_projection": [
+      {
+        "n": 2016,
+        "max_css_px": 1.6871634132470267e-05
+      }
+    ],
+    "budget_passed": {
+      "camera": true,
+      "apply": true,
+      "lod": true
+    }
+  },
+  "regressions": {
+    "physical": {
+      "catalog": 3471,
+      "checks": [
+        "physical scene: Earth/Moon, one draw call, one renderer",
+        "displayed UTC and Float64 geometric positions agree",
+        "far overview loads all five centers; eviction/reload preserves centers and resources",
+        "floating origin follows selected body without modifying physical positions",
+        "Mercury/Venus selection, camera zoom and refocus preserve body centers and renderer",
+        "server search finds unloaded cards; paged sector read preserves unknown status",
+        "no full JSON/v2 catalog and no legacy live-ephemeris request",
+        "Mercury/Venus change with time and reverse return restores exact vectors",
+        "date changes and reverse return restore exactly the same centers",
+        "bounded registry pages, model metadata, pinned revision and 304",
+        "synthetic membership beyond five grows/reuses buffers without GPU resource growth",
+        "hierarchy cross-sector repartition preserves centers, render positions and GPU resources; stale epoch rejected",
+        "no uncaught JavaScript errors or console errors"
+      ]
+    },
+    "lod": {
+      "catalog": 3471,
+      "checks": 5,
+      "requests_during_lod_only": 0
+    },
+    "recovery": {
+      "catalog": 3471,
+      "checks": [
+        "revision race: pinned 409 restarts discovery once and recovers",
+        "repeated conflict: bounded retry, visible error and no stale positions",
+        "next valid request restores positions after conflict",
+        "flat positions/1 with UTC model scale is rejected",
+        "successful frame clears transient scene error",
+        "frame recovery cannot hide initialization failure",
+        "no renderer rebuild, GPU resource growth or uncaught JavaScript errors"
+      ],
+      "resources": {
+        "geometries": 1,
+        "textures": 0,
+        "same_renderer": true
+      }
+    },
+    "latency": {
+      "catalog": 3471,
+      "steady_nonempty": 20,
+      "steady_samples": 20,
+      "distinct_frames": 3,
+      "pause_exact": true,
+      "manual_jump": true,
+      "directions": [
+        {
+          "reverse": false,
+          "samples": 25,
+          "frames": 6
+        },
+        {
+          "reverse": true,
+          "samples": 25,
+          "frames": 6
+        }
+      ],
+      "resources": {
+        "geometries": 1,
+        "textures": 0
+      }
+    }
+  }
+}

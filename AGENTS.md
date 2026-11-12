@@ -4,6 +4,14 @@ React + Three.js / FastAPI, Docker. Catalog prepared at container startup.
 Start with this file and the relevant document; do not load every document by
 habit. Current sequence/status: `ROADMAP.md`; verification: `docs/TEST_COVERAGE.md`.
 Commands and browser/benchmark details: `tests/README.md`.
+Long-term goal: all known astronomical bodies as of each data refresh, with
+source coverage/gaps recorded. Million-row and S-100k milestones are neither
+catalog size caps nor proof of complete coverage. Unknown physics stays null.
+Target production storage: all working body/model data lives and updates in the
+DB. Fixed JSON files must not be the primary body catalog; startup must not
+require a full objects.json. JSON remains valid for API, fixtures and tooling.
+Current seed/JSON startup is transitional. Migrate and verify its consumers
+before removing catalog files; retain numeric fixtures, configs and lockfiles.
 
 ## Non-negotiable physical contract
 
@@ -51,17 +59,20 @@ environments/caches; retain test sources, numeric fixtures, lockfiles, MCP, BSP.
 - `data/physical_hierarchy.py` / `frontend/src/physical/`: default scene,
   Float64 centers, linear GPU transform; `docs/HIERARCHY.md`. One physical
   sector today; general 3.3/3.8 remain open. Legacy is `/?scene=legacy`.
+  Opt-in SQLite synthetic S-100k uses the same path: `docs/S100K.md`;
+  `docker-compose.s100k-test.yml`. Hardware milestone remains open.
 - `backend/sector_api.py`, `data/sectors.py`: bounded snapshot API/index;
   `docs/SECTORS.md`. `at` always 422. `frontend/src/data/sectorStore.js`
   reads bounded snapshot cards only.
 - `streaming_catalog.py`, `streaming_binary.py`, `incremental_catalog.py`:
   bounded JSON→SQLite/patch preparation; full legacy publication remains O(N).
-  Production target (planned, ROADMAP 3.7/10.0.1): direct bounded source→DB
-  staging ingestion, validated atomic revisions and incremental updates; no
-  mandatory full intermediate objects.json. Current builder is not yet that path.
+  `data/import_sbdb.py`: bounded direct SBDB asteroid HTTP→staging→atomic
+  runtime SQLite, manifest, explicit owned deletes; 3.7-A accepted. The old
+  online list builder remains for compatibility; incremental writer 3.7-B is open.
   `backend/prepare_runtime.py` runs separately. Runtime `CATALOG` is DiskCatalog;
   never populate the test-only list `catalog_index()` from production data.
-- `backend/entrypoint.py`: offline/online/existing mode; objects.json generated.
+- `backend/entrypoint.py`: offline/online/existing generate/read objects.json;
+  published mode reads existing SQLite via required ASTROVERSE_SECTOR_PATH.
   `tests/test_api.py` pins catalog_seed.json. unittest ignores smoke_*.py.
 - HTTP limits: filtered legacy 4096 objects/8 MiB; snapshot pages 512/2 MiB;
   separate sector/filtered caches 8 MiB each. Full legacy routes stream.

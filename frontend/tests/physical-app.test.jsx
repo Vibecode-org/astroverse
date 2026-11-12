@@ -53,7 +53,7 @@ describe('physical experience',()=>{
     mocks.positions={frame:{objects:[{id:'mercury',position:[1,2,3]},{id:'venus',position:[4,5,6]}]},error:null};
     render(<PhysicalApp/>);
     await screen.findByText(/В каталоге: 3471/);
-    expect(document.querySelectorAll('.objectRow')).toHaveLength(5);
+    await waitFor(()=>expect(document.querySelectorAll('.objectRow')).toHaveLength(5));
     expect(screen.getByText(/В реестре положений: 5 тел/)).toBeTruthy();
     for (const [name,id] of [['Меркурий','mercury'],['Венера','venus']]) {
       fireEvent.click(screen.getAllByText(name)[0]);
@@ -186,4 +186,19 @@ it('keeps scene metadata stable across clock-only renders',async()=>{
  const bodies=mocks.scene.bodies;
  mocks.time={...mocks.time,simDate:new Date('2026-11-06T00:00:01Z')};
  view.rerender(<PhysicalApp/>);expect(mocks.scene.bodies).toBe(bodies);
+});
+
+it('selects/searches during flight without teleporting, and returns explicitly to observation',async()=>{
+ render(<PhysicalApp/>);await screen.findByText('Луна');
+ fireEvent.click(screen.getByText('Свободный полёт'));expect(mocks.scene.flying).toBe(true);
+ const focus=mocks.scene.focusVersion;fireEvent.click(screen.getByText('Луна'));
+ expect(mocks.scene.centerId).toBe('earth');expect(mocks.scene.focusVersion).toBe(focus);
+ expect(screen.getByRole('heading',{name:'Луна'})).toBeTruthy();
+ fireEvent.click(screen.getByLabelText('Увеличить скорость полёта'));
+ fireEvent.click(screen.getByLabelText('Уменьшить скорость полёта'));fireEvent.click(screen.getByText('Стоп'));
+ act(()=>mocks.scene.onFlightStatus({speed:200000,held:1}));expect(screen.getByText(/200.*000 км\/с/)).toBeTruthy();
+ fireEvent.click(screen.getByText('Наблюдать Луна'));
+ expect(mocks.scene.flying).toBe(false);expect(mocks.scene.centerId).toBe('moon');expect(mocks.scene.focusVersion).toBe(focus+1);
+ fireEvent.click(screen.getByText('Свободный полёт'));fireEvent.click(screen.getByText('Завершить полёт'));
+ expect(mocks.scene.flying).toBe(false);
 });

@@ -138,6 +138,25 @@ class PositionAPITests(unittest.TestCase):
                              (supplied == '*' or etag in supplied))
         return TestClient(app)
 
+    def test_fixed_camera_origin_is_independent_of_anchor_time_and_validated_before_etag(self):
+        with self.client() as client:
+            at='2020-01-01T00:00:00Z'
+            vector=client.get('/api/positions/v1/objects/earth',params={'at':at}).json()['objects'][0]['position']
+            query=dict(anchor='earth',dx=0,dy=0,dz=0,radius=1,at=at,ox=vector[0],oy=vector[1],oz=vector[2])
+            near=client.get('/api/positions/v1/nearby',params=query)
+            self.assertEqual(near.status_code,200)
+            self.assertEqual(len(near.json()['sectors']),1)
+            self.assertEqual(near.json()['query']['origin_km'],vector)
+            # Anchor is irrelevant to the fixed physical camera, at either date.
+            for date in [at,'2021-06-01T00:00:00Z']:
+                a=client.get('/api/positions/v1/nearby',params={**query,'at':date}).json()
+                b=client.get('/api/positions/v1/nearby',params={**query,'at':date,'anchor':'venus'}).json()
+                self.assertEqual(a['sectors'],b['sectors'])
+            for update in [{'ox':None},{'oy':'nan'},{'oz':1e14}]:
+                bad={k:v for k,v in {**query,**update}.items() if v is not None}
+                self.assertEqual(client.get('/api/positions/v1/nearby',params=bad,headers={'If-None-Match':'*'}).status_code,422)
+            self.assertEqual(client.get('/api/positions/v1/nearby',params=query,headers={'If-None-Match':near.headers['etag']}).status_code,304)
+
     def test_versioned_contract_conditional_requests_and_unknown_positions(self):
         with self.client() as client:
             self.assertEqual(client.get('/api/positions/v1/contract').json()['version'], 'positions/1')

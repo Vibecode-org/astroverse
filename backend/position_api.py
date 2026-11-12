@@ -114,10 +114,11 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
             lock.release()
         check()
         if neighborhood is not None:
-            anchor, dx, dy, dz, radius = neighborhood
+            anchor, dx, dy, dz, radius, fixed_origin = neighborhood
             result = json.loads(payload)
             vectors = {row['id']: row['position'] for row in result['objects']}
-            center = [vectors[anchor][axis] + delta for axis, delta in enumerate((dx, dy, dz))]
+            origin = vectors[anchor] if fixed_origin is None else fixed_origin
+            center = [origin[axis] + delta for axis, delta in enumerate((dx, dy, dz))]
             lower = [min(v[axis] for v in vectors.values()) for axis in range(3)]
             upper = [max(v[axis] for v in vectors.values()) for axis in range(3)]
             delta = [max(lower[a]-center[a], 0, center[a]-upper[a]) for a in range(3)]
@@ -127,6 +128,8 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
                                    'min': lower, 'max': upper, 'object_count': len(vectors)}]
                                  if math.hypot(*delta) <= radius else [])
             result['query'] = {'anchor': anchor, 'offset_km': [dx,dy,dz], 'radius_km': radius}
+            if fixed_origin is not None:
+                result['query']['origin_km'] = fixed_origin
             payload = json.dumps(result, separators=(',', ':'), allow_nan=False).encode()
         etag = '"' + hashlib.sha256(payload).hexdigest() + '"'
         headers = {'ETag': etag, 'Cache-Control': 'public, max-age=0, must-revalidate',
@@ -143,13 +146,17 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
     @router.get('/nearby')
     async def nearby(request: Request, anchor: str, dx: float, dy: float, dz: float,
                radius: float, at: str | None = Query(None, max_length=64), jd_tdb: float | None = None,
-               revision: str | None = Query(None, max_length=256)):
+               revision: str | None = Query(None, max_length=256),
+               ox: float | None = None, oy: float | None = None, oz: float | None = None):
         # The camera offset is ICRF km relative to a confirmed moving anchor.
         # Re-evaluating both anchor and bounds prevents static-root omissions.
         if (anchor not in targets or any(not math.isfinite(v) or abs(v)>1e13 for v in (dx,dy,dz,radius))
                 or radius < 0):
             raise HTTPException(422, 'Invalid physical neighborhood; expected supported anchor and finite km within 1e13')
-        return await work.run(request, lambda cancelled: evaluate(request, at, jd_tdb, None, (anchor, dx, dy, dz, radius), expected_revision=revision, cancelled=cancelled))
+        fixed_origin = None if all(v is None for v in (ox,oy,oz)) else [ox,oy,oz]
+        if fixed_origin is not None and any(v is None or not math.isfinite(v) or abs(v)>1e13 for v in fixed_origin):
+            raise HTTPException(422, 'Expected complete finite ICRF/SSB origin km within 1e13')
+        return await work.run(request, lambda cancelled: evaluate(request, at, jd_tdb, None, (anchor, dx, dy, dz, radius, fixed_origin), expected_revision=revision, cancelled=cancelled))
 
     @router.get('/objects/{object_id}')
     async def object_position(request: Request, object_id: str,

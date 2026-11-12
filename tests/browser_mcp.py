@@ -20,18 +20,21 @@ from browser_smoke.common import INSTALL_PROBE, VIEW_LABELS
 
 
 class MCP:
-    def __init__(self, slow=False):
+    def __init__(self, slow=False, browser_url=None):
         self.slow = slow
+        self.browser_url = browser_url
+        self.page_id = 1
 
     def __enter__(self):
         command = shutil.which("chrome-devtools-mcp")
         if command is None:
             raise RuntimeError("Install chrome-devtools-mcp before running this regression suite")
         self.errors = tempfile.TemporaryFile(mode="w+")
-        self.process = subprocess.Popen([
-            command, "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux",
+        browser_args = ['--browser-url='+self.browser_url] if self.browser_url else ["--headless", "--isolated",
             "--viewport=1440x1000", "--chrome-arg=--use-angle=swiftshader",
-            "--chrome-arg=--enable-unsafe-swiftshader",
+            "--chrome-arg=--enable-unsafe-swiftshader"]
+        self.process = subprocess.Popen([
+            command, "--no-usage-statistics", "--no-performance-crux", *browser_args,
         ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.errors, bufsize=0)
         self.buffer = b""
         self.sequence = 0
@@ -82,8 +85,8 @@ class MCP:
 
     def call(self, name, **arguments):
         # Chrome DevTools MCP 1.12 requires pageId for page-scoped tools.
-        if name != "list_pages":
-            arguments.setdefault("pageId", 1)
+        if name not in ("list_pages", "new_page"):
+            arguments.setdefault("pageId", self.page_id)
         result = self.request("tools/call", {"name": name, "arguments": arguments})
         text = "\n".join(item.get("text", "") for item in result.get("content", []))
         if result.get("isError"):

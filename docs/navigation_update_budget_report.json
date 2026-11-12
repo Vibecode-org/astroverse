@@ -1,0 +1,104 @@
+{
+  "complete": true,
+  "synthetic": false,
+  "checks": [
+    "overview → flight transfers controls and rebases without a physical camera jump",
+    "trusted held keys rotate yaw/pitch/roll and move along local forward; frozen centers unchanged",
+    "trusted mouse drag rotates flight without selection or OrbitControls movement",
+    "search typing is isolated; selecting a body opens its card without teleporting",
+    "explicit refocus restores observation; stop/manual date/Now/pause leave free camera fixed",
+    "native tab switch during held flight clears keys; hidden/resume has no camera catch-up",
+    "12 flight/exit/refocus cycles retain renderer, canvas, GPU resources and listener count"
+  ],
+  "budgets_ms": {
+    "camera": [
+      1,
+      8
+    ],
+    "apply": [
+      16,
+      50
+    ],
+    "lod": [
+      1,
+      8
+    ]
+  },
+  "tolerances": {
+    "cpu_roundoff_km": 1e-06,
+    "gpu_relative": 1e-07,
+    "gpu_absolute_render": 1e-06,
+    "rebase_screen_css_px": 0.05
+  },
+  "environment": {
+    "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
+    "renderer": "SwiftShader (functional, not hardware fps)",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+    "cores": 10,
+    "width": 1440,
+    "height": 913,
+    "dpr": 1
+  },
+  "numeric_centers": 5,
+  "local_forward_error": 8.608081126597871e-14,
+  "time_modes": [
+    {
+      "reverse": false,
+      "multiplier": 86400,
+      "distance_km": 34999.999999998436,
+      "hold_seconds": 0.35
+    },
+    {
+      "reverse": true,
+      "multiplier": -86400,
+      "distance_km": 33330.00000000063,
+      "hold_seconds": 0.35
+    }
+  ],
+  "resources_warm": {
+    "listeners": 28,
+    "memory": {
+      "geometries": 1,
+      "textures": 0
+    }
+  },
+  "resource_cycles": 12,
+  "resources_final": {
+    "listeners": 28,
+    "memory": {
+      "geometries": 1,
+      "textures": 0
+    }
+  },
+  "timing_ms": {
+    "camera": {
+      "n": 761,
+      "mean": 0.0420499341794915,
+      "p95": 0.09999999403953552,
+      "max": 11
+    },
+    "apply": {
+      "n": 155,
+      "mean": 0.06903225779533387,
+      "p95": 0.20000001788139343,
+      "max": 0.5
+    },
+    "lod": {
+      "n": 761,
+      "mean": 0.02391590019406533,
+      "p95": 0.09999999403953552,
+      "max": 6.4000000059604645
+    }
+  },
+  "rebase_projection": [
+    {
+      "n": 5,
+      "max_css_px": 1.2476973670112182e-05
+    }
+  ],
+  "budget_passed": {
+    "camera": false,
+    "apply": true,
+    "lod": true
+  }
+}

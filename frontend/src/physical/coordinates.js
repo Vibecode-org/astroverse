@@ -27,3 +27,50 @@ export function verifiedRows(frame) { return physicalFrame(frame).rows; }
 export function physicalOffset(render) {
   return [render.x * KM_PER_RENDER_UNIT, -render.z * KM_PER_RENDER_UNIT, render.y * KM_PER_RENDER_UNIT];
 }
+
+export function relativeToReference(row, hierarchy, reference) {
+  const path = hierarchy?.path(row.id), base = reference.path;
+  // Subtract each chart component before summing, including across time/address
+  // changes. This retains supplied sub-ULP local offsets at large common origins.
+  return [0,1,2].map(a => (path && base
+    ? (path[0].origin_km[a]-base[0].origin_km[a])
+      +(path[1].offset_km[a]-base[1].offset_km[a])
+      +(path[2].offset_km[a]-base[2].offset_km[a])
+    : row.position[a]-reference.position[a])-reference.offset[a]);
+}
+
+// Large flat synthetic frames use the same contract, filtering in cancellable
+// slices. Hierarchical production frames retain their stricter bounded decoder.
+export async function physicalFrameAsync(frame, check, onSlice, centerId) {
+  if (frame.hierarchy !== undefined || frame.objects.length <= 4096) return physicalFrame(frame);
+  physicalFrame({...frame,objects:[]});
+  const rows=[];let centerPosition=null;
+  for(let offset=0;offset<frame.objects.length;){
+    await yieldPhysicalWork();check();
+    const start=performance.now();let count=0;
+    while(offset<frame.objects.length && count++<500 && performance.now()-start<2){
+      const row=frame.objects[offset++];
+      if(row.id===centerId)centerPosition=row.position;
+      if(row.status==='computed' && Array.isArray(row.position) && row.position.length===3 && row.position.every(Number.isFinite))rows.push(row);
+    }
+    onSlice?.(performance.now()-start);
+  }
+  check();return {rows,hierarchy:null,centerPosition};
+}
+
+// All manager/renderer continuations share a 2ms wall-time allowance between
+// RAFs. scheduler.yield alone can saturate the task queue during continuous
+// updates. Each operation remains bounded; this gate limits the aggregate duty.
+let workDeadline=0;
+export const yieldPhysicalWork = () => {
+  if(!globalThis.scheduler?.yield || !globalThis.requestAnimationFrame)
+    return new Promise(resolve=>setTimeout(resolve,0));
+  if(performance.now()<workDeadline)return globalThis.scheduler.yield();
+  return new Promise(resolve=>{
+    let raf,timer;
+    const resume=()=>{clearTimeout(timer);cancelAnimationFrame(raf);workDeadline=performance.now()+2;resolve();};
+    raf=requestAnimationFrame(resume);
+    // Hidden tabs must still drain cancelled staging/workers.
+    timer=setTimeout(resume,32);
+  });
+};

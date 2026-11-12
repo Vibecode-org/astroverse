@@ -1,0 +1,531 @@
+{
+  "action_timing_includes_readonly_diagnostics": true,
+  "marker_footprints": "5px L0 / 15px L1 overlap densely; pixel_center_collisions counts centers only, not marker footprint pairs",
+  "complete": true,
+  "hardware_criterion_passed": false,
+  "checks": [
+    "100000 identities, known centers, submitted and in frustum via ordinary page load",
+    "search/card selection across sector boundaries and exact overlapping centers",
+    "manual/Now/acceleration/reverse; permanent partial failure clears; revision conflict retries atomically",
+    "three trusted yaw/pitch/roll/move/refocus/overview cycles, stable renderer/resources/listeners"
+  ],
+  "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
+  "cold_interactive_ms": 3172.7000000178814,
+  "initial": {
+    "resident": 100000,
+    "computed": 100000,
+    "submitted": 100000,
+    "allocated_slots": 100000,
+    "in_frustum": 100000,
+    "numeric": 100000,
+    "identities": 100000,
+    "pixel_center_collisions": 1,
+    "hidden_by_policy": 0,
+    "raster_occlusion": "marker footprints overlap; centers counted separately",
+    "lod0": 100000,
+    "lod1": 0,
+    "calls": 1,
+    "stats": {
+      "applyMs": 0.5999999940395355,
+      "maxApplyMs": 1.899999976158142,
+      "lodMs": 0.09999999403953552,
+      "maxLodMs": 0.19999998807907104,
+      "visited": 128,
+      "pickMs": 0,
+      "prepareMs": 1165.199999988079,
+      "sliceMaxMs": 3.0999999940395355,
+      "slots": 100000,
+      "capacity": 131072,
+      "bufferBytes": 3670016,
+      "detailed": 0
+    },
+    "memory": {
+      "geometries": 1,
+      "textures": 0
+    },
+    "heap": {
+      "used": 77775390,
+      "total": 123585322
+    },
+    "manager": {
+      "requests": 234,
+      "active": 0,
+      "peakActive": 4,
+      "responseBytes": 27320760,
+      "retries": 0,
+      "conflicts": 0,
+      "evictions": 1,
+      "peakQueue": 100,
+      "peakPending": 100,
+      "peakObjects": 129000,
+      "peakSerialized": 19382994,
+      "peakDecoded": 206800528,
+      "clientId": "2d29c763-0941-4974-8773-91f1fdb2fdb2",
+      "generation": 5,
+      "queue": 0,
+      "pending": 0,
+      "residentObjects": 100000,
+      "objects": 100000,
+      "serialized": 12132070,
+      "decoded": 148670256
+    },
+    "listeners": 28,
+    "sameRenderer": true,
+    "framebuffer": [
+      1920,
+      1080
+    ],
+    "dpr": 1,
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "cores": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    }
+  },
+  "steady": {
+    "frame": {
+      "n": 186,
+      "p50": 16.69999999999891,
+      "p95": 16.799999999999272,
+      "p99": 16.80000000000109,
+      "max": 16.80000000000109,
+      "over50ms": 0,
+      "fraction_60hz": 0.3924731182795699
+    },
+    "camera": {
+      "n": 193,
+      "p50": 0,
+      "p95": 0.09999999403953552,
+      "p99": 0.19999998807907104,
+      "max": 0.20000001788139343,
+      "over50ms": 0,
+      "fraction_60hz": 1.0
+    },
+    "lod": {
+      "n": 193,
+      "p50": 0.09999999403953552,
+      "p95": 0.20000001788139343,
+      "p99": 0.30000001192092896,
+      "max": 0.7000000178813934,
+      "over50ms": 0,
+      "fraction_60hz": 1.0
+    },
+    "apply": null,
+    "pick": null,
+    "commit": null,
+    "preparation_wall": null,
+    "preparation_slice_max": null
+  },
+  "steady_seconds": 3,
+  "warmup_seconds": 3,
+  "actions_start": 13380.200000017881,
+  "cycles": [
+    {
+      "resident": 100000,
+      "computed": 100000,
+      "submitted": 100000,
+      "allocated_slots": 100000,
+      "in_frustum": 100000,
+      "numeric": 100000,
+      "identities": 100000,
+      "pixel_center_collisions": 1,
+      "hidden_by_policy": 0,
+      "raster_occlusion": "marker footprints overlap; centers counted separately",
+      "lod0": 99999,
+      "lod1": 1,
+      "calls": 1,
+      "stats": {
+        "applyMs": 0.19999998807907104,
+        "maxApplyMs": 1.899999976158142,
+        "lodMs": 0.10000002384185791,
+        "maxLodMs": 1.399999976158142,
+        "visited": 128,
+        "pickMs": 0,
+        "prepareMs": 1181.699999988079,
+        "sliceMaxMs": 2.9000000059604645,
+        "slots": 100000,
+        "capacity": 131072,
+        "bufferBytes": 3670016,
+        "detailed": 1
+      },
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      },
+      "heap": {
+        "used": 67122365,
+        "total": 131129137
+      },
+      "manager": {
+        "requests": 1314,
+        "active": 0,
+        "peakActive": 4,
+        "responseBytes": 152673776,
+        "retries": 0,
+        "conflicts": 0,
+        "evictions": 11,
+        "peakQueue": 100,
+        "peakPending": 100,
+        "peakObjects": 129000,
+        "peakSerialized": 19382994,
+        "peakDecoded": 206800528,
+        "clientId": "2d29c763-0941-4974-8773-91f1fdb2fdb2",
+        "generation": 48,
+        "queue": 0,
+        "pending": 0,
+        "residentObjects": 100000,
+        "objects": 100000,
+        "serialized": 12132070,
+        "decoded": 148670256
+      },
+      "listeners": 28,
+      "sameRenderer": true,
+      "framebuffer": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+        "cores": 10,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+      }
+    },
+    {
+      "resident": 100000,
+      "computed": 100000,
+      "submitted": 100000,
+      "allocated_slots": 100000,
+      "in_frustum": 100000,
+      "numeric": 100000,
+      "identities": 100000,
+      "pixel_center_collisions": 1,
+      "hidden_by_policy": 0,
+      "raster_occlusion": "marker footprints overlap; centers counted separately",
+      "lod0": 99999,
+      "lod1": 1,
+      "calls": 1,
+      "stats": {
+        "applyMs": 0.5,
+        "maxApplyMs": 1.899999976158142,
+        "lodMs": 0.10000002384185791,
+        "maxLodMs": 1.399999976158142,
+        "visited": 128,
+        "pickMs": 0,
+        "prepareMs": 1297.5999999940395,
+        "sliceMaxMs": 2.7000000178813934,
+        "slots": 100000,
+        "capacity": 131072,
+        "bufferBytes": 3670016,
+        "detailed": 1
+      },
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      },
+      "heap": {
+        "used": 85601856,
+        "total": 151987968
+      },
+      "manager": {
+        "requests": 1647,
+        "active": 0,
+        "peakActive": 4,
+        "responseBytes": 189087901,
+        "retries": 0,
+        "conflicts": 0,
+        "evictions": 19,
+        "peakQueue": 100,
+        "peakPending": 100,
+        "peakObjects": 129000,
+        "peakSerialized": 19382994,
+        "peakDecoded": 206800528,
+        "clientId": "2d29c763-0941-4974-8773-91f1fdb2fdb2",
+        "generation": 73,
+        "queue": 0,
+        "pending": 0,
+        "residentObjects": 100000,
+        "objects": 100000,
+        "serialized": 12132070,
+        "decoded": 148670256
+      },
+      "listeners": 28,
+      "sameRenderer": true,
+      "framebuffer": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+        "cores": 10,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+      }
+    },
+    {
+      "resident": 100000,
+      "computed": 100000,
+      "submitted": 100000,
+      "allocated_slots": 100000,
+      "in_frustum": 100000,
+      "numeric": 100000,
+      "identities": 100000,
+      "pixel_center_collisions": 1,
+      "hidden_by_policy": 0,
+      "raster_occlusion": "marker footprints overlap; centers counted separately",
+      "lod0": 99999,
+      "lod1": 1,
+      "calls": 1,
+      "stats": {
+        "applyMs": 0.5,
+        "maxApplyMs": 1.899999976158142,
+        "lodMs": 0.10000002384185791,
+        "maxLodMs": 1.399999976158142,
+        "visited": 128,
+        "pickMs": 0,
+        "prepareMs": 1316.7000000178814,
+        "sliceMaxMs": 2.4000000059604645,
+        "slots": 100000,
+        "capacity": 131072,
+        "bufferBytes": 3670016,
+        "detailed": 1
+      },
+      "memory": {
+        "geometries": 1,
+        "textures": 0
+      },
+      "heap": {
+        "used": 64489548,
+        "total": 130124996
+      },
+      "manager": {
+        "requests": 1980,
+        "active": 0,
+        "peakActive": 4,
+        "responseBytes": 225502026,
+        "retries": 0,
+        "conflicts": 0,
+        "evictions": 27,
+        "peakQueue": 100,
+        "peakPending": 100,
+        "peakObjects": 129000,
+        "peakSerialized": 19382994,
+        "peakDecoded": 206800528,
+        "clientId": "2d29c763-0941-4974-8773-91f1fdb2fdb2",
+        "generation": 98,
+        "queue": 0,
+        "pending": 0,
+        "residentObjects": 100000,
+        "objects": 100000,
+        "serialized": 12132070,
+        "decoded": 148670256
+      },
+      "listeners": 28,
+      "sameRenderer": true,
+      "framebuffer": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+        "cores": 10,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+      }
+    }
+  ],
+  "displayed_time_progress": [
+    {
+      "mode": "\u0421\u0435\u0439\u0447\u0430\u0441",
+      "from": "2026-11-12T13:43:16.398000+00:00",
+      "to": "2026-11-12T13:43:19.390000+00:00"
+    },
+    {
+      "mode": "\u0423\u0441\u043a\u043e\u0440\u0438\u0442\u044c",
+      "from": "2026-11-12T13:43:22.837000+00:00",
+      "to": "2026-11-12T13:46:10.638000+00:00"
+    },
+    {
+      "mode": "\u27f2",
+      "from": "2026-11-12T13:49:49.626000+00:00",
+      "to": "2026-11-12T13:47:20.064000+00:00"
+    }
+  ],
+  "actions": {
+    "frame": {
+      "n": 5218,
+      "p50": 16.69999999999709,
+      "p95": 16.70000000001164,
+      "p99": 16.80000000000291,
+      "max": 266.70000000000437,
+      "over50ms": 6,
+      "fraction_60hz": 0.3779225756995017
+    },
+    "camera": {
+      "n": 5224,
+      "p50": 0,
+      "p95": 0.10000002384185791,
+      "p99": 0.19999998807907104,
+      "max": 0.7000000178813934,
+      "over50ms": 0,
+      "fraction_60hz": 1.0
+    },
+    "lod": {
+      "n": 5224,
+      "p50": 0,
+      "p95": 0.10000002384185791,
+      "p99": 0.20000001788139343,
+      "max": 1.399999976158142,
+      "over50ms": 0,
+      "fraction_60hz": 1.0
+    },
+    "apply": {
+      "n": 61,
+      "p50": 0.09999999403953552,
+      "p95": 0.19999998807907104,
+      "p99": 0.4000000059604645,
+      "max": 0.4000000059604645,
+      "over50ms": 0,
+      "fraction_60hz": 1.0
+    },
+    "pick": {
+      "n": 4,
+      "p50": 0,
+      "p95": 3.300000011920929,
+      "p99": 3.300000011920929,
+      "max": 3.300000011920929,
+      "over50ms": 0,
+      "fraction_60hz": 1.0
+    },
+    "commit": {
+      "n": 25,
+      "p50": 0.5,
+      "p95": 1,
+      "p99": 1.0999999940395355,
+      "max": 1.0999999940395355,
+      "over50ms": 0,
+      "fraction_60hz": 1.0
+    },
+    "preparation_wall": {
+      "n": 25,
+      "p50": 1297.5999999940395,
+      "p95": 1598.0999999940395,
+      "p99": 1655.5,
+      "max": 1655.5,
+      "over50ms": 25,
+      "fraction_60hz": 0.0
+    },
+    "preparation_slice_max": {
+      "n": 25,
+      "p50": 2.7000000178813934,
+      "p95": 3.9000000059604645,
+      "p99": 6,
+      "max": 6,
+      "over50ms": 0,
+      "fraction_60hz": 1.0
+    }
+  },
+  "final": {
+    "resident": 100000,
+    "computed": 100000,
+    "submitted": 100000,
+    "allocated_slots": 100000,
+    "in_frustum": 100000,
+    "numeric": 100000,
+    "identities": 100000,
+    "pixel_center_collisions": 1,
+    "hidden_by_policy": 0,
+    "raster_occlusion": "marker footprints overlap; centers counted separately",
+    "lod0": 99999,
+    "lod1": 1,
+    "calls": 1,
+    "stats": {
+      "applyMs": 0.800000011920929,
+      "maxApplyMs": 1.899999976158142,
+      "lodMs": 0,
+      "maxLodMs": 1.399999976158142,
+      "visited": 128,
+      "pickMs": 0,
+      "prepareMs": 1500.4000000059605,
+      "sliceMaxMs": 3.5999999940395355,
+      "slots": 100000,
+      "capacity": 131072,
+      "bufferBytes": 3670016,
+      "detailed": 1
+    },
+    "memory": {
+      "geometries": 1,
+      "textures": 0
+    },
+    "heap": {
+      "used": 92428873,
+      "total": 171722997
+    },
+    "manager": {
+      "requests": 3078,
+      "active": 0,
+      "peakActive": 4,
+      "responseBytes": 354228635,
+      "retries": 0,
+      "conflicts": 1,
+      "evictions": 36,
+      "peakQueue": 100,
+      "peakPending": 100,
+      "peakObjects": 200000,
+      "peakSerialized": 27974499,
+      "peakDecoded": 297339704,
+      "clientId": "2d29c763-0941-4974-8773-91f1fdb2fdb2",
+      "generation": 115,
+      "queue": 0,
+      "pending": 0,
+      "residentObjects": 100000,
+      "objects": 100000,
+      "serialized": 12131161,
+      "decoded": 148662984
+    },
+    "listeners": 28,
+    "sameRenderer": true,
+    "framebuffer": [
+      1920,
+      1080
+    ],
+    "dpr": 1,
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "cores": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    }
+  },
+  "rebase_proof": [
+    {
+      "max_css_px": 0,
+      "bitwise_centers": true
+    },
+    {
+      "max_css_px": 0,
+      "bitwise_centers": true
+    },
+    {
+      "max_css_px": 0,
+      "bitwise_centers": true
+    }
+  ],
+  "provider": {
+    "requests": 6519,
+    "active": 0,
+    "peak_active": 4,
+    "bytes": 743110358,
+    "max_bytes": 122062,
+    "statuses": {
+      "200": 6514,
+      "409": 4,
+      "422": 1
+    },
+    "total_ms": 141199.29140801,
+    "max_ms": 102.85512500013283,
+    "provider_rss_kib": 140840,
+    "builder": "none; generated per bounded request"
+  },
+  "errors": [],
+  "hardware_renderer": true
+}

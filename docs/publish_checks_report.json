@@ -1,0 +1,37 @@
+[
+  {
+    "label": "s100k_functional",
+    "exit_code": 0,
+    "seconds": 112.68392345801112
+  },
+  {
+    "label": "s100k_rebase",
+    "exit_code": 0,
+    "seconds": 10.084015917003853
+  },
+  {
+    "label": "fixture_down",
+    "exit_code": 0,
+    "seconds": 0.7304137090104632
+  },
+  {
+    "label": "ordinary_restore",
+    "exit_code": 0,
+    "seconds": 8.24032654101029
+  },
+  {
+    "label": "navigation",
+    "exit_code": 0,
+    "seconds": 49.64915970800212
+  },
+  {
+    "label": "navigation_regions",
+    "exit_code": 0,
+    "seconds": 86.40052037499845
+  },
+  {
+    "label": "depth",
+    "exit_code": 0,
+    "seconds": 14.400426791980863
+  }
+]

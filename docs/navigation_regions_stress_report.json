@@ -1,0 +1,42 @@
+{
+  "complete": true,
+  "checks": [
+    "Earth local view submits all five computed centers with exact HTTP vectors",
+    "Three trusted Mercury zoom/flight/rotation/motion/exit/reentry/refocus cycles preserve centers and resources"
+  ],
+  "cycles": [
+    {
+      "wheels": 14,
+      "handoff_radius_km": 439691778.2187971,
+      "handoff_jump_km": 0.0,
+      "travel_km": 33330.00000000033,
+      "rebases": 1
+    },
+    {
+      "wheels": 14,
+      "handoff_radius_km": 439691778.2187971,
+      "handoff_jump_km": 0.0,
+      "travel_km": 31669.99999999857,
+      "rebases": 2
+    },
+    {
+      "wheels": 14,
+      "handoff_radius_km": 439691778.2187971,
+      "handoff_jump_km": 0.0,
+      "travel_km": 36669.99999998568,
+      "rebases": 3
+    }
+  ],
+  "tolerance_km": 1e-06,
+  "environment": "Chrome / SwiftShader; functional, no fps claim",
+  "earth": {
+    "submitted": 5,
+    "resident_ids": [
+      "sun",
+      "earth",
+      "moon",
+      "mercury",
+      "venus"
+    ]
+  }
+}

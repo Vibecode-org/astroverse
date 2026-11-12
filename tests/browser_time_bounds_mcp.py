@@ -31,7 +31,7 @@ def run(catalog):
         date(stop.isoformat()[:19])
         m.wait("document.querySelector('[role=status] [role=alert]')?.textContent.includes('UTC date outside')")
         assert m.evaluate(PROBE)['rows']==[]
-        m.click('Сейчас');m.wait('('+PROBE+')()?.rows.length===2')
+        m.click('Сейчас');m.wait('('+PROBE+')()?.rows.length===5')
         final=m.evaluate(PROBE)
         assert (final['canvasCount'],final['geometries'],final['textures'])==(1,1,0)
         assert m.evaluate('()=>window.__boundsErrors')==[]

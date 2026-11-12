@@ -6,6 +6,7 @@ services:
     restart: unless-stopped
     environment:
       ASTROVERSE_CATALOG_MODE: ${ASTROVERSE_CATALOG_MODE:-offline}
+      ASTROVERSE_SECTOR_PATH: ${ASTROVERSE_SECTOR_PATH:-}
       ASTROVERSE_CATALOG_PATH: ${ASTROVERSE_CATALOG_PATH:-}
       ASTROVERSE_CORS_ORIGINS: ${ASTROVERSE_CORS_ORIGINS:-}
     healthcheck:

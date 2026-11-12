@@ -123,13 +123,18 @@ def search():
 
 
 @app.get('/api/positions/v1/nearby')
-async def nearby(at: str, anchor: str, dx: float, dy: float, dz: float, radius: float):
+async def nearby(at: str, anchor: str, dx: float, dy: float, dz: float, radius: float,
+                 ox: float | None = None, oy: float | None = None, oz: float | None = None):
     result = metadata(at)
     if any(not math.isfinite(v) for v in [dx,dy,dz,radius]) or radius < 0:
         raise HTTPException(422,'Invalid synthetic area')
     await asyncio.sleep(state['delay']/1000)
     anchor_number = int(anchor.split('-')[1]) if anchor.startswith('synthetic-') else None
     center = [dx+(anchor_number//64*6000000+(anchor_number%64)*1000 if anchor_number is not None else 0),dy,dz]
+    if any(v is not None for v in (ox,oy,oz)):
+        if any(v is None or not math.isfinite(v) for v in (ox,oy,oz)):
+            raise HTTPException(422,'Incomplete fixed origin')
+        center = [ox+dx,oy+dy,oz+dz]
     result['sectors'] = []
     if anchor_number is not None:
         for number in range(32):

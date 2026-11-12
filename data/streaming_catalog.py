@@ -10,6 +10,7 @@ import math
 from pathlib import Path
 import sqlite3
 import tempfile
+import time
 
 import ijson
 
@@ -33,30 +34,39 @@ def iter_catalog(source):
         stream.seek(0)
         try:
             for obj in ijson.items(stream,'item',use_float=True):
-                if isinstance(obj,dict) and obj.get('ra') == 24 and not isinstance(obj.get('ra'),bool):
-                    obj['ra'] = 0.0
-                # Validate local fields using the existing contract. Graph checks
-                # are separate SQL operations after all objects have arrived.
-                local = dict(obj) if isinstance(obj,dict) else obj
-                if isinstance(local,dict):
-                    local.pop('parent',None)
-                validate_catalog([local])
-                if obj.get('parent') is not None and (not isinstance(obj['parent'],str) or obj['parent']==obj['id']):
-                    raise ValueError('invalid parent')
-                snapshot_coordinates(obj)
+                obj = validate_record(obj)
                 yield obj
         except ijson.JSONError as exc:
             raise ValueError('invalid catalog JSON') from exc
 
 
+def validate_record(obj):
+    """Same local contract for JSON, generators and source adapters."""
+    if isinstance(obj, dict):
+        obj = dict(obj)
+        if obj.get('ra') == 24 and not isinstance(obj.get('ra'), bool):
+            obj['ra'] = 0.0
+        local = dict(obj)
+        local.pop('parent', None)
+    else:
+        local = obj
+    validate_catalog([local])
+    if obj.get('parent') is not None and (not isinstance(obj['parent'], str) or obj['parent'] == obj['id']):
+        raise ValueError('invalid parent')
+    snapshot_coordinates(obj)
+    return obj
+
+
 def build_streaming_index(path, source, *, cell_size_ly=32.0, max_objects=4096,
-                          max_depth=16, source_signature=None, objects=None, previous_path=None, parent_revision=None):
+                          max_depth=16, source_signature=None, objects=None, previous_path=None, parent_revision=None, manifest=None, metrics=None):
     if (isinstance(cell_size_ly,bool) or not isinstance(cell_size_ly,(int,float))
             or not math.isfinite(cell_size_ly) or not 0<cell_size_ly<=MAX_BOUND_LY
             or type(max_objects) is not int or max_objects<1
             or type(max_depth) is not int or not 0<=max_depth<=32
             or cell_size_ly/(1<<max_depth)==0):
         raise ValueError('invalid partition configuration')
+    started = time.perf_counter()
+    metrics = metrics if metrics is not None else {}
     cell_size_ly = float(cell_size_ly)
     path = Path(path)
     source = Path(source) if source is not None else None
@@ -85,6 +95,7 @@ def build_streaming_index(path, source, *, cell_size_ly=32.0, max_objects=4096,
             count = 0
             try:
                 for ordinal,obj in enumerate(iter_catalog(source) if objects is None else objects):
+                    obj = validate_record(obj)
                     payload = _canonical(obj)
                     digest.update(payload.encode()); digest.update(b'\n')
                     db.execute('INSERT INTO input VALUES (?,?,?,?,?,?,NULL)',
@@ -92,6 +103,8 @@ def build_streaming_index(path, source, *, cell_size_ly=32.0, max_objects=4096,
                     count += 1
             except sqlite3.IntegrityError as exc:
                 raise ValueError('duplicate catalog ID') from exc
+            loaded = time.perf_counter()
+            metrics['read_normalize_seconds'] = loaded-started
             if db.execute('SELECT 1 FROM input i LEFT JOIN input p ON p.id=i.parent WHERE i.parent IS NOT NULL AND p.id IS NULL LIMIT 1').fetchone():
                 raise ValueError('unknown parent')
             db.execute('''WITH RECURSIVE tree(id,root) AS (
@@ -168,11 +181,18 @@ def build_streaming_index(path, source, *, cell_size_ly=32.0, max_objects=4096,
             for sid,scale,frame in db.execute('SELECT * FROM cells ORDER BY sid'):
                 lower = None if frame in ('system','unlocated') else [int(v)*cell_size_ly for v in sid.split(':')[2:]]
                 partition(sid,scale,frame,lower,cell_size_ly,0)
+            indexed = time.perf_counter()
+            metrics['index_seconds'] = indexed-loaded
             write_representations(db)
+            metrics['legacy_seconds'] = time.perf_counter()-indexed
+            metrics['legacy_bytes'] = dict(db.execute('SELECT name,length(data) FROM representations'))
             metadata = {'schema_version':SCHEMA_VERSION,'unit':'ly','cell_size_ly':cell_size_ly,
                         'max_objects':max_objects,'max_depth':max_depth,'object_count':count,
                         'catalog_revision':digest.hexdigest(),'coordinates':coordinate_contract(),
                         'source_signature':source_signature,'builder':BUILDER_VERSION,'reused_sectors':reused_sectors}
+            if manifest is not None:
+                manifest['semantic_revision'] = metadata['catalog_revision']
+                metadata['import_manifest'] = manifest
             if parent_revision is not None:
                 metadata['parent_revision'] = parent_revision
             db.executemany('INSERT INTO metadata VALUES (?,?)',((k,json.dumps(v)) for k,v in metadata.items()))
@@ -180,6 +200,8 @@ def build_streaming_index(path, source, *, cell_size_ly=32.0, max_objects=4096,
             db.commit()
             if previous_path is not None:
                 db.execute('DETACH DATABASE previous')
+            compact = time.perf_counter()
             db.execute('VACUUM')
+            metrics['compact_seconds'] = time.perf_counter()-compact
         temporary.replace(path)
     return metadata

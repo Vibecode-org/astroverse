@@ -1,13 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 
-import { PhysicalSectorManager } from './sectorManager.js';
+import { PhysicalSectorManager, S100K_LIMITS } from './sectorManager.js';
 
-export function useVerifiedFrame(simDate, neighborhood = null, anchor = 'earth', { continuous = false, generation = 0 } = {}) {
+export function useVerifiedFrame(simDate, neighborhood = null, anchor = 'earth', { continuous = false, generation = 0, profile = null, presentedFrame = null } = {}) {
   const manager = useRef(null);
-  if (!manager.current) manager.current = new PhysicalSectorManager();
+  if (!manager.current) manager.current = new PhysicalSectorManager({limits:profile === 'synthetic-s100k' ? S100K_LIMITS : {}});
+  useEffect(() => {manager.current.cancel(); manager.current = new PhysicalSectorManager({limits:profile === 'synthetic-s100k' ? S100K_LIMITS : {}});}, [profile]);
   const milliseconds = simDate.getTime();
   const neighborhoodKey = JSON.stringify(neighborhood);
-  const contextKey = JSON.stringify([neighborhoodKey, anchor, continuous, generation]);
+  const contextKey = JSON.stringify([neighborhoodKey, anchor, continuous, generation, profile]);
   const [state, setState] = useState({ requested:null, frame:null, error:null });
   const [admitted, setAdmitted] = useState({ contextKey, milliseconds });
   const requestedMilliseconds = continuous && admitted.contextKey === contextKey ? admitted.milliseconds : milliseconds;
@@ -16,9 +17,12 @@ export function useVerifiedFrame(simDate, neighborhood = null, anchor = 'earth',
   // One in-flight selection and one latest desired instant. Clock ticks do not
   // cancel useful work; explicit controls/context changes start a new generation.
   useEffect(() => {
+    // Large frames have asynchronous staging. Do not outrun/cancel every
+    // preparation when HTTP is faster than the renderer's bounded work.
+    if (state.frame?.objects?.length > 4096 && state.frame !== presentedFrame) return;
     if (continuous && !state.permanent && state.contextKey === contextKey && state.requested === requestedMilliseconds
         && milliseconds !== requestedMilliseconds) setAdmitted({contextKey, milliseconds});
-  }, [milliseconds, state, continuous, contextKey, requestedMilliseconds]);
+  }, [milliseconds, state, continuous, contextKey, requestedMilliseconds, presentedFrame]);
   useEffect(() => {
     let cancelled = false;
     const controller = new AbortController();

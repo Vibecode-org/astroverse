@@ -3,6 +3,15 @@ import * as THREE from 'three';
 import { createPhysicalLayer, LOD_LIMITS } from '../src/physical/physicalLayer.js';
 const frame=n=>({version:'positions/1',jd_tdb:2451545,coordinates:{representation:'simulation_position',unit:'km',reference_system:'ICRF',origin:'solar_system_barycenter',time_scale:'TDB',corrections:'NONE'},objects:Array.from({length:n},(_,i)=>({id:String(i),status:'computed',position:[i*100,0,0]}))});
 const camera=z=>{const c=new THREE.PerspectiveCamera(50,1,.01,10000);c.position.z=z;c.lookAt(0,0,0);c.updateMatrixWorld();return c;};
+it('picks the visible nearer center at overlapping projections independent of load order',()=>{
+ const layer=createPhysicalLayer(new THREE.Scene()),c=camera(0);c.far=1e12;c.near=1e-5;c.updateProjectionMatrix();
+ const near={id:'near',status:'computed',position:[0,1e9,0]},far={id:'far',status:'computed',position:[0,2e9,0]};
+ for(const objects of [[far,near],[near,far]]){
+  layer.update({...frame(0),objects},'missing',true);
+  expect(layer.pick(c,300,300,600,600)).toBe('near');
+ }
+ layer.dispose();
+});
 it('bounds work and detail, prioritizes selection, preserves all centers and reuses stable slots',()=>{
  const scene=new THREE.Scene(),layer=createPhysicalLayer(scene),f=frame(4096),raw=JSON.stringify(f);
  layer.update(f,'0',true);const before=layer.inspect(),c=camera(10);

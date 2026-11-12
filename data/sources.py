@@ -8,9 +8,9 @@ import urllib.request
 from typing import Any, Dict, List, Optional
 
 try:
-    from data.normalizers import SourceError, coordinates, make_object, measurement
+    from data.normalizers import SourceError, coordinates, make_object, measurement, small_body_name
 except ImportError:
-    from normalizers import SourceError, coordinates, make_object, measurement
+    from normalizers import SourceError, coordinates, make_object, measurement, small_body_name
 
 
 class JsonClient:
@@ -117,7 +117,6 @@ def fetch_small_bodies(
     limit: int,
 ) -> List[Dict[str, Any]]:
     """Fetch asteroids or comets from JPL SBDB."""
-    import re
     source = config["sources"]["asteroids" if kind == "asteroid" else "comets"]
     fields = ["full_name", "pdes", "a", "per", "diameter"]
     payload = client.get(source["url"], {
@@ -140,10 +139,7 @@ def fetch_small_bodies(
             raise SourceError("JPL SBDB row is missing name/designation")
 
         full_name = row["full_name"].strip()
-        name = re.sub(r"\s+\([^)]*\)$", "", full_name)
-        if re.fullmatch(r"\d+", name):
-            name = full_name
-        name = re.sub(r"[()]", "", name).strip()
+        name = small_body_name(full_name)
 
         item = make_object(kind, name, "solar", config, identities)
         diameter = measurement(row["diameter"], positive=True)

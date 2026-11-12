@@ -1,0 +1,2064 @@
+{
+  "complete": true,
+  "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
+  "hardware_display_acceptance": false,
+  "method": "headless RAF timestamps, no monitor presentation or GPU fence; bounded 20000 samples per metric/window; no full probes inside windows",
+  "source_sha256": {
+    "frontend/src/physical/sectorManager.js": "3f52ad2690aabda04e239395d03e41ed4571d6ea87cca31ddd9c6071eca9ffb9",
+    "frontend/src/physical/flight.js": "967bf2b27a327e2e2f4d39a809287e74dc2ba4687d1d278cda1857d021fa5d76",
+    "frontend/src/physical/hierarchy.js": "2d14cb8325e9d244f77c1153251a313321e0ff09162080684e196aef1a08e036",
+    "frontend/src/physical/PhysicalApp.jsx": "554a0a8aefedcdf1751fe802fef358dfb45c1f5a1db582c61e9b3cdc6d8962d5",
+    "frontend/src/physical/physicalLayer.js": "f2f38a9f27bd45a67ce714237b2f8c693cb0a143763516b5719f8b3db725f6b3",
+    "frontend/src/physical/coordinates.js": "05a89edf381735398d7dda891b7498ade28e0cd6aea1725a4a22d6d2451d6277",
+    "frontend/src/physical/useVerifiedFrame.js": "8573870a108bbe0409dbfa57e92aad00d08787c52e8e912f75b9ca09f4312278",
+    "frontend/src/physical/PhysicalScene.jsx": "ee1f17fa19486115dae38567e257d3fe2e7b1548bebf5cf7c7e5916f20484067"
+  },
+  "windows": {
+    "steady": {
+      "duration_s": 10.109847583982628,
+      "warmup_s": 3,
+      "metrics": {
+        "camera_cpu": {
+          "n": 607,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.3999999761581421,
+          "max": 1.100000023841858,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod_cpu": {
+          "n": 607,
+          "p50": 0.09999999403953552,
+          "p95": 0.20000001788139343,
+          "p99": 0.30000001192092896,
+          "max": 2,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "render_submission_cpu": {
+          "n": 607,
+          "p50": 0.10000002384185791,
+          "p95": 0.4000000059604645,
+          "p99": 0.7000000178813934,
+          "max": 1.9000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "frame": {
+          "n": 606,
+          "p50": 16.69999999999891,
+          "p95": 16.799999999999272,
+          "p99": 16.80000000000109,
+          "max": 16.80000000000291,
+          "over50ms": 0,
+          "fraction_60hz": 0.3927392739273927
+        }
+      },
+      "pause_durations_ms": [],
+      "bounded_counters": {
+        "manager": {
+          "requests": 232,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 27076687,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 1,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 127000,
+          "peakSerialized": 19138921,
+          "peakDecoded": 204839752,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 5,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "layer": {
+          "applyMs": 0.5999999940395355,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0.10000002384185791,
+          "maxLodMs": 4.199999988079071,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 1282.9000000059605,
+          "sliceMaxMs": 3,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 0
+        },
+        "submitted": 100000,
+        "calls": 1,
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "rebases": 0,
+        "displayed": "2026-11-12T13:38:55.770000+00:00"
+      },
+      "outside_window_full_check": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 100000,
+        "lod1": 0,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.5999999940395355,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 4.199999988079071,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 1282.9000000059605,
+          "sliceMaxMs": 3,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 0
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 91049226,
+          "total": 139052154
+        },
+        "manager": {
+          "requests": 232,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 27076687,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 1,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 127000,
+          "peakSerialized": 19138921,
+          "peakDecoded": 204839752,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 5,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "listeners": 26,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      }
+    },
+    "picking": {
+      "duration_s": 12.302623417024733,
+      "warmup_s": 1,
+      "metrics": {
+        "camera_cpu": {
+          "n": 738,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.20000001788139343,
+          "max": 0.699999988079071,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod_cpu": {
+          "n": 738,
+          "p50": 0.09999999403953552,
+          "p95": 0.20000001788139343,
+          "p99": 0.4000000059604645,
+          "max": 1.9000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "render_submission_cpu": {
+          "n": 738,
+          "p50": 0.09999999403953552,
+          "p95": 0.30000001192092896,
+          "p99": 0.5,
+          "max": 4.600000023841858,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "frame": {
+          "n": 737,
+          "p50": 16.69999999999709,
+          "p95": 16.799999999995634,
+          "p99": 16.80000000000291,
+          "max": 16.80000000000291,
+          "over50ms": 0,
+          "fraction_60hz": 0.39077340569877883
+        },
+        "picking_cpu": {
+          "n": 20,
+          "p50": 0,
+          "p95": 1.699999988079071,
+          "p99": 2.800000011920929,
+          "max": 2.800000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "decode_cpu": {
+          "n": 101,
+          "p50": 0.20000001788139343,
+          "p95": 0.30000001192092896,
+          "p99": 0.4000000059604645,
+          "max": 0.4000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "validation_cpu": {
+          "n": 101,
+          "p50": 0.20000001788139343,
+          "p95": 0.30000001192092896,
+          "p99": 0.4000000059604645,
+          "max": 0.4000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_slice_cpu": {
+          "n": 200,
+          "p50": 0.09999999403953552,
+          "p95": 0.20000001788139343,
+          "p99": 0.20000001788139343,
+          "max": 0.5,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_elapsed": {
+          "n": 1,
+          "p50": 200.7000000178814,
+          "p95": 200.7000000178814,
+          "p99": 200.7000000178814,
+          "max": 200.7000000178814,
+          "over50ms": 1,
+          "fraction_60hz": 0.0
+        },
+        "selection_elapsed": {
+          "n": 1,
+          "p50": 1351.300000011921,
+          "p95": 1351.300000011921,
+          "p99": 1351.300000011921,
+          "max": 1351.300000011921,
+          "over50ms": 1,
+          "fraction_60hz": 0.0
+        },
+        "prepare_prelude_cpu": {
+          "n": 2,
+          "p50": 0.10000002384185791,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.10000002384185791,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "preparation_slice_cpu": {
+          "n": 1182,
+          "p50": 0.09999999403953552,
+          "p95": 0.4000000059604645,
+          "p99": 0.699999988079071,
+          "max": 1.9000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "commit_cpu": {
+          "n": 2,
+          "p50": 0.5,
+          "p95": 0.5,
+          "p99": 0.5,
+          "max": 0.5,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "prepare_elapsed": {
+          "n": 2,
+          "p50": 939.5999999940395,
+          "p95": 939.5999999940395,
+          "p99": 939.5999999940395,
+          "max": 939.5999999940395,
+          "over50ms": 2,
+          "fraction_60hz": 0.0
+        },
+        "prepare_slice_max": {
+          "n": 2,
+          "p50": 1.9000000059604645,
+          "p95": 1.9000000059604645,
+          "p99": 1.9000000059604645,
+          "max": 1.9000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "ready_to_display_elapsed": {
+          "n": 2,
+          "p50": 1647.2999999821186,
+          "p95": 1647.2999999821186,
+          "p99": 1647.2999999821186,
+          "max": 1647.2999999821186,
+          "over50ms": 2,
+          "fraction_60hz": 0.0
+        }
+      },
+      "pause_durations_ms": [],
+      "bounded_counters": {
+        "manager": {
+          "requests": 334,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 39208757,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 2,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 127000,
+          "peakSerialized": 19138921,
+          "peakDecoded": 204839752,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 7,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "layer": {
+          "applyMs": 0.4000000059604645,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 4.199999988079071,
+          "visited": 128,
+          "pickMs": 1.699999988079071,
+          "prepareMs": 939.5999999940395,
+          "sliceMaxMs": 1.9000000059604645,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 32
+        },
+        "submitted": 100000,
+        "calls": 1,
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "rebases": 0,
+        "displayed": "2026-11-12T13:38:55.770000+00:00"
+      },
+      "outside_window_full_check": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 99968,
+        "lod1": 32,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.4000000059604645,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 4.199999988079071,
+          "visited": 128,
+          "pickMs": 1.699999988079071,
+          "prepareMs": 939.5999999940395,
+          "sliceMaxMs": 1.9000000059604645,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 32
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 61057379,
+          "total": 79004831
+        },
+        "manager": {
+          "requests": 334,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 39208757,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 2,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 127000,
+          "peakSerialized": 19138921,
+          "peakDecoded": 204839752,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 7,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "listeners": 26,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      }
+    },
+    "flight": {
+      "duration_s": 12.711825792008312,
+      "warmup_s": 1,
+      "metrics": {
+        "camera_cpu": {
+          "n": 762,
+          "p50": 0,
+          "p95": 0.09999999403953552,
+          "p99": 0.10000002384185791,
+          "max": 0.29999998211860657,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod_cpu": {
+          "n": 762,
+          "p50": 0.09999999403953552,
+          "p95": 0.20000001788139343,
+          "p99": 0.4000000059604645,
+          "max": 4.899999976158142,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "render_submission_cpu": {
+          "n": 762,
+          "p50": 0.10000002384185791,
+          "p95": 0.30000001192092896,
+          "p99": 0.5,
+          "max": 2.2000000178813934,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "preparation_slice_cpu": {
+          "n": 524,
+          "p50": 0.09999999403953552,
+          "p95": 0.30000001192092896,
+          "p99": 0.9000000059604645,
+          "max": 1.7000000178813934,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "frame": {
+          "n": 761,
+          "p50": 16.69999999999709,
+          "p95": 16.799999999995634,
+          "p99": 16.80000000000291,
+          "max": 16.80000000000291,
+          "over50ms": 0,
+          "fraction_60hz": 0.38896189224704336
+        },
+        "commit_cpu": {
+          "n": 1,
+          "p50": 0.7000000178813934,
+          "p95": 0.7000000178813934,
+          "p99": 0.7000000178813934,
+          "max": 0.7000000178813934,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "prepare_elapsed": {
+          "n": 1,
+          "p50": 861.6000000238419,
+          "p95": 861.6000000238419,
+          "p99": 861.6000000238419,
+          "max": 861.6000000238419,
+          "over50ms": 1,
+          "fraction_60hz": 0.0
+        },
+        "prepare_slice_max": {
+          "n": 1,
+          "p50": 1.7000000178813934,
+          "p95": 1.7000000178813934,
+          "p99": 1.7000000178813934,
+          "max": 1.7000000178813934,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "ready_to_display_elapsed": {
+          "n": 1,
+          "p50": 882.2999999821186,
+          "p95": 882.2999999821186,
+          "p99": 882.2999999821186,
+          "max": 882.2999999821186,
+          "over50ms": 1,
+          "fraction_60hz": 0.0
+        }
+      },
+      "pause_durations_ms": [],
+      "bounded_counters": {
+        "manager": {
+          "requests": 435,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 51340827,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 3,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 127000,
+          "peakSerialized": 19138921,
+          "peakDecoded": 204839752,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 8,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "layer": {
+          "applyMs": 0.7000000178813934,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 861.6000000238419,
+          "sliceMaxMs": 1.7000000178813934,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 32
+        },
+        "submitted": 100000,
+        "calls": 1,
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "rebases": 0,
+        "displayed": "2026-11-12T13:38:55.770000+00:00"
+      },
+      "outside_window_full_check": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 15516,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 0,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 99968,
+        "lod1": 32,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.7000000178813934,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 861.6000000238419,
+          "sliceMaxMs": 1.7000000178813934,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 32
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 59326728,
+          "total": 88671920
+        },
+        "manager": {
+          "requests": 435,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 51340827,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 3,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 127000,
+          "peakSerialized": 19138921,
+          "peakDecoded": 204839752,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 8,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "listeners": 26,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      }
+    },
+    "rebase_eviction": {
+      "duration_s": 12.047480792010901,
+      "warmup_s": 1,
+      "metrics": {
+        "camera_cpu": {
+          "n": 723,
+          "p50": 0,
+          "p95": 0.09999999403953552,
+          "p99": 0.10000002384185791,
+          "max": 0.10000002384185791,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod_cpu": {
+          "n": 723,
+          "p50": 0,
+          "p95": 0.09999999403953552,
+          "p99": 0.10000002384185791,
+          "max": 1.2999999821186066,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "render_submission_cpu": {
+          "n": 723,
+          "p50": 0.09999999403953552,
+          "p95": 0.20000001788139343,
+          "p99": 0.4000000059604645,
+          "max": 1.699999988079071,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "frame": {
+          "n": 722,
+          "p50": 16.69999999999709,
+          "p95": 16.700000000004366,
+          "p99": 16.80000000000291,
+          "max": 16.80000000000291,
+          "over50ms": 0,
+          "fraction_60hz": 0.38227146814404434
+        },
+        "decode_cpu": {
+          "n": 1,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "validation_cpu": {
+          "n": 1,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_cpu": {
+          "n": 1,
+          "p50": 0.09999999403953552,
+          "p95": 0.09999999403953552,
+          "p99": 0.09999999403953552,
+          "max": 0.09999999403953552,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "selection_elapsed": {
+          "n": 1,
+          "p50": 491.7000000178814,
+          "p95": 491.7000000178814,
+          "p99": 491.7000000178814,
+          "max": 491.7000000178814,
+          "over50ms": 1,
+          "fraction_60hz": 0.0
+        },
+        "ready_to_display_elapsed": {
+          "n": 1,
+          "p50": 6.699999988079071,
+          "p95": 6.699999988079071,
+          "p99": 6.699999988079071,
+          "max": 6.699999988079071,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        }
+      },
+      "pause_durations_ms": [],
+      "bounded_counters": {
+        "manager": {
+          "requests": 489,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 51341418,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 4,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 127000,
+          "peakSerialized": 19138921,
+          "peakDecoded": 204839752,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 62,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 0,
+          "objects": 0,
+          "serialized": 591,
+          "decoded": 8824
+        },
+        "layer": {
+          "applyMs": 0.09999999403953552,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0,
+          "maxLodMs": 4.899999976158142,
+          "visited": 0,
+          "pickMs": 0.5,
+          "prepareMs": 861.6000000238419,
+          "sliceMaxMs": 1.7000000178813934,
+          "slots": 0,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 0
+        },
+        "submitted": 0,
+        "calls": 0,
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "rebases": 2,
+        "displayed": "2026-11-12T13:38:55.770000+00:00"
+      },
+      "outside_window_full_check": {
+        "resident": 0,
+        "computed": 0,
+        "submitted": 0,
+        "allocated_slots": 0,
+        "in_frustum": 0,
+        "numeric": 0,
+        "identities": 0,
+        "pixel_center_collisions": 0,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 0,
+        "lod1": 0,
+        "calls": 0,
+        "stats": {
+          "applyMs": 0.09999999403953552,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0,
+          "maxLodMs": 4.899999976158142,
+          "visited": 0,
+          "pickMs": 0.5,
+          "prepareMs": 861.6000000238419,
+          "sliceMaxMs": 1.7000000178813934,
+          "slots": 0,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 0
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 10670241,
+          "total": 17486225
+        },
+        "manager": {
+          "requests": 489,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 51341418,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 4,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 127000,
+          "peakSerialized": 19138921,
+          "peakDecoded": 204839752,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 62,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 0,
+          "objects": 0,
+          "serialized": 591,
+          "decoded": 8824
+        },
+        "listeners": 26,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      }
+    },
+    "\u0421\u0435\u0439\u0447\u0430\u0441": {
+      "duration_s": 10.408959541993681,
+      "warmup_s": 1,
+      "metrics": {
+        "camera_cpu": {
+          "n": 624,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.20000001788139343,
+          "max": 1.300000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod_cpu": {
+          "n": 624,
+          "p50": 0,
+          "p95": 0.19999998807907104,
+          "p99": 0.30000001192092896,
+          "max": 2,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "render_submission_cpu": {
+          "n": 624,
+          "p50": 0.09999999403953552,
+          "p95": 0.20000001788139343,
+          "p99": 0.4000000059604645,
+          "max": 0.9000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "frame": {
+          "n": 623,
+          "p50": 16.69999999999709,
+          "p95": 16.70000000001164,
+          "p99": 16.80000000000291,
+          "max": 16.80000000000291,
+          "over50ms": 0,
+          "fraction_60hz": 0.36436597110754415
+        },
+        "decode_cpu": {
+          "n": 404,
+          "p50": 0.29999998211860657,
+          "p95": 0.9000000059604645,
+          "p99": 1.2000000178813934,
+          "max": 1.800000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "validation_cpu": {
+          "n": 404,
+          "p50": 0.20000001788139343,
+          "p95": 0.5,
+          "p99": 0.5999999940395355,
+          "max": 2.199999988079071,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_slice_cpu": {
+          "n": 609,
+          "p50": 0.19999998807907104,
+          "p95": 0.699999988079071,
+          "p99": 1.199999988079071,
+          "max": 4.899999976158142,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_elapsed": {
+          "n": 3,
+          "p50": 486.80000001192093,
+          "p95": 593,
+          "p99": 593,
+          "max": 593,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        },
+        "selection_elapsed": {
+          "n": 3,
+          "p50": 1496.199999988079,
+          "p95": 1590.1000000238419,
+          "p99": 1590.1000000238419,
+          "max": 1590.1000000238419,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        },
+        "prepare_prelude_cpu": {
+          "n": 3,
+          "p50": 0.20000001788139343,
+          "p95": 0.4000000059604645,
+          "p99": 0.4000000059604645,
+          "max": 0.4000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "preparation_slice_cpu": {
+          "n": 2555,
+          "p50": 0.09999999403953552,
+          "p95": 0.5,
+          "p99": 1,
+          "max": 4.699999988079071,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "commit_cpu": {
+          "n": 3,
+          "p50": 0.5,
+          "p95": 0.7000000178813934,
+          "p99": 0.7000000178813934,
+          "max": 0.7000000178813934,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "prepare_elapsed": {
+          "n": 3,
+          "p50": 1566.0999999940395,
+          "p95": 1608.1000000238419,
+          "p99": 1608.1000000238419,
+          "max": 1608.1000000238419,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        },
+        "prepare_slice_max": {
+          "n": 3,
+          "p50": 2.800000011920929,
+          "p95": 4.699999988079071,
+          "p99": 4.699999988079071,
+          "max": 4.699999988079071,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "ready_to_display_elapsed": {
+          "n": 3,
+          "p50": 1582.4000000059605,
+          "p95": 1632.199999988079,
+          "p99": 1632.199999988079,
+          "max": 1632.199999988079,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        }
+      },
+      "pause_durations_ms": [],
+      "bounded_counters": {
+        "manager": {
+          "requests": 1017,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 114082389,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 8,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974598,
+          "peakDecoded": 297339704,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 69,
+          "queue": 0,
+          "pending": 100,
+          "residentObjects": 100000,
+          "objects": 200000,
+          "serialized": 24263938,
+          "decoded": 297338896
+        },
+        "layer": {
+          "applyMs": 0.5,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0.5,
+          "prepareMs": 1566.0999999940395,
+          "sliceMaxMs": 1.800000011920929,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "submitted": 100000,
+        "calls": 1,
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "rebases": 2,
+        "displayed": "2026-11-12T13:40:08.669000+00:00"
+      },
+      "outside_window_full_check": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 99999,
+        "lod1": 1,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.5,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0.19999998807907104,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0.5,
+          "prepareMs": 1566.0999999940395,
+          "sliceMaxMs": 1.800000011920929,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 88570231,
+          "total": 148223671
+        },
+        "manager": {
+          "requests": 1017,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 114082389,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 8,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974598,
+          "peakDecoded": 297339704,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 69,
+          "queue": 0,
+          "pending": 100,
+          "residentObjects": 100000,
+          "objects": 200000,
+          "serialized": 24263938,
+          "decoded": 297338896
+        },
+        "listeners": 26,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      }
+    },
+    "\u0423\u0441\u043a\u043e\u0440\u0438\u0442\u044c": {
+      "duration_s": 11.91348620801,
+      "warmup_s": 1,
+      "metrics": {
+        "camera_cpu": {
+          "n": 715,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.19999998807907104,
+          "max": 0.800000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod_cpu": {
+          "n": 715,
+          "p50": 0,
+          "p95": 0.20000001788139343,
+          "p99": 0.29999998211860657,
+          "max": 0.800000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "render_submission_cpu": {
+          "n": 715,
+          "p50": 0.09999999403953552,
+          "p95": 0.30000001192092896,
+          "p99": 0.5999999940395355,
+          "max": 2.300000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "preparation_slice_cpu": {
+          "n": 2673,
+          "p50": 0.10000002384185791,
+          "p95": 0.5999999940395355,
+          "p99": 1.0999999940395355,
+          "max": 5.0999999940395355,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "frame": {
+          "n": 714,
+          "p50": 16.69999999999709,
+          "p95": 16.70000000001164,
+          "p99": 16.80000000000291,
+          "max": 16.80000000000291,
+          "over50ms": 0,
+          "fraction_60hz": 0.37815126050420167
+        },
+        "decode_cpu": {
+          "n": 404,
+          "p50": 0.20000001788139343,
+          "p95": 0.9000000059604645,
+          "p99": 1.5,
+          "max": 2.5999999940395355,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "validation_cpu": {
+          "n": 404,
+          "p50": 0.20000001788139343,
+          "p95": 0.4000000059604645,
+          "p99": 0.5,
+          "max": 0.6000000238418579,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_slice_cpu": {
+          "n": 806,
+          "p50": 0.19999998807907104,
+          "p95": 0.699999988079071,
+          "p99": 1.4000000059604645,
+          "max": 2.800000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_elapsed": {
+          "n": 4,
+          "p50": 680,
+          "p95": 682.0999999940395,
+          "p99": 682.0999999940395,
+          "max": 682.0999999940395,
+          "over50ms": 4,
+          "fraction_60hz": 0.0
+        },
+        "selection_elapsed": {
+          "n": 4,
+          "p50": 1674,
+          "p95": 1701.300000011921,
+          "p99": 1701.300000011921,
+          "max": 1701.300000011921,
+          "over50ms": 4,
+          "fraction_60hz": 0.0
+        },
+        "prepare_prelude_cpu": {
+          "n": 4,
+          "p50": 0.19999998807907104,
+          "p95": 0.30000001192092896,
+          "p99": 0.30000001192092896,
+          "max": 0.30000001192092896,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "commit_cpu": {
+          "n": 3,
+          "p50": 0.5,
+          "p95": 0.5999999940395355,
+          "p99": 0.5999999940395355,
+          "max": 0.5999999940395355,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "prepare_elapsed": {
+          "n": 3,
+          "p50": 1899.9000000059605,
+          "p95": 1942.3999999761581,
+          "p99": 1942.3999999761581,
+          "max": 1942.3999999761581,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        },
+        "prepare_slice_max": {
+          "n": 3,
+          "p50": 3.0999999940395355,
+          "p95": 5.0999999940395355,
+          "p99": 5.0999999940395355,
+          "max": 5.0999999940395355,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "ready_to_display_elapsed": {
+          "n": 3,
+          "p50": 1915.5,
+          "p95": 1963.699999988079,
+          "p99": 1963.699999988079,
+          "max": 1963.699999988079,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        }
+      },
+      "pause_durations_ms": [],
+      "bounded_counters": {
+        "manager": {
+          "requests": 1421,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 162610265,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 13,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974598,
+          "peakDecoded": 297339704,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 73,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12131969,
+          "decoded": 148669448
+        },
+        "layer": {
+          "applyMs": 0.5,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0.5,
+          "prepareMs": 1942.3999999761581,
+          "sliceMaxMs": 1.899999976158142,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "submitted": 100000,
+        "calls": 1,
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "rebases": 2,
+        "displayed": "2026-11-12T13:46:46.818000+00:00"
+      },
+      "outside_window_full_check": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 99999,
+        "lod1": 1,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.5,
+          "maxApplyMs": 0.8999999761581421,
+          "lodMs": 0,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0.5,
+          "prepareMs": 1942.3999999761581,
+          "sliceMaxMs": 1.899999976158142,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 88250828,
+          "total": 147885188
+        },
+        "manager": {
+          "requests": 1421,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 162610265,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 13,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974598,
+          "peakDecoded": 297339704,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 73,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12131969,
+          "decoded": 148669448
+        },
+        "listeners": 26,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      }
+    },
+    "\u27f2": {
+      "duration_s": 10.573898375005228,
+      "warmup_s": 1,
+      "metrics": {
+        "camera_cpu": {
+          "n": 634,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.29999998211860657,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod_cpu": {
+          "n": 634,
+          "p50": 0,
+          "p95": 0.19999998807907104,
+          "p99": 0.29999998211860657,
+          "max": 1.600000023841858,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "render_submission_cpu": {
+          "n": 634,
+          "p50": 0.09999999403953552,
+          "p95": 0.20000001788139343,
+          "p99": 0.30000001192092896,
+          "max": 0.5,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "preparation_slice_cpu": {
+          "n": 2605,
+          "p50": 0.09999999403953552,
+          "p95": 0.5,
+          "p99": 0.9000000059604645,
+          "max": 3.399999976158142,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "frame": {
+          "n": 633,
+          "p50": 16.69999999999709,
+          "p95": 16.79999999998836,
+          "p99": 16.80000000000291,
+          "max": 16.80000000000291,
+          "over50ms": 0,
+          "fraction_60hz": 0.38704581358609796
+        },
+        "commit_cpu": {
+          "n": 4,
+          "p50": 0.5,
+          "p95": 1,
+          "p99": 1,
+          "max": 1,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "prepare_elapsed": {
+          "n": 4,
+          "p50": 1730.5999999940395,
+          "p95": 1730.5999999940395,
+          "p99": 1730.5999999940395,
+          "max": 1730.5999999940395,
+          "over50ms": 4,
+          "fraction_60hz": 0.0
+        },
+        "prepare_slice_max": {
+          "n": 4,
+          "p50": 3,
+          "p95": 3.399999976158142,
+          "p99": 3.399999976158142,
+          "max": 3.399999976158142,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "ready_to_display_elapsed": {
+          "n": 4,
+          "p50": 1748.4000000059605,
+          "p95": 1749.7000000178814,
+          "p99": 1749.7000000178814,
+          "max": 1749.7000000178814,
+          "over50ms": 4,
+          "fraction_60hz": 0.0
+        },
+        "decode_cpu": {
+          "n": 405,
+          "p50": 0.20000001788139343,
+          "p95": 0.800000011920929,
+          "p99": 1,
+          "max": 6.200000017881393,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "validation_cpu": {
+          "n": 405,
+          "p50": 0.20000001788139343,
+          "p95": 0.4000000059604645,
+          "p99": 0.7000000178813934,
+          "max": 4.4000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_slice_cpu": {
+          "n": 777,
+          "p50": 0.19999998807907104,
+          "p95": 0.699999988079071,
+          "p99": 1.0999999940395355,
+          "max": 2.4000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_elapsed": {
+          "n": 3,
+          "p50": 525.7000000178814,
+          "p95": 569.7999999821186,
+          "p99": 569.7999999821186,
+          "max": 569.7999999821186,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        },
+        "selection_elapsed": {
+          "n": 3,
+          "p50": 1496,
+          "p95": 1598.199999988079,
+          "p99": 1598.199999988079,
+          "max": 1598.199999988079,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        },
+        "prepare_prelude_cpu": {
+          "n": 3,
+          "p50": 0.19999998807907104,
+          "p95": 0.30000001192092896,
+          "p99": 0.30000001192092896,
+          "max": 0.30000001192092896,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        }
+      },
+      "pause_durations_ms": [],
+      "bounded_counters": {
+        "manager": {
+          "requests": 1830,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 211145721,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 17,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974598,
+          "peakDecoded": 297339704,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 78,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12131969,
+          "decoded": 148669448
+        },
+        "layer": {
+          "applyMs": 0.29999998211860657,
+          "maxApplyMs": 1,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0.5,
+          "prepareMs": 1730.5999999940395,
+          "sliceMaxMs": 0.20000001788139343,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "submitted": 100000,
+        "calls": 1,
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "rebases": 2,
+        "displayed": "2026-11-12T13:48:09.648000+00:00"
+      },
+      "outside_window_full_check": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 99999,
+        "lod1": 1,
+        "calls": 1,
+        "stats": {
+          "applyMs": 0.29999998211860657,
+          "maxApplyMs": 1,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0.5,
+          "prepareMs": 1730.5999999940395,
+          "sliceMaxMs": 0.7000000178813934,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 97005243,
+          "total": 156866999
+        },
+        "manager": {
+          "requests": 1830,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 211145721,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 17,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974598,
+          "peakDecoded": 297339704,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 78,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12131969,
+          "decoded": 148669448
+        },
+        "listeners": 26,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      }
+    },
+    "cycles": {
+      "duration_s": 30.924797541025328,
+      "warmup_s": 1,
+      "metrics": {
+        "camera_cpu": {
+          "n": 1855,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.20000001788139343,
+          "max": 2.899999976158142,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "lod_cpu": {
+          "n": 1855,
+          "p50": 0,
+          "p95": 0.20000001788139343,
+          "p99": 0.30000001192092896,
+          "max": 3.199999988079071,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "render_submission_cpu": {
+          "n": 1855,
+          "p50": 0.09999999403953552,
+          "p95": 0.30000001192092896,
+          "p99": 0.5,
+          "max": 4.4000000059604645,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "frame": {
+          "n": 1854,
+          "p50": 16.69999999999709,
+          "p95": 16.79999999998836,
+          "p99": 16.80000000000291,
+          "max": 16.800000000017462,
+          "over50ms": 0,
+          "fraction_60hz": 0.38457389428263217
+        },
+        "prepare_prelude_cpu": {
+          "n": 4,
+          "p50": 0.09999999403953552,
+          "p95": 0.19999998807907104,
+          "p99": 0.19999998807907104,
+          "max": 0.19999998807907104,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "preparation_slice_cpu": {
+          "n": 1926,
+          "p50": 0.19999998807907104,
+          "p95": 0.699999988079071,
+          "p99": 1.5,
+          "max": 4.200000017881393,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "decode_cpu": {
+          "n": 437,
+          "p50": 0.29999998211860657,
+          "p95": 1.0999999940395355,
+          "p99": 1.7000000178813934,
+          "max": 3.300000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "validation_cpu": {
+          "n": 437,
+          "p50": 0.20000001788139343,
+          "p95": 0.5,
+          "p99": 0.5999999940395355,
+          "max": 1.100000023841858,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_cpu": {
+          "n": 3,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "selection_elapsed": {
+          "n": 6,
+          "p50": 1633.7999999821186,
+          "p95": 1750.300000011921,
+          "p99": 1750.300000011921,
+          "max": 1750.300000011921,
+          "over50ms": 6,
+          "fraction_60hz": 0.0
+        },
+        "ready_to_display_elapsed": {
+          "n": 6,
+          "p50": 1099.4000000059605,
+          "p95": 1481.199999988079,
+          "p99": 1481.199999988079,
+          "max": 1481.199999988079,
+          "over50ms": 3,
+          "fraction_60hz": 0.5
+        },
+        "picking_cpu": {
+          "n": 3,
+          "p50": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.10000002384185791,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_slice_cpu": {
+          "n": 606,
+          "p50": 0.19999998807907104,
+          "p95": 0.9000000059604645,
+          "p99": 1.800000011920929,
+          "max": 3.300000011920929,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "merge_elapsed": {
+          "n": 3,
+          "p50": 535.5,
+          "p95": 594.9000000059605,
+          "p99": 594.9000000059605,
+          "max": 594.9000000059605,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        },
+        "commit_cpu": {
+          "n": 3,
+          "p50": 0.7000000178813934,
+          "p95": 1.699999988079071,
+          "p99": 1.699999988079071,
+          "max": 1.699999988079071,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        },
+        "prepare_elapsed": {
+          "n": 3,
+          "p50": 1453.7999999821186,
+          "p95": 1468.5,
+          "p99": 1468.5,
+          "max": 1468.5,
+          "over50ms": 3,
+          "fraction_60hz": 0.0
+        },
+        "prepare_slice_max": {
+          "n": 3,
+          "p50": 4,
+          "p95": 4.200000017881393,
+          "p99": 4.200000017881393,
+          "max": 4.200000017881393,
+          "over50ms": 0,
+          "fraction_60hz": 1.0
+        }
+      },
+      "pause_durations_ms": [],
+      "bounded_counters": {
+        "manager": {
+          "requests": 2552,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 275301520,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 24,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974598,
+          "peakDecoded": 297339704,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 260,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "layer": {
+          "applyMs": 1.699999988079071,
+          "maxApplyMs": 1.699999988079071,
+          "lodMs": 0,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 1468.5,
+          "sliceMaxMs": 3.699999988079071,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "submitted": 100000,
+        "calls": 1,
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "rebases": 8,
+        "displayed": "2026-11-12T13:42:41.286000+00:00"
+      },
+      "outside_window_full_check": {
+        "resident": 100000,
+        "computed": 100000,
+        "submitted": 100000,
+        "allocated_slots": 100000,
+        "in_frustum": 100000,
+        "numeric": 100000,
+        "identities": 100000,
+        "pixel_center_collisions": 1,
+        "hidden_by_policy": 0,
+        "raster_occlusion": "marker footprints overlap; centers counted separately",
+        "lod0": 99999,
+        "lod1": 1,
+        "calls": 1,
+        "stats": {
+          "applyMs": 1.699999988079071,
+          "maxApplyMs": 1.699999988079071,
+          "lodMs": 0.09999999403953552,
+          "maxLodMs": 4.899999976158142,
+          "visited": 128,
+          "pickMs": 0,
+          "prepareMs": 1468.5,
+          "sliceMaxMs": 3.699999988079071,
+          "slots": 100000,
+          "capacity": 131072,
+          "bufferBytes": 3670016,
+          "detailed": 1
+        },
+        "memory": {
+          "geometries": 1,
+          "textures": 0
+        },
+        "heap": {
+          "used": 72935864,
+          "total": 100452284
+        },
+        "manager": {
+          "requests": 2552,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 275301520,
+          "retries": 0,
+          "conflicts": 0,
+          "evictions": 24,
+          "peakQueue": 100,
+          "peakPending": 100,
+          "peakObjects": 200000,
+          "peakSerialized": 27974598,
+          "peakDecoded": 297339704,
+          "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+          "generation": 260,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 100000,
+          "objects": 100000,
+          "serialized": 12132070,
+          "decoded": 148670256
+        },
+        "listeners": 26,
+        "sameRenderer": true,
+        "framebuffer": [
+          1920,
+          1080
+        ],
+        "dpr": 1,
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "cores": 10,
+          "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+        }
+      }
+    }
+  },
+  "served_scripts": [
+    {
+      "url": "http://localhost:5174/assets/index-CeKNjtcF.js",
+      "sha256": "59f933e1b98946d8c318adcefb0e8c16d5d2b9298a679d12ccddab592bc03dd3"
+    }
+  ],
+  "cold_interactive_ms": 3296.2999999821186,
+  "initial": {
+    "resident": 100000,
+    "computed": 100000,
+    "submitted": 100000,
+    "allocated_slots": 100000,
+    "in_frustum": 100000,
+    "numeric": 100000,
+    "identities": 100000,
+    "pixel_center_collisions": 1,
+    "hidden_by_policy": 0,
+    "raster_occlusion": "marker footprints overlap; centers counted separately",
+    "lod0": 100000,
+    "lod1": 0,
+    "calls": 1,
+    "stats": {
+      "applyMs": 0.5999999940395355,
+      "maxApplyMs": 0.8999999761581421,
+      "lodMs": 0,
+      "maxLodMs": 0.20000001788139343,
+      "visited": 128,
+      "pickMs": 0,
+      "prepareMs": 1282.9000000059605,
+      "sliceMaxMs": 3,
+      "slots": 100000,
+      "capacity": 131072,
+      "bufferBytes": 3670016,
+      "detailed": 0
+    },
+    "memory": {
+      "geometries": 1,
+      "textures": 0
+    },
+    "heap": {
+      "used": 80394996,
+      "total": 124371888
+    },
+    "manager": {
+      "requests": 232,
+      "active": 0,
+      "peakActive": 4,
+      "responseBytes": 27076687,
+      "retries": 0,
+      "conflicts": 0,
+      "evictions": 1,
+      "peakQueue": 100,
+      "peakPending": 100,
+      "peakObjects": 127000,
+      "peakSerialized": 19138921,
+      "peakDecoded": 204839752,
+      "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+      "generation": 5,
+      "queue": 0,
+      "pending": 0,
+      "residentObjects": 100000,
+      "objects": 100000,
+      "serialized": 12132070,
+      "decoded": 148670256
+    },
+    "listeners": 26,
+    "sameRenderer": true,
+    "framebuffer": [
+      1920,
+      1080
+    ],
+    "dpr": 1,
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "cores": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    }
+  },
+  "instrumentation_micro_cpu_ms": {
+    "iterations": 10000,
+    "total": 6.5
+  },
+  "final": {
+    "resident": 100000,
+    "computed": 100000,
+    "submitted": 100000,
+    "allocated_slots": 100000,
+    "in_frustum": 100000,
+    "numeric": 100000,
+    "identities": 100000,
+    "pixel_center_collisions": 1,
+    "hidden_by_policy": 0,
+    "raster_occlusion": "marker footprints overlap; centers counted separately",
+    "lod0": 99999,
+    "lod1": 1,
+    "calls": 1,
+    "stats": {
+      "applyMs": 1.699999988079071,
+      "maxApplyMs": 1.699999988079071,
+      "lodMs": 0,
+      "maxLodMs": 4.899999976158142,
+      "visited": 128,
+      "pickMs": 0,
+      "prepareMs": 1468.5,
+      "sliceMaxMs": 3.699999988079071,
+      "slots": 100000,
+      "capacity": 131072,
+      "bufferBytes": 3670016,
+      "detailed": 1
+    },
+    "memory": {
+      "geometries": 1,
+      "textures": 0
+    },
+    "heap": {
+      "used": 93181961,
+      "total": 117770433
+    },
+    "manager": {
+      "requests": 2552,
+      "active": 0,
+      "peakActive": 4,
+      "responseBytes": 275301520,
+      "retries": 0,
+      "conflicts": 0,
+      "evictions": 24,
+      "peakQueue": 100,
+      "peakPending": 100,
+      "peakObjects": 200000,
+      "peakSerialized": 27974598,
+      "peakDecoded": 297339704,
+      "clientId": "fe6428ec-9638-4649-bae0-df887b11cd77",
+      "generation": 260,
+      "queue": 0,
+      "pending": 0,
+      "residentObjects": 100000,
+      "objects": 100000,
+      "serialized": 12132070,
+      "decoded": 148670256
+    },
+    "listeners": 26,
+    "sameRenderer": true,
+    "framebuffer": [
+      1920,
+      1080
+    ],
+    "dpr": 1,
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "cores": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"
+    }
+  },
+  "instrumentation": "performance.now pairs, bounded array pushes, one RAF callback; render_submission includes driver CPU/upload submission, not GPU completion. Instrumentation overhead not independently isolated."
+}

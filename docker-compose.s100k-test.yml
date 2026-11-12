@@ -1,0 +1,5 @@
+# Isolated opt-in physical S-100k fixture; never use for production.
+services:
+  backend:
+    command: ["python", "-m", "tests.s100k_provider"]
+    working_dir: /app

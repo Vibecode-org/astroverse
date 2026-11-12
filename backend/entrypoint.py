@@ -29,11 +29,16 @@ def main():
             if mode in {"offline", "online"}:
                 LOG.info("Preparing catalog before API startup: %s", mode)
                 build_enriched_catalog(offline=mode == "offline")
+            elif mode == "published":
+                from backend.prepare_runtime import ensure_runtime
+                from data.catalog import catalog_path
+                ensure_runtime(catalog_path())
+                LOG.info("Using published SQLite catalog without JSON or network")
             elif mode == "existing":
                 load_catalog()
                 LOG.info("Using validated existing catalog")
             else:
-                raise ValueError("ASTROVERSE_CATALOG_MODE must be offline, online or existing")
+                raise ValueError("ASTROVERSE_CATALOG_MODE must be offline, online, existing or published")
         # OverflowError обязателен: positive_limit(1e400) даёт int(inf) ->
         # OverflowError, а не ValueError. Без него внятный LOG.error
         # превращался в traceback из PID 1.

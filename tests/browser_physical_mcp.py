@@ -36,9 +36,9 @@ def run(catalog):
         mcp.wait("document.querySelector('[role=status]')?.textContent.includes('Положения вычислены')")
         initial=mcp.evaluate(PROBE)
         assert initial['canvasCount']==1 and initial['frames']>0 and initial['calls']==1,initial
-        assert {r['id'] for r in initial['rows']}=={'earth','moon'},initial
+        assert {r['id'] for r in initial['rows']}=={'sun','earth','moon','mercury','venus'},initial
         report['initial']=initial
-        passed('physical scene: Earth/Moon, one draw call, one renderer')
+        passed('physical scene: all five centers near Earth, one draw call, one renderer')
 
         # Full-precision CPU coordinates agree with an independent HTTP read at
         # exactly the displayed UTC moment; astronomy itself has golden tests.
@@ -62,7 +62,7 @@ def run(catalog):
         near=mcp.evaluate(PROBE)
         assert near['rows']==initial['rows'] and near['render']==initial['render'],near
         assert (near['geometries'],near['textures'])==(initial['geometries'],initial['textures']),near
-        passed('far overview loads all five centers; eviction/reload preserves centers and resources')
+        passed('overview/local view preserve all five resident centers and resources')
 
         mcp.click('Луна')
         mcp.wait("document.querySelector('[role=status]')?.textContent.includes('Положения вычислены')")
@@ -77,8 +77,8 @@ def run(catalog):
             mcp.wait("document.querySelector('[role=status]')?.textContent.includes('Положения вычислены')")
             focused=mcp.evaluate(PROBE)
             assert focused['origin']==known[oid],focused
-            assert [row['id'] for row in focused['rows']]==[oid],focused
-            assert focused['rows'][0]['position']==known[oid],focused
+            assert {row['id'] for row in focused['rows']}==set(known),focused
+            assert next(row['position'] for row in focused['rows'] if row['id']==oid)==known[oid],focused
             assert focused['canvasCount']==1 and focused['calls']==1,focused
             assert focused['geometries']==initial['geometries'],focused
             # Wheel input goes through OrbitControls; physical data is read only.

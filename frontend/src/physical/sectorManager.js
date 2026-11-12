@@ -1,11 +1,12 @@
-import { verifiedRows } from './coordinates.js';
+import { verifiedRows, yieldPhysicalWork } from './coordinates.js';
 
 export const frameReadyAt = new WeakMap();
 
 export class PositionRevisionChanged extends Error {
   constructor() { super('Ревизия положений изменилась; повторите запрос'); }
 }
-export const SECTOR_LIMITS = Object.freeze({ concurrency:4, queue:128, objects:4096,
+export const S100K_LIMITS = Object.freeze({objects:200000, sectorObjects:1000, serialized:64*1024*1024, decoded:512*1024*1024, response:1024*1024});
+export const SECTOR_LIMITS = Object.freeze({ concurrency:4, queue:128, objects:4096, sectorObjects:128,
   serialized:4*1024*1024, decoded:32*1024*1024, response:256*1024,
   timeout:10000, retries:1, backoff:100 });
 const abortError = () => new DOMException('cancelled', 'AbortError');
@@ -66,6 +67,26 @@ function combine(manifest, bodies, milliseconds) {
   return frame;
 }
 
+// Sector payloads have already passed bounded contract/time validation. Global
+// identity closure and array assembly are staged, never published piecemeal.
+async function combineLarge(manifest,bodies,check,onSlice) {
+  if(bodies.some(b=>b.hierarchy)) throw new Error('Large hierarchy exceeds decoder budget');
+  const objects=[],ids=new Set(),targets=new Set();
+  for(const body of bodies) for(let offset=0;offset<body.objects.length;){
+    await yieldPhysicalWork();check();
+    const start=performance.now();let count=0;
+    while(offset<body.objects.length && count++<500 && performance.now()-start<2){
+      const row=body.objects[offset++];
+      if(ids.has(row.id))fail('Дубликат или неверный ID физического тела');ids.add(row.id);
+      if(row.target!=null){const identity=JSON.stringify([row.model_id??null,row.target]);
+        if(targets.has(identity))fail('Дубликат идентичности физического тела');targets.add(identity);}
+      objects.push(row);
+    }
+    onSlice(performance.now()-start);
+  }
+  check();const frame={...manifest,objects};delete frame.sector;return frame;
+}
+
 /** One atomic selection, bounded workers and no partial scene publication.
  * The caller coalesces continuous clock ticks. Explicit contexts evict the old
  * set; only continuous work in the SAME context can retain it while loading.
@@ -79,7 +100,7 @@ export class PhysicalSectorManager {
       if (!Number.isSafeInteger(value) || value < (key === 'retries' ? 0 : 1)) fail('Invalid sector budget');
     }
     if (this.limits.retries > 1 || this.limits.concurrency > 128 || this.limits.queue > 128
-        || this.limits.objects > 4096) fail('Invalid sector budget');
+        || this.limits.objects > 200000 || this.limits.sectorObjects > 1000) fail('Invalid sector budget');
     this.generation = 0; this.resident = null; this.current = null;
     // Transport correlation only; never a source identity or a physical phase.
     this.clientId = clientIdentity();
@@ -195,8 +216,11 @@ export class PhysicalSectorManager {
           error.permanent = [400,401,403,404,413,422].includes(status); throw error;
         }
         if (!body) fail('Некорректный ответ сервера эфемерид');
+        if (body.objects?.length > this.limits.sectorObjects) fail('Превышен размер физического сектора');
+        const validationStart=performance.now();
         validate(body, state.milliseconds);
-        if (body.objects.length > 128) fail('Превышен размер физического сектора');
+        this.onPhase?.({kind:"validation_cpu",ms:performance.now()-validationStart});
+        if (body.objects.length > this.limits.sectorObjects) fail('Превышен размер физического сектора');
         // Transfer the reservation to decoded residency without double counting.
         this.admit(state, {objects:body.objects.length-reserve.objects,
           serialized:bytes-reserve.serialized, decoded:decodedEstimate(bytes)-reserve.decoded});
@@ -253,7 +277,9 @@ export class PhysicalSectorManager {
       } finally { await reader.cancel(); }
       const buffer = new Uint8Array(bytes); let offset = 0;
       for (const chunk of chunks) { buffer.set(chunk, offset); offset += chunk.length; }
+      const decodeStart=performance.now();
       try { body = JSON.parse(new TextDecoder().decode(buffer)); } catch { body = null; }
+      this.onPhase?.({kind:'decode_cpu',ms:performance.now()-decodeStart});
     } else {
       // Compatibility with injected test fetchers, native HTTP uses bounded reads.
       body = await response.json().catch(() => null);
@@ -266,6 +292,7 @@ export class PhysicalSectorManager {
     const params = new URLSearchParams({at:new Date(state.milliseconds).toISOString(), anchor});
     const area = neighborhood || {offset:[0,0,0], radius:1e13};
     ['dx','dy','dz'].forEach((key,a) => params.set(key, String(area.offset[a])));
+    if(area.origin)['ox','oy','oz'].forEach((key,a)=>params.set(key,String(area.origin[a])));
     params.set('radius', String(area.radius));
     try {
       for (let attempt=0; attempt<2; attempt++) {
@@ -286,7 +313,7 @@ export class PhysicalSectorManager {
           }
           // Known counts allow rejection before any sector work. Without counts,
           // each bounded response is admitted before becoming staging residency.
-          if (manifest.sectors.every(s => Number.isSafeInteger(s.object_count) && s.object_count >= 0 && s.object_count <= 128))
+          if (manifest.sectors.every(s => Number.isSafeInteger(s.object_count) && s.object_count >= 0 && s.object_count <= this.limits.sectorObjects))
             this.admit(state, {objects:manifest.sectors.reduce((n,s)=>n+s.object_count,0)});
           const bodies = new Array(manifest.sectors.length); let next = 0, failure;
           state.queue = bodies.length; this.account(state);
@@ -296,7 +323,7 @@ export class PhysicalSectorManager {
                 this.check(state, controller.signal);
                 const index = next++, sector = manifest.sectors[index]; state.queue--;
                 const query = new URLSearchParams({at:params.get('at'), revision:manifest.revision});
-                const body = await this.request(state, this.root+'sectors/'+encodeURIComponent(sector.id)+'?'+query, controller.signal, Number.isSafeInteger(sector.object_count) && sector.object_count >= 0 && sector.object_count <= 128 ? sector.object_count : 0);
+                const body = await this.request(state, this.root+'sectors/'+encodeURIComponent(sector.id)+'?'+query, controller.signal, Number.isSafeInteger(sector.object_count) && sector.object_count >= 0 && sector.object_count <= this.limits.sectorObjects ? sector.object_count : 0);
                 if (body.revision !== manifest.revision || body.registry_revision !== manifest.registry_revision) throw new PositionRevisionChanged();
                 if (body.sector !== sector.id || body.jd_tdb !== manifest.jd_tdb
                     || body.evaluated_at !== manifest.evaluated_at
@@ -311,7 +338,11 @@ export class PhysicalSectorManager {
           // Reserve combined arrays/identity maps while old and staging coexist.
           this.admit(state, {decoded:state.cost.objects * 512});
           state.cost.decoded += state.cost.objects * 512; this.account(state);
-          const frame = combine(manifest, bodies, state.milliseconds);
+          const mergeStart=performance.now();
+          const large=state.cost.objects>4096;
+          const frame = large ? await combineLarge(manifest,bodies,()=>this.check(state),
+            ms=>this.onPhase?.({kind:'merge_slice_cpu',ms})) : combine(manifest, bodies, state.milliseconds);
+          this.onPhase?.({kind:large?"merge_elapsed":"merge_cpu",ms:performance.now()-mergeStart});
           return this.publish(state, frame);
         } catch (error) {
           controller.abort(); state.cost = emptyCost(); state.pending = 0; state.queue = 0;

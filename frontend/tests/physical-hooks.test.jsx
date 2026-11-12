@@ -308,3 +308,110 @@ it('does not acknowledge an obsolete frame after a failed apply before the next 
  expect(timing).not.toHaveBeenCalled();expect(sceneRef.current.pendingDisplay).toBe(null);
  expect(sceneRef.current.displayedAt).toBe(null);view.unmount();
 });
+
+it('hands off flight, rebases without a projection jump, holds position over time and refocuses explicitly',()=>{
+ let next;vi.stubGlobal('requestAnimationFrame',vi.fn(fn=>{next=fn;return 1;}));vi.stubGlobal('cancelAnimationFrame',vi.fn());
+ const sceneRef={current:null},onError=vi.fn(),onNeighborhood=vi.fn(),onFlightStatus=vi.fn();
+ const props={frame,centerId:'earth',onError,sceneRef,onNeighborhood,onFlightStatus,overview:true};
+ const view=render(<PhysicalScene {...props}/>),state=sceneRef.current;
+ // A normal overview position is well past the rebase threshold at entry.
+ const before=state.layer.inspect(),eye=state.camera.position.clone();
+ const beforeVector=new THREE.Vector3(...before.render.slice(3,6)).sub(eye);
+ view.rerender(<PhysicalScene {...props} flying/>);expect(state.controls.enabled).toBe(false);
+ act(()=>next(1000));expect(state.rebases).toBe(1);
+ const after=state.layer.inspect(),afterVector=new THREE.Vector3(...after.render.slice(3,6)).sub(state.camera.position);
+ expect(afterVector.distanceTo(beforeVector)).toBeLessThan(1e-3);expect(after.rows).toEqual(before.rows);
+ expect(onNeighborhood.mock.calls.at(-1)[0].origin).toBeTruthy();expect(onFlightStatus).toHaveBeenCalled();
+ const physicalEye=state.reference.position.map((v,a)=>v+state.reference.offset[a]);
+ const moved={...frame,objects:frame.objects.map(row=>({...row,position:row.position.map(v=>v+1000)}))};
+ view.rerender(<PhysicalScene {...props} frame={moved} flying/>);
+ expect(state.reference.position.map((v,a)=>v+state.reference.offset[a])).toEqual(physicalEye);
+ expect(state.camera.position.length()).toBe(0);
+ view.rerender(<PhysicalScene {...props} frame={moved}/>);expect(state.controls.enabled).toBe(true);
+ expect(state.reference).toBeTruthy();
+ view.rerender(<PhysicalScene {...props} frame={moved} focusVersion={1}/>);
+ expect(state.reference).toBe(null);expect(state.layer.inspect().origin).toEqual(moved.objects[0].position);
+ expect(state.camera.position.toArray()).toEqual([0,1800,2400]);expect(stages.latest.renderer).toBe(state.renderer);
+ view.rerender(<PhysicalScene {...props} frame={moved} focusVersion={1} flying/>);
+ expect(state.reference.position).toEqual(moved.objects[0].position);expect(state.reference.offset).toEqual([0,0,0]);
+ view.unmount();
+});
+
+it('preserves a zoomed-out Mercury loading reach across flight, rebase and exit',()=>{
+ let next;vi.stubGlobal('requestAnimationFrame',vi.fn(fn=>{next=fn;return 1;}));vi.stubGlobal('cancelAnimationFrame',vi.fn());
+ const sceneRef={current:null},onError=vi.fn(),onNeighborhood=vi.fn();
+ const mercury={...frame,objects:[{id:'mercury',status:'computed',position:[3e7,4e7,1e6]}]};
+ const props={frame:mercury,centerId:'mercury',onError,sceneRef,onNeighborhood};
+ const view=render(<PhysicalScene {...props}/>),s=sceneRef.current;
+ s.camera.position.set(0,800,1200);act(()=>next(1000));
+ const orbitArea=onNeighborhood.mock.calls.at(-1)[0],eye=s.camera.position.clone();
+ const origin=[...s.layer.inspect().origin];
+ view.rerender(<PhysicalScene {...props} flying/>);act(()=>next(1100));
+ const flightArea=onNeighborhood.mock.calls.at(-1)[0];
+ expect(flightArea.radius).toBe(orbitArea.radius);expect(s.rebases).toBe(1);
+ expect(flightArea.origin.map((v,a)=>v+flightArea.offset[a])).toEqual(origin.map((v,a)=>v+orbitArea.offset[a]));
+ expect(s.layer.inspect().rows).toEqual(mercury.objects.map(({id,position})=>({id,position})));
+ // Empty/loading/failed frames never prevent camera control or reset its chart.
+ view.rerender(<PhysicalScene {...props} frame={null} flying/>);
+ expect(s.flight.enabled).toBe(true);expect(s.reference.radius).toBe(orbitArea.radius);
+ view.rerender(<PhysicalScene {...props} flying/>);
+ view.rerender(<PhysicalScene {...props}/>);act(()=>next(1200));
+ expect(s.reference.radius).toBe(orbitArea.radius);expect(s.camera.position.length()).toBe(0);
+ s.camera.position.set(0,8000,12000);act(()=>next(1300));
+ const wider=onNeighborhood.mock.calls.at(-1)[0].radius;expect(wider).toBeGreaterThan(orbitArea.radius);
+ view.rerender(<PhysicalScene {...props} flying/>);act(()=>next(1400));
+ expect(s.reference.radius).toBe(wider);expect(s.flight.enabled).toBe(true);
+ expect(eye.length()).toBeGreaterThan(100);expect(onError).not.toHaveBeenCalledWith(expect.any(String),'frame');
+ view.unmount();
+});
+
+it('forwards fixed ICRF origin through the bounded manager rather than tracking a moving anchor',async()=>{
+ const fetcher=vi.fn().mockResolvedValue(reply({...frame,objects:[],sectors:[]}));vi.stubGlobal('fetch',fetcher);
+ const hook=renderHook(()=>useVerifiedFrame(new Date(at),{offset:[1,2,3],origin:[1e8,0,0],radius:3e6},'earth'));
+ await waitFor(()=>expect(hook.result.current.frame?.objects).toHaveLength(0));
+ expect(fetcher.mock.calls[0][0]).toContain('ox=100000000&oy=0&oz=0');hook.unmount();
+});
+
+it('waits for rendered large-frame acknowledgement while retaining the latest desired UTC',async()=>{
+ const {PhysicalSectorManager}=await import('../src/physical/sectorManager.js');
+ const load=vi.spyOn(PhysicalSectorManager.prototype,'load').mockImplementation(async({milliseconds})=>({
+   ...frame,evaluated_at:new Date(milliseconds).toISOString(),objects:new Array(5000).fill(frame.objects[0])
+ }));
+ const start=Date.parse(at);
+ const hook=renderHook(({ms,presented=null,generation=0})=>useVerifiedFrame(new Date(ms),null,'earth',{
+   continuous:true,profile:'synthetic-s100k',presentedFrame:presented,generation
+ }),{initialProps:{ms:start}});
+ await waitFor(()=>expect(hook.result.current.frame?.objects.length).toBe(5000));
+ const first=hook.result.current.frame;
+ for(let i=1;i<=10;i++)hook.rerender({ms:start+i*100});
+ await act(async()=>{});expect(load).toHaveBeenCalledTimes(1);
+ hook.rerender({ms:start+1000,presented:first});
+ await waitFor(()=>expect(load).toHaveBeenCalledTimes(2));
+ await waitFor(()=>expect(hook.result.current.frame?.evaluated_at).toBe(new Date(start+1000).toISOString()));
+ hook.rerender({ms:start+2000,presented:first});await act(async()=>{});expect(load).toHaveBeenCalledTimes(2);
+ hook.rerender({ms:start+3000,presented:first,generation:1});
+ await waitFor(()=>expect(load).toHaveBeenCalledTimes(3));hook.unmount();
+});
+
+it('acknowledges staged time only after render and preserves the published UTC while preparing',async()=>{
+ let raf,finish;
+ vi.stubGlobal('requestAnimationFrame',vi.fn(fn=>{raf=fn;return 42;}));vi.stubGlobal('cancelAnimationFrame',vi.fn());
+ const sceneRef={current:null},onError=vi.fn(),onPresented=vi.fn();
+ const props={centerId:'earth',overview:true,bodies:[],onError,onPresented,sceneRef};
+ const view=render(<PhysicalScene {...props} frame={frame}/>);
+ act(()=>raf(16));expect(sceneRef.current.displayedAt).toBe(at);expect(onPresented).toHaveBeenLastCalledWith(frame);
+ vi.spyOn(sceneRef.current.layer,'prepare').mockImplementation(()=>new Promise(resolve=>{finish=resolve;}));
+ const next={...frame,evaluated_at:'2026-11-06T00:00:01.000Z',objects:new Array(5000).fill(frame.objects[0])};
+ view.rerender(<PhysicalScene {...props} frame={next}/>);
+ act(()=>raf(32));expect(sceneRef.current.displayedAt).toBe(at);expect(onPresented).toHaveBeenLastCalledWith(frame);
+ await act(async()=>finish(true));expect(sceneRef.current.displayedAt).toBe(at);
+ expect(sceneRef.current.pendingDisplay.frame).toBe(next);
+ view.rerender(<PhysicalScene {...props} frame={next} focusVersion={1}/>);
+ expect(sceneRef.current.pendingDisplay).toBe(null);expect(sceneRef.current.displayedAt).toBe(null);
+ await act(async()=>finish(true));
+ act(()=>raf(48));expect(sceneRef.current.displayedAt).toBe(next.evaluated_at);expect(onPresented).toHaveBeenLastCalledWith(next);
+ sceneRef.current.layer.prepare.mockRejectedValue(new Error('bad staging'));
+ view.rerender(<PhysicalScene {...props} frame={{...next}}/>);
+ await act(async()=>{});expect(sceneRef.current.displayedAt).toBe(null);expect(onPresented).toHaveBeenLastCalledWith(null);
+ view.unmount();
+});

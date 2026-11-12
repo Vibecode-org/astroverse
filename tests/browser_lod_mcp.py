@@ -10,7 +10,7 @@ def run(catalog):
     with MCP() as m:
         m.call('navigate_page',url='http://localhost:5173/',timeout=45000)
         assert m.evaluate("async()=>(await fetch('/api/health')).json()")['objects']==catalog
-        m.wait('('+PROBE+')()?.rows.length===2')
+        m.wait('('+PROBE+')()?.rows.length===5')
         m.click('Пауза');m.evaluate(CAPTURE)
         m.wait("document.querySelector('[role=status]').textContent.includes('Положения вычислены на этот момент')")
         def zoom(z):

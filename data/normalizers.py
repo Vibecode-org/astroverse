@@ -97,3 +97,11 @@ def coordinates(row: Dict[str, Any]) -> Dict[str, Any]:
         "dec": dec,
         "distance_ly": distance * PARSEC_TO_LIGHT_YEARS if distance is not None else None,
     }
+
+
+def small_body_name(full_name):
+    """Existing SBDB display normalization; identity still comes from pdes."""
+    name = re.sub(r"\s+\([^)]*\)$", "", full_name.strip())
+    if re.fullmatch(r"\d+", name):
+        name = full_name.strip()
+    return re.sub(r"[()]", "", name).strip()

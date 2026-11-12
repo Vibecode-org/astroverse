@@ -37,11 +37,11 @@ describe('physical centers', () => {
     const value = frame([row('earth',[1e8,3e7,0]),row('moon',[1e8+300000,3e7,0]),row('sun',[0,0,0])]);
     const original = JSON.stringify(value);
     const points = scene.children[0], geometry = points.geometry;
-    layer.update(value,'earth'); expect(geometry.drawRange.count).toBe(2);
+    layer.update(value,'earth'); expect(geometry.drawRange.count).toBe(3);
     const near = layer.inspect();
     layer.update(value,'earth',true); expect(geometry.drawRange.count).toBe(3);
-    expect(layer.inspect().render.slice(0,6)).toEqual(near.render);
-    layer.update(value,'sun'); expect(layer.inspect().rows.map(r => r.id)).toEqual(['sun']);
+    expect(layer.inspect().render).toEqual(near.render);
+    layer.update(value,'sun'); expect(layer.inspect().rows.map(r => r.id)).toEqual(['earth','moon','sun']);
     layer.update(value,'missing',true); expect(layer.inspect().origin).toEqual([0,0,0]);
     layer.update(frame([row('extra',[0,0,0])]),'extra',true);
     layer.update(frame([1,2,3,4,5,6].map(n => row(String(n),[n,0,0]))),'1');
@@ -80,8 +80,11 @@ describe('physical centers', () => {
       const all = layer.inspect();
       expect(all.origin).toEqual(value.objects.find(row=>row.id===id).position);
       layer.update(value,id);
-      expect(layer.inspect().rows.map(row=>row.id)).toEqual([id]);
+      expect(layer.inspect().rows).toEqual(all.rows);
       layer.update(value,id,false,{offset:[1e12,0,0],radius:1});
+      expect(geometry.drawRange.count).toBe(5);
+      // Only an empty manager frame evicts the resident centers.
+      layer.update({...value,objects:[]},id);
       expect(geometry.drawRange.count).toBe(0);
       layer.update(value,id,true);
       expect(layer.inspect()).toEqual(all);
