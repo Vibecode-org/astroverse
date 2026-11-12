@@ -1,4 +1,3 @@
-import React from 'react';
 
 const TelemetryTab = ({ selected, formatNum, formatLy, formatPeriod }) => {
   return (

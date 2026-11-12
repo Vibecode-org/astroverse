@@ -9,7 +9,7 @@ the same command works against either stack:
     /tmp/astroverse-smoke-env/bin/python -m pytest tests/browser_smoke/ -m stack100k -v
 
 It checks the properties Phase 1 promises, not a specific frame rate (fps is
-measured separately in docs/PERFORMANCE.md with a real GPU):
+measured separately in docs/HISTORY.md with a real GPU):
 - the v2 binary catalog loads (no full JSON fallback) within a sane size/time;
 - the local view stays under 50 draw calls with bounded triangle count;
 - the object list is virtualized (only a viewport of rows is mounted);
@@ -100,7 +100,7 @@ class TestStressCatalog:
         }
         assert "astroverse:binary-parse" in measures, measures
         assert "astroverse:catalog-load" in measures, measures
-        # Generous ceilings: the numbers are documented in docs/PERFORMANCE.md.
+        # Generous ceilings: the numbers are documented in docs/HISTORY.md.
         assert measures["astroverse:binary-parse"] < 2000, measures
         assert measures["astroverse:catalog-load"] < 8000, measures
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTimeEngine } from '../hooks/useTimeEngine.js';
 import TimeControls from '../components/controls/TimeControls.jsx';
 import ObjectList from '../components/ui/ObjectList.jsx';

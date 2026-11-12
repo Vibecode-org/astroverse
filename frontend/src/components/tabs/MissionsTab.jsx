@@ -1,4 +1,3 @@
-import React from 'react';
 
 const MissionsTab = ({ missions }) => {
   // missions может отсутствовать или прийти не-массивом: раньше здесь был

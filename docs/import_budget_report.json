@@ -9,67 +9,29 @@
   "budgets": {
     "rss_bytes": 402653184,
     "rss_growth_bytes": 67108864,
-    "seconds": {
-      "100000": 300,
-      "1000000": 1800
-    },
-    "peak_disk_bytes": {
-      "100000": 1073741824,
-      "1000000": 10737418240
-    }
+    "seconds": {"100000": 300, "1000000": 1800},
+    "peak_disk_bytes": {"100000": 1073741824, "1000000": 10737418240}
   },
-  "environment": {
-    "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
-    "python": "3.12.16 (main, Nov  5 2026, 08:06:14) [GCC 14.2.0]",
-    "sqlite": "3.46.1",
-    "cpus": 10,
-    "cgroup_memory_max": "max",
-    "cgroup_cpu_max": "max 100000",
-    "cpu_isolation": false
-  },
+  "environment": {"platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41", "python": "3.12.16 (main, Nov  5 2026, 08:06:14) [GCC 14.2.0]", "sqlite": "3.46.1", "cpus": 10, "cgroup_memory_max": "max", "cgroup_cpu_max": "max 100000", "cpu_isolation": false},
   "results": [
     {
       "count": 100000,
       "memory_checkpoints": {
         "read_response": {
-          "before": {
-            "VmRSS": 35278848,
-            "VmHWM": 35278848
-          },
-          "after": {
-            "VmRSS": 38555648,
-            "VmHWM": 38555648
-          }
+          "before": {"VmRSS": 35278848, "VmHWM": 35278848},
+          "after": {"VmRSS": 38555648, "VmHWM": 38555648}
         },
         "write_representations": {
-          "before": {
-            "VmRSS": 58560512,
-            "VmHWM": 58560512
-          },
-          "after": {
-            "VmRSS": 58560512,
-            "VmHWM": 58560512
-          }
+          "before": {"VmRSS": 58560512, "VmHWM": 58560512},
+          "after": {"VmRSS": 58560512, "VmHWM": 58560512}
         },
         "build_streaming_index": {
-          "before": {
-            "VmRSS": 40214528,
-            "VmHWM": 40214528
-          },
-          "after": {
-            "VmRSS": 58560512,
-            "VmHWM": 58560512
-          }
+          "before": {"VmRSS": 40214528, "VmHWM": 40214528},
+          "after": {"VmRSS": 58560512, "VmHWM": 58560512}
         },
         "validate_staged": {
-          "before": {
-            "VmRSS": 58560512,
-            "VmHWM": 58560512
-          },
-          "after": {
-            "VmRSS": 58560512,
-            "VmHWM": 58560512
-          }
+          "before": {"VmRSS": 58560512, "VmHWM": 58560512},
+          "after": {"VmRSS": 58560512, "VmHWM": 58560512}
         }
       },
       "elapsed_seconds": 12.289493213999776,
@@ -80,10 +42,7 @@
         "bytes": 5589037,
         "returned": 100000,
         "matching_count": 100000,
-        "signature": {
-          "source": "NASA/JPL SBDB Query API",
-          "version": "1.0"
-        }
+        "signature": {"source": "NASA/JPL SBDB Query API", "version": "1.0"}
       },
       "revision": "c74d5bbeec97fb080a2d7cfc42de953067dd1fba6a2e21f4a40786b09ba2a93a",
       "metrics": {
@@ -92,10 +51,7 @@
         "read_normalize_seconds": 2.589123417999872,
         "index_seconds": 2.477539376000095,
         "legacy_seconds": 2.1572354179998,
-        "legacy_bytes": {
-          "v1": 2600046,
-          "v2": 10889148
-        },
+        "legacy_bytes": {"v1": 2600046, "v2": 10889148},
         "compact_seconds": 0.7022307500001261,
         "validate_seconds": 0.40872508400025254,
         "publish_seconds": 0.0009179999997286359
@@ -103,58 +59,27 @@
       "peak_allocated_disk_bytes": 559964160,
       "peak_named_staging_bytes": 443432960,
       "samples": 553,
-      "http": {
-        "health": 100001,
-        "card": true,
-        "search": true,
-        "page": true,
-        "etag304": true,
-        "revision409": true
-      },
+      "http": {"health": 100001, "card": true, "search": true, "page": true, "etag304": true, "revision409": true},
       "passed": true
     },
     {
       "count": 1000000,
       "memory_checkpoints": {
         "read_response": {
-          "before": {
-            "VmRSS": 35237888,
-            "VmHWM": 35237888
-          },
-          "after": {
-            "VmRSS": 40312832,
-            "VmHWM": 40312832
-          }
+          "before": {"VmRSS": 35237888, "VmHWM": 35237888},
+          "after": {"VmRSS": 40312832, "VmHWM": 40312832}
         },
         "write_representations": {
-          "before": {
-            "VmRSS": 58667008,
-            "VmHWM": 58667008
-          },
-          "after": {
-            "VmRSS": 58667008,
-            "VmHWM": 58667008
-          }
+          "before": {"VmRSS": 58667008, "VmHWM": 58667008},
+          "after": {"VmRSS": 58667008, "VmHWM": 58667008}
         },
         "build_streaming_index": {
-          "before": {
-            "VmRSS": 40312832,
-            "VmHWM": 40312832
-          },
-          "after": {
-            "VmRSS": 58667008,
-            "VmHWM": 58667008
-          }
+          "before": {"VmRSS": 40312832, "VmHWM": 40312832},
+          "after": {"VmRSS": 58667008, "VmHWM": 58667008}
         },
         "validate_staged": {
-          "before": {
-            "VmRSS": 58667008,
-            "VmHWM": 58667008
-          },
-          "after": {
-            "VmRSS": 58667008,
-            "VmHWM": 58667008
-          }
+          "before": {"VmRSS": 58667008, "VmHWM": 58667008},
+          "after": {"VmRSS": 58667008, "VmHWM": 58667008}
         }
       },
       "elapsed_seconds": 130.18607172500015,
@@ -165,10 +90,7 @@
         "bytes": 56889038,
         "returned": 1000000,
         "matching_count": 1000000,
-        "signature": {
-          "source": "NASA/JPL SBDB Query API",
-          "version": "1.0"
-        }
+        "signature": {"source": "NASA/JPL SBDB Query API", "version": "1.0"}
       },
       "revision": "6ff7580b1a6f583aff95e57a531cd3d78cb98c7ae6c574b9861efbca2055dd6c",
       "metrics": {
@@ -177,10 +99,7 @@
         "read_normalize_seconds": 26.40638892900006,
         "index_seconds": 26.383992179000415,
         "legacy_seconds": 22.504076635000274,
-        "legacy_bytes": {
-          "v1": 26000046,
-          "v2": 109889148
-        },
+        "legacy_bytes": {"v1": 26000046, "v2": 109889148},
         "compact_seconds": 8.171116253999571,
         "validate_seconds": 4.488116626999727,
         "publish_seconds": 0.0002523749999454594
@@ -188,14 +107,7 @@
       "peak_allocated_disk_bytes": 5761699840,
       "peak_named_staging_bytes": 4520042496,
       "samples": 5670,
-      "http": {
-        "health": 1000001,
-        "card": true,
-        "search": true,
-        "page": true,
-        "etag304": true,
-        "revision409": true
-      },
+      "http": {"health": 1000001, "card": true, "search": true, "page": true, "etag304": true, "revision409": true},
       "passed": true
     }
   ],

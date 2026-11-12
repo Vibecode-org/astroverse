@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { makeNebulaCloudSprite } from '../textures/nebulaTextures.js';
 import { sharedGeometry, sharedMaterial } from '../resources.js';
 import { safeColor } from '../utils/colorUtils.js';
-import { hashUnit } from '../utils/hash.js';
 
 const PLEIADES_STARS = [[0.15,0.05,0], [-0.35,0.25,0.1], [-0.65,-0.2,-0.1], [-0.12,0.45,0], [-0.25,-0.42,0.1], [-0.52,0.32,-0.1], [0.35,0.12,0]];
 const CLUSTER_STARS = 280;

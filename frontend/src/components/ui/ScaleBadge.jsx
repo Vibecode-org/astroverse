@@ -1,4 +1,3 @@
-import React from 'react';
 
 const ScaleBadge = ({ simDate }) => {
   const formatted = simDate.toLocaleString('ru-RU');

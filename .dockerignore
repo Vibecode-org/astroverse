@@ -18,3 +18,10 @@ data/sectors*.sqlite
 data/*.runtime.sqlite
 data/*.runtime.sqlite.lock
 data/sectors*.sqlite.lock
+
+# Local notes/configuration and generated test output are not image inputs.
+.agent
+.env
+**/coverage
+**/.pytest_cache
+docs

@@ -5,7 +5,6 @@ import { useThreeScene } from './useThreeScene.js';
 import { useThreeView } from './useThreeView.js';
 import { useThreeFollow } from './useThreeFollow.js';
 import { useThreeTime } from './useThreeTime.js';
-import { applyViewState } from '../scene/viewState.js';
 
 /** Mounts the Three.js scene and keeps it in sync with the UI state.
  *

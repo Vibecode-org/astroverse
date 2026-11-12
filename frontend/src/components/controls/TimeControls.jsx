@@ -1,4 +1,3 @@
-import React from 'react';
 
 const DAY_MS = 86400000;
 const HOUR_S = 3600;

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useObjectData } from '../../hooks/useObjectData.js';
 import { useTimeEngine } from '../../hooks/useTimeEngine.js';
 import { useThree } from '../../hooks/useThree.js';

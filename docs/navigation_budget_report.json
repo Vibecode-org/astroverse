@@ -1,20 +1,7 @@
 {
-  "version": "navigation-acceptance/1",
-  "measured_at": "2026-11-10T19:50:23.808104+00:00",
-  "scope": "bounded 8.1 and minimum 8.2/8.6; not Phase 8 or S-100k",
-  "preliminary_budget_exceedance": {
-    "camera": {
-      "n": 688,
-      "p95_ms": 0.100000009,
-      "max_ms": 9.299999997,
-      "budget_p95_max_ms": [
-        1,
-        8
-      ]
-    },
-    "context": "Before idle hot-path cleanup; builds not isolated; cause unestablished; retained rather than changing budget"
-  },
-  "ordinary": {
+  "version": "navigation-acceptance/2",
+  "evidence_revision": "7f6609842f10e9cbfc5516f6193d9e22e4e3d54f",
+  "current": {
     "complete": true,
     "synthetic": false,
     "checks": [
@@ -27,525 +14,295 @@
       "12 flight/exit/refocus cycles retain renderer, canvas, GPU resources and listener count"
     ],
     "budgets_ms": {
-      "camera": [
-        1,
-        8
-      ],
-      "apply": [
-        16,
-        50
-      ],
-      "lod": [
-        1,
-        8
-      ]
+      "camera": [1, 8],
+      "apply": [16, 50],
+      "lod": [1, 8]
     },
-    "tolerances": {
-      "cpu_roundoff_km": 1e-06,
-      "gpu_relative": 1e-07,
-      "gpu_absolute_render": 1e-06
-    },
-    "environment": {
-      "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
-      "renderer": "SwiftShader (functional, not hardware fps)",
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
-      "cores": 10,
-      "width": 1440,
-      "height": 913,
-      "dpr": 1
-    },
+    "tolerances": {"cpu_roundoff_km": 1e-06, "gpu_relative": 1e-07, "gpu_absolute_render": 1e-06, "rebase_screen_css_px": 0.05},
+    "environment": {"os": "macOS-26.3-arm64-arm-64bit-Mach-O", "renderer": "SwiftShader (functional, not hardware fps)", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "width": 1440, "height": 913, "dpr": 1},
     "numeric_centers": 5,
-    "local_forward_error": 1.3375139744683137e-13,
+    "local_forward_error": 5.010218913503804e-14,
     "time_modes": [
-      {
-        "reverse": false,
-        "multiplier": 86400,
-        "distance_km": 38329.999999999825,
-        "hold_seconds": 0.35
-      },
-      {
-        "reverse": true,
-        "multiplier": -86400,
-        "distance_km": 36660.00000000409,
-        "hold_seconds": 0.35
-      }
+      {"reverse": false, "multiplier": 86400, "distance_km": 30010.000000003787, "hold_seconds": 0.35},
+      {"reverse": true, "multiplier": -86400, "distance_km": 33330.00000000063, "hold_seconds": 0.35}
     ],
     "resources_warm": {
       "listeners": 28,
-      "memory": {
-        "geometries": 1,
-        "textures": 0
-      }
+      "memory": {"geometries": 1, "textures": 0}
     },
     "resource_cycles": 12,
     "resources_final": {
       "listeners": 28,
-      "memory": {
-        "geometries": 1,
-        "textures": 0
-      }
+      "memory": {"geometries": 1, "textures": 0}
     },
     "timing_ms": {
-      "camera": {
-        "n": 727,
-        "mean": 0.04044016488562588,
-        "p95": 0.10000000894069672,
-        "max": 6.5999999940395355
-      },
-      "apply": {
-        "n": 154,
-        "mean": 0.12467532334002582,
-        "p95": 0.3999999910593033,
-        "max": 2.5999999940395355
-      },
-      "lod": {
-        "n": 727,
-        "mean": 0.010178817105588428,
-        "p95": 0.09999999403953552,
-        "max": 2.5
-      }
+      "camera": {"n": 776, "mean": 0.018427834836478085, "p95": 0.09999999403953552, "max": 1},
+      "apply": {"n": 151, "mean": 0.07152317809742807, "p95": 0.20000001788139343, "max": 1.5},
+      "lod": {"n": 776, "mean": 0.011984536097836248, "p95": 0.09999999403953552, "max": 0.4000000059604645}
     },
     "rebase_projection": [
-      {
-        "n": 5,
-        "max_css_px": 2.9975297762028654e-05
-      }
+      {"n": 5, "max_css_px": 1.4248444649530666e-05}
     ],
-    "budget_passed": {
-      "camera": true,
-      "apply": true,
-      "lod": true
-    }
+    "budget_passed": {"camera": true, "apply": true, "lod": true}
   },
-  "synthetic_http": {
+  "regions": {
     "complete": true,
-    "synthetic": true,
-    "checks": [
-      "overview → flight transfers controls and rebases without a physical camera jump",
-      "trusted held keys rotate yaw/pitch/roll and move along local forward; frozen centers unchanged",
-      "trusted mouse drag rotates flight without selection or OrbitControls movement",
-      "search typing is isolated; selecting a body opens its card without teleporting",
-      "explicit refocus restores observation; stop/manual date/Now/pause leave free camera fixed",
-      "native tab switch during held flight clears keys; hidden/resume has no camera catch-up",
-      "native flight loads/evicts HTTP sectors; explicit return and transport failure recover atomically",
-      "12 flight/exit/refocus cycles retain renderer, canvas, GPU resources and listener count"
+    "checks": ["Earth local view submits all five computed centers with exact HTTP vectors", "Three trusted Mercury zoom/flight/rotation/motion/exit/reentry/refocus cycles preserve centers and resources"],
+    "cycles": [
+      {"wheels": 14, "handoff_radius_km": 439691778.2187971, "handoff_jump_km": 0.0, "travel_km": 33330.00000000033, "rebases": 1},
+      {"wheels": 14, "handoff_radius_km": 439691778.2187971, "handoff_jump_km": 0.0, "travel_km": 31669.99999999857, "rebases": 2},
+      {"wheels": 14, "handoff_radius_km": 439691778.2187971, "handoff_jump_km": 0.0, "travel_km": 36669.99999998568, "rebases": 3}
     ],
-    "budgets_ms": {
-      "camera": [
-        1,
-        8
-      ],
-      "apply": [
-        16,
-        50
-      ],
-      "lod": [
-        1,
-        8
-      ]
-    },
-    "tolerances": {
-      "cpu_roundoff_km": 1e-06,
-      "gpu_relative": 1e-07,
-      "gpu_absolute_render": 1e-06
-    },
-    "environment": {
-      "os": "macOS-26.3-arm64-arm-64bit-Mach-O",
-      "renderer": "SwiftShader (functional, not hardware fps)",
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
-      "cores": 10,
-      "width": 1440,
-      "height": 913,
-      "dpr": 1
-    },
-    "numeric_centers": 2016,
-    "local_forward_error": 3.4706679824171495e-15,
-    "time_modes": [
-      {
-        "reverse": false,
-        "multiplier": 86400,
-        "distance_km": 28329.99999999987,
-        "hold_seconds": 0.35
-      },
-      {
-        "reverse": true,
-        "multiplier": -86400,
-        "distance_km": 30000.000000000022,
-        "hold_seconds": 0.35
-      }
-    ],
-    "resources_warm": {
-      "listeners": 28,
-      "memory": {
-        "geometries": 1,
-        "textures": 0
-      }
-    },
-    "resource_cycles": 12,
-    "resources_final": {
-      "listeners": 28,
-      "memory": {
-        "geometries": 1,
-        "textures": 0
-      }
-    },
-    "timing_ms": {
-      "camera": {
-        "n": 1068,
-        "mean": 0.03576779026496277,
-        "p95": 0.10000000894069672,
-        "max": 4.5
-      },
-      "apply": {
-        "n": 79,
-        "mean": 0.9354430376728878,
-        "p95": 4.9000000059604645,
-        "max": 32.20000000298023
-      },
-      "lod": {
-        "n": 1068,
-        "mean": 0.013483145975329902,
-        "p95": 0.09999999403953552,
-        "max": 2.5
-      }
-    },
-    "rebase_projection": [
-      {
-        "n": 2016,
-        "max_css_px": 1.6871634132470267e-05
-      }
-    ],
-    "budget_passed": {
-      "camera": true,
-      "apply": true,
-      "lod": true
+    "tolerance_km": 1e-06,
+    "environment": "Chrome / SwiftShader; functional, no fps claim",
+    "earth": {
+      "submitted": 5,
+      "resident_ids": ["sun", "earth", "moon", "mercury", "venus"]
     }
   },
-  "sector_regression": {
+  "depth": {
     "complete": true,
-    "checks": [
-      "32 reordered HTTP sectors publish one coherent hierarchy; nulls stay unknown",
-      "48 camera moves through HTTP load/eviction/empty/return preserve centers and GPU resources",
-      "HTTP camera zoom L0/L1 hysteresis and repeated cycles preserve canonical centers",
-      "manual date changes discard old generations; exact UTC/JD and Float64 match HTTP",
-      "HTTP 409 rediscovers the entire selection once and accepts the new revision",
-      "permanent partial HTTP failure cancels siblings and clears the whole scene",
-      "incompatible time cannot be merged; recovery keeps the renderer",
-      "hung HTTP sector times out at 10s and a fresh selection recovers",
-      "multisector HTTP jitter 350–550ms: Now, exact pause, acceleration and reverse do not starve",
-      "permanent HTTP error stops clock retries; explicit Now starts a recoverable context"
-    ],
-    "numeric_centers_checked": 2016,
-    "resources_warm": {
-      "geometries": 1,
-      "materials": 1,
-      "slots": 2016,
-      "capacity": 2048,
-      "listeners": 28
-    },
-    "gpu_before": {
-      "geometries": 1,
-      "textures": 0,
-      "calls": 1,
-      "canvasCount": 1
-    },
-    "resources_after": {
-      "geometries": 1,
-      "materials": 1,
-      "slots": 2016,
-      "capacity": 2048,
-      "listeners": 28
-    },
-    "gpu_after": {
-      "geometries": 1,
-      "textures": 0,
-      "calls": 1,
-      "canvasCount": 1
-    },
-    "timings": {
-      "apply": {
-        "n": 138,
-        "p95": 3.8999999910593033,
-        "max": 4.9000000059604645
-      },
-      "lod": {
-        "n": 3553,
-        "p95": 0.09999999403953552,
-        "max": 0.10000000894069672
-      },
-      "display": {
-        "n": 70,
-        "p95": 49.80000001192093,
-        "max": 440.70000000298023
-      },
-      "fullApply": {
-        "n": 20,
-        "p95": 4.799999997019768,
-        "max": 4.9000000059604645
-      },
-      "fullLod": {
-        "n": 697,
-        "p95": 0.09999999403953552,
-        "max": 0.10000000894069672
-      },
-      "fullDisplay": {
-        "n": 18,
-        "p95": 50.3999999910593,
-        "max": 50.3999999910593
-      }
-    },
-    "environment": {
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
-      "hardwareConcurrency": 10,
-      "dpr": 1,
-      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
-    },
-    "manager": {
-      "requests": 855,
-      "active": 0,
-      "peakActive": 4,
-      "responseBytes": 10615402,
-      "retries": 0,
-      "conflicts": 1,
-      "evictions": 73,
-      "peakQueue": 32,
-      "peakPending": 32,
-      "peakObjects": 4096,
-      "peakSerialized": 1918064,
-      "peakDecoded": 16663424,
-      "clientId": "a5222bab-e760-4fc2-9102-28078d25324f",
-      "generation": 90,
-      "queue": 0,
-      "pending": 0,
-      "residentObjects": 2048,
-      "objects": 2048,
-      "serialized": 463739,
-      "decoded": 4893656
-    },
-    "reconciliation": {
-      "captured": 848,
-      "reached_provider": 845,
-      "cancelled_before_provider": 3,
-      "duplicates": 0,
-      "outside_capture_requests": 226
-    },
-    "dispose": {
-      "geometry": 1,
-      "material": 1,
-      "geometries": 0
-    },
-    "admission": {
-      "failed": {
-        "requests": 73,
-        "active": 0,
-        "peakActive": 4,
-        "responseBytes": 927489,
-        "retries": 0,
-        "conflicts": 0,
-        "evictions": 3,
-        "peakQueue": 32,
-        "peakPending": 32,
-        "peakObjects": 2048,
-        "peakSerialized": 1454203,
-        "peakDecoded": 11768792,
-        "clientId": "707b287d-360a-41be-abf3-b7e1611447bd",
-        "generation": 8,
-        "queue": 0,
-        "pending": 0,
-        "residentObjects": 0,
-        "objects": 0,
-        "serialized": 0,
-        "decoded": 0
-      },
-      "requests_after_1500ms": 73,
-      "recovered": {
-        "requests": 141,
-        "active": 0,
-        "peakActive": 4,
-        "responseBytes": 1855097,
-        "retries": 0,
-        "conflicts": 0,
-        "evictions": 4,
-        "peakQueue": 32,
-        "peakPending": 32,
-        "peakObjects": 2048,
-        "peakSerialized": 1454260,
-        "peakDecoded": 11769248,
-        "clientId": "707b287d-360a-41be-abf3-b7e1611447bd",
-        "generation": 12,
-        "queue": 0,
-        "pending": 0,
-        "residentObjects": 2048,
-        "objects": 2048,
-        "serialized": 463804,
-        "decoded": 4894176
-      }
-    },
-    "motion": [
-      {
-        "mode": "Now",
-        "nonempty": 100,
-        "samples": 100,
-        "frames": 3
-      },
-      {
-        "mode": "86400x",
-        "nonempty": 100,
-        "samples": 100,
-        "frames": 3
-      },
-      {
-        "mode": "-86400x",
-        "nonempty": 100,
-        "samples": 100,
-        "frames": 3
-      }
-    ],
-    "resource_cycle_count": 48,
-    "provider": {
-      "requests": 1071,
-      "active": 0,
-      "peak_active": 5,
-      "bytes": 12222438,
-      "max_bytes": 14654,
-      "statuses": {
-        "200": 1067,
-        "409": 1,
-        "422": 3
-      },
-      "total_ms": 434987.10256199003,
-      "max_ms": 12004.169796999122,
-      "provider_rss_kib": 76168,
-      "builder": "none; generated per bounded request"
-    }
-  },
-  "verification": {
-    "backend_tests": 240,
-    "backend_branch_coverage_percent": 98.38,
-    "positions_api_coverage_percent": 100,
-    "sectors_coverage_percent": 100,
-    "frontend_tests": 207,
-    "frontend_coverage_percent": {
-      "statements": 98.24,
-      "lines": 99.15,
-      "branches": 92.7,
-      "functions": 98.51
-    },
-    "frontend_build": "passed; existing >500 kB chunk warning",
-    "horizons_vectors": 100,
-    "horizons_max_error_km": 0.002420538,
-    "ordinary_health": {
-      "status": "ok",
-      "objects": 3471
-    },
-    "screenshots_reviewed": [
-      "synthetic flight UI",
-      "ordinary physical Venus marker"
-    ],
-    "final_bundle": "index-DmAWaVHA.js; unchanged after removal of unused chart constructor"
-  },
-  "ordinary_regressions": {
-    "physical": {
-      "catalog": 3471,
-      "checks": [
-        "physical scene: Earth/Moon, one draw call, one renderer",
-        "displayed UTC and Float64 geometric positions agree",
-        "far overview loads all five centers; eviction/reload preserves centers and resources",
-        "floating origin follows selected body without modifying physical positions",
-        "Mercury/Venus selection, camera zoom and refocus preserve body centers and renderer",
-        "server search finds unloaded cards; paged sector read preserves unknown status",
-        "no full JSON/v2 catalog and no legacy live-ephemeris request",
-        "Mercury/Venus change with time and reverse return restores exact vectors",
-        "date changes and reverse return restore exactly the same centers",
-        "bounded registry pages, model metadata, pinned revision and 304",
-        "synthetic membership beyond five grows/reuses buffers without GPU resource growth",
-        "hierarchy cross-sector repartition preserves centers, render positions and GPU resources; stale epoch rejected",
-        "no uncaught JavaScript errors or console errors"
-      ],
-      "process_exit_code": 0
-    },
-    "lod": {
-      "catalog": 3471,
-      "checks": 5,
-      "requests_during_lod_only": 0,
-      "process_exit_code": 0
-    },
-    "recovery": {
-      "catalog": 3471,
-      "checks": [
-        "revision race: pinned 409 restarts discovery once and recovers",
-        "repeated conflict: bounded retry, visible error and no stale positions",
-        "next valid request restores positions after conflict",
-        "flat positions/1 with UTC model scale is rejected",
-        "successful frame clears transient scene error",
-        "frame recovery cannot hide initialization failure",
-        "no renderer rebuild, GPU resource growth or uncaught JavaScript errors"
-      ],
-      "resources": {
-        "geometries": 1,
-        "textures": 0,
-        "same_renderer": true
-      },
-      "process_exit_code": 0
-    },
-    "bounds": {
-      "catalog": 3471,
-      "checks": [
-        "2027-01-01 exact UTC/JD/centers",
-        "last supported UTC second",
-        "exclusive upper bound clears scene",
-        "Now recovers without GPU growth"
-      ],
-      "utc_interval": [
-        "2000-01-01T00:00:00+00:00",
-        "2027-06-28T00:00:00+00:00"
-      ],
-      "process_exit_code": 0
-    },
-    "latency": {
-      "catalog": 3471,
-      "steady_nonempty": 20,
-      "steady_samples": 20,
-      "distinct_frames": 3,
-      "pause_exact": true,
-      "manual_jump": true,
-      "directions": [
+    "checks": ["12 WebGL pixel + picking cases: both orders, L0/L1, 1e7/1e9/1e12 km", "both exact poles preserve physical eye/orientation through exit/idle; native drag resumes orbit"],
+    "tolerances": {"handoff_eye_km": 1e-06, "handoff_quaternion_components": 1e-12},
+    "depth": {
+      "results": [
         {
-          "reverse": false,
-          "samples": 25,
-          "frames": 5
+          "distance_km": 10000000,
+          "reversed": false,
+          "detail": false,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
         },
         {
-          "reverse": true,
-          "samples": 25,
-          "frames": 6
+          "distance_km": 10000000,
+          "reversed": false,
+          "detail": true,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 10000000,
+          "reversed": true,
+          "detail": false,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 10000000,
+          "reversed": true,
+          "detail": true,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000,
+          "reversed": false,
+          "detail": false,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000,
+          "reversed": false,
+          "detail": true,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000,
+          "reversed": true,
+          "detail": false,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000,
+          "reversed": true,
+          "detail": true,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000000,
+          "reversed": false,
+          "detail": false,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000000,
+          "reversed": false,
+          "detail": true,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000000,
+          "reversed": true,
+          "detail": false,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
+        },
+        {
+          "distance_km": 1000000000000,
+          "reversed": true,
+          "detail": true,
+          "pixel": [255, 0, 0, 255],
+          "picked": "synthetic-depth-near",
+          "centers_unchanged": true
         }
       ],
-      "resources": {
-        "geometries": 1,
-        "textures": 0
-      },
-      "process_exit_code": 0
+      "logarithmic_depth": true,
+      "depth_bits": 24,
+      "near": 1e-05,
+      "far": 1000000000000,
+      "gl_error": 0,
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
     },
-    "legacy": {
-      "catalog": 3471,
-      "complete": true,
-      "checks": [
-        "catalog, WebGL canvas and rendered frame",
-        "binary v2, gzip and ETag revalidation",
-        "spatial snapshot API, bounded page, ID lookup and ETag revalidation",
-        "paused date jumps and deterministic orbit return",
-        "all three scales remain mutually exclusive",
-        "LOD draw-call budget and virtualized list",
-        "no geometry/material/texture growth after scale-switch cycles",
-        "search, lazy detail card, tabs, follow toggle and close",
-        "empty search results and recovery",
-        "no uncaught browser errors"
-      ],
-      "runtime_errors": [],
-      "process_exit_code": 0
-    }
+    "handoff": [
+      {"pole": 1, "eye_error_km": 0.0, "quaternion_component_error": 0.0, "native_orbit_resumed": true},
+      {"pole": -1, "eye_error_km": 0.0, "quaternion_component_error": 0.0, "native_orbit_resumed": true}
+    ]
   },
-  "declared_rebase_screen_tolerance_css_px": 0.05,
-  "recorded_at": "2026-11-10T19:59:43.868921+00:00"
+  "history": {
+    "ordinary": {
+      "complete": true,
+      "synthetic": false,
+      "checks": [
+        "overview → flight transfers controls and rebases without a physical camera jump",
+        "trusted held keys rotate yaw/pitch/roll and move along local forward; frozen centers unchanged",
+        "trusted mouse drag rotates flight without selection or OrbitControls movement",
+        "search typing is isolated; selecting a body opens its card without teleporting",
+        "explicit refocus restores observation; stop/manual date/Now/pause leave free camera fixed",
+        "native tab switch during held flight clears keys; hidden/resume has no camera catch-up",
+        "12 flight/exit/refocus cycles retain renderer, canvas, GPU resources and listener count"
+      ],
+      "budgets_ms": {
+        "camera": [1, 8],
+        "apply": [16, 50],
+        "lod": [1, 8]
+      },
+      "tolerances": {"cpu_roundoff_km": 1e-06, "gpu_relative": 1e-07, "gpu_absolute_render": 1e-06},
+      "environment": {"os": "macOS-26.3-arm64-arm-64bit-Mach-O", "renderer": "SwiftShader (functional, not hardware fps)", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "width": 1440, "height": 913, "dpr": 1},
+      "numeric_centers": 5,
+      "local_forward_error": 1.3375139744683137e-13,
+      "time_modes": [
+        {"reverse": false, "multiplier": 86400, "distance_km": 38329.999999999825, "hold_seconds": 0.35},
+        {"reverse": true, "multiplier": -86400, "distance_km": 36660.00000000409, "hold_seconds": 0.35}
+      ],
+      "resources_warm": {
+        "listeners": 28,
+        "memory": {"geometries": 1, "textures": 0}
+      },
+      "resource_cycles": 12,
+      "resources_final": {
+        "listeners": 28,
+        "memory": {"geometries": 1, "textures": 0}
+      },
+      "timing_ms": {
+        "camera": {"n": 727, "mean": 0.04044016488562588, "p95": 0.10000000894069672, "max": 6.5999999940395355},
+        "apply": {"n": 154, "mean": 0.12467532334002582, "p95": 0.3999999910593033, "max": 2.5999999940395355},
+        "lod": {"n": 727, "mean": 0.010178817105588428, "p95": 0.09999999403953552, "max": 2.5}
+      },
+      "rebase_projection": [
+        {"n": 5, "max_css_px": 2.9975297762028654e-05}
+      ],
+      "budget_passed": {"camera": true, "apply": true, "lod": true}
+    },
+    "synthetic_http": {
+      "complete": true,
+      "synthetic": true,
+      "checks": [
+        "overview → flight transfers controls and rebases without a physical camera jump",
+        "trusted held keys rotate yaw/pitch/roll and move along local forward; frozen centers unchanged",
+        "trusted mouse drag rotates flight without selection or OrbitControls movement",
+        "search typing is isolated; selecting a body opens its card without teleporting",
+        "explicit refocus restores observation; stop/manual date/Now/pause leave free camera fixed",
+        "native tab switch during held flight clears keys; hidden/resume has no camera catch-up",
+        "native flight loads/evicts HTTP sectors; explicit return and transport failure recover atomically",
+        "12 flight/exit/refocus cycles retain renderer, canvas, GPU resources and listener count"
+      ],
+      "budgets_ms": {
+        "camera": [1, 8],
+        "apply": [16, 50],
+        "lod": [1, 8]
+      },
+      "tolerances": {"cpu_roundoff_km": 1e-06, "gpu_relative": 1e-07, "gpu_absolute_render": 1e-06},
+      "environment": {"os": "macOS-26.3-arm64-arm-64bit-Mach-O", "renderer": "SwiftShader (functional, not hardware fps)", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "width": 1440, "height": 913, "dpr": 1},
+      "numeric_centers": 2016,
+      "local_forward_error": 3.4706679824171495e-15,
+      "time_modes": [
+        {"reverse": false, "multiplier": 86400, "distance_km": 28329.99999999987, "hold_seconds": 0.35},
+        {"reverse": true, "multiplier": -86400, "distance_km": 30000.000000000022, "hold_seconds": 0.35}
+      ],
+      "resources_warm": {
+        "listeners": 28,
+        "memory": {"geometries": 1, "textures": 0}
+      },
+      "resource_cycles": 12,
+      "resources_final": {
+        "listeners": 28,
+        "memory": {"geometries": 1, "textures": 0}
+      },
+      "timing_ms": {
+        "camera": {"n": 1068, "mean": 0.03576779026496277, "p95": 0.10000000894069672, "max": 4.5},
+        "apply": {"n": 79, "mean": 0.9354430376728878, "p95": 4.9000000059604645, "max": 32.20000000298023},
+        "lod": {"n": 1068, "mean": 0.013483145975329902, "p95": 0.09999999403953552, "max": 2.5}
+      },
+      "rebase_projection": [
+        {"n": 2016, "max_css_px": 1.6871634132470267e-05}
+      ],
+      "budget_passed": {"camera": true, "apply": true, "lod": true}
+    },
+    "camera_outliers": [
+      {
+        "camera": {
+          "n": 688,
+          "p95_ms": 0.100000009,
+          "max_ms": 9.299999997,
+          "budget_p95_max_ms": [1, 8]
+        },
+        "context": "Before idle hot-path cleanup; builds not isolated; cause unestablished; retained rather than changing budget"
+      },
+      {
+        "camera": {"n": 761, "mean": 0.0420499341794915, "p95": 0.09999999403953552, "max": 11},
+        "budget_passed": {"camera": false, "apply": true, "lod": true},
+        "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/navigation_update_budget_report.json",
+        "note": "11ms outlier was not reproduced; no causal claim"
+      }
+    ],
+    "depth_pre_fix": {
+      "webgl_pixel_rgba": [0, 0, 255, 255],
+      "expected_front_pixel_rgba": [255, 0, 0, 255],
+      "near_marker_km": 1000000000.0,
+      "far_marker_km": 2000000000.0,
+      "renderer_log_depth_enabled": true,
+      "depth_bits": 24,
+      "pole_exit_camera_jump_km": 1.2
+    },
+    "regions_source_sha256": {
+      "frontend/src/physical/PhysicalScene.jsx": "ee1f17fa19486115dae38567e257d3fe2e7b1548bebf5cf7c7e5916f20484067",
+      "frontend/src/physical/physicalLayer.js": "e8686eea9a0f4148da420050334236325ad3b35da0aacf53a706537b3cc3ac3e",
+      "frontend/tests/physical-hooks.test.jsx": "88d594bdb7a7d358a0d03d8b2f1854b19b74af82740f2c610be773f1a13130b3",
+      "frontend/tests/physical-data.test.js": "a53b0353ac32d2111370e1ad43f410b091110e2e79f6c55948af17faf143a24e",
+      "tests/browser_navigation_regions_mcp.py": "3c67fd60375b02e4417eb4997486d2bb7f062504d6667e62e2e47b0e7a747801"
+    },
+    "raw_evidence": {
+      "navigation_budget_report.json": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/navigation_budget_report.json",
+      "navigation_regions_report.json": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/navigation_regions_report.json",
+      "debug_report_2026_11_11.json": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/debug_report_2026_11_11.json",
+      "navigation_regions_update_report.json": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/navigation_regions_update_report.json"
+    }
+  }
 }
