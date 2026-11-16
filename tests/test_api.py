@@ -13,11 +13,16 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-# Importing backend.app loads a catalog immediately. Tests must not depend on
-# data/objects.json, which is generated inside the container at startup.
-if not os.environ.get("ASTROVERSE_CATALOG_PATH", "").strip():
-    os.environ.pop("ASTROVERSE_CATALOG_PATH", None)
-os.environ.setdefault("ASTROVERSE_CATALOG_PATH", str(ROOT / "data" / "catalog_seed.json"))
+# API startup opens a published SQLite artifact. Keep this fixture independent
+# of the production volume and retain the JSON seed only as test input.
+from data.streaming_catalog import build_streaming_index
+
+_API_FIXTURE = tempfile.TemporaryDirectory(prefix="astroverse-api-test-")
+_API_FIXTURE_PATH = Path(_API_FIXTURE.name) / "catalog.sqlite"
+build_streaming_index(_API_FIXTURE_PATH, ROOT / "data" / "catalog_seed.json")
+os.environ["ASTROVERSE_CATALOG_MODE"] = "offline"
+os.environ["ASTROVERSE_SECTOR_PATH"] = str(_API_FIXTURE_PATH)
+os.environ["ASTROVERSE_CATALOG_PATH"] = str(ROOT / "data" / "catalog_seed.json")
 
 from fastapi.testclient import TestClient
 

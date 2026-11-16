@@ -224,7 +224,9 @@ def build_sector_index(path, items, *, cell_size_ly=32.0, max_objects=4096,
                     sector_id = f"{scale}:{frame}:" + ":".join(map(str, grid))
                     partition(sector_id, scale, frame,
                               [v * cell_size_ly for v in grid], cell_size_ly, units, 0)
-            metadata = {"schema_version": SCHEMA_VERSION, "unit": "ly",
+            from data.incremental_index import install_incremental_index, INCREMENTAL_SCHEMA
+            install_incremental_index(db)
+            metadata = {"incremental_schema": INCREMENTAL_SCHEMA, "schema_version": SCHEMA_VERSION, "unit": "ly",
                         "cell_size_ly": cell_size_ly, "max_objects": max_objects,
                         "max_depth": max_depth, "object_count": len(items)}
             digest = hashlib.sha256(_canonical([SCHEMA_VERSION, coordinate_contract(),

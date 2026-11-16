@@ -1,7 +1,4 @@
-import csv
-import hashlib
-import json
-import math
+import logging
 import os
 import sys
 import time
@@ -13,8 +10,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response, StreamingResponse
-from starlette.background import BackgroundTask
+from fastapi.responses import JSONResponse, Response
 
 ROOT = Path(__file__).resolve().parents[1]
 # Support `uvicorn app:app` from backend/ both locally and in Docker.
@@ -26,7 +22,19 @@ from data.catalog import (
 )
 from backend.prepare_runtime import ensure_runtime
 from backend.byte_cache import ByteLRU
+from backend.catalog_responses import disk_objects as _disk_objects
+from backend.legacy_ephemeris import (
+    fetch_jpl_vector as _fetch_jpl_vector, live_ephemeris as _live_ephemeris,
+    solar_ephemeris_targets as _solar_ephemeris_targets,
+)
 from data.runtime_catalog import DiskCatalog
+
+# Uvicorn configures its own loggers, leaving library INFO records disabled.
+# Keep the separately measured O(N) startup check visible under ordinary CMD.
+runtime_logger = logging.getLogger("data.runtime_catalog")
+runtime_logger.setLevel(logging.INFO)
+if not runtime_logger.hasHandlers():
+    runtime_logger.addHandler(logging.StreamHandler())
 
 DATA_PATH = catalog_path()
 CATALOG = DiskCatalog(ensure_runtime(DATA_PATH))
@@ -109,6 +117,8 @@ def build_catalog_index(items):
 
 def catalog_index():
     catalog = CATALOG
+    if isinstance(catalog, DiskCatalog):
+        raise RuntimeError("Disk catalogs must use SQLite queries, not the in-memory catalog index")
     if _CATALOG_INDEX["catalog"] is not catalog:
         by_id, haystacks = build_catalog_index(catalog)
         _CATALOG_INDEX.update(catalog=catalog, by_id=by_id, haystacks=haystacks)
@@ -207,76 +217,11 @@ install_sector_api(app, CATALOG, etag_matches,
 
 
 def disk_objects(request, q, kind, scale, version):
-    # Keep the transaction alive until the streaming response is consumed.
-    context = CATALOG.snapshot()
-    index = context.__enter__()
-    try:
-        revision = index.metadata["catalog_revision"]
-        key = ("legacy", revision, version, q, kind, scale)
-        etag = '"' + hashlib.sha256(repr(key).encode()).hexdigest() + '"'
-        headers = {"ETag": etag, "Cache-Control": CACHE_CONTROL, "Vary": "Accept"}
-        if etag_matches(request.headers.get("if-none-match"), etag):
-            return Response(status_code=304, headers=headers)
-        if version != "json" and not any((q, kind, scale)):
-            headers.update({"X-Object-Count": str(index.metadata["object_count"]),
-                            "X-Catalog-Format": version,
-                            "Content-Length": str(index.binary_size(version))})
-            def stream_binary():
-                try:
-                    yield from index.binary(version)
-                finally:
-                    stream_context.__exit__(None, None, None)
-            stream_context = context
-            response = StreamingResponse(stream_binary(), media_type="application/octet-stream", headers=headers,
-                                         background=BackgroundTask(stream_context.__exit__, None, None, None))
-            context = None
-            return response
-        if version == "json" and not any((q, kind, scale)):
-            def stream_json():
-                try:
-                    yield b"["
-                    separator = b""
-                    buffer = bytearray()
-                    for payload in index.select(raw=True):
-                        buffer.extend(separator + payload.encode())
-                        if len(buffer) >= 65536:
-                            yield bytes(buffer)
-                            buffer.clear()
-                        separator = b","
-                    yield bytes(buffer) + b"]"
-                finally:
-                    stream_context.__exit__(None, None, None)
-            stream_context = context
-            response = StreamingResponse(stream_json(), media_type="application/json", headers=headers,
-                                         background=BackgroundTask(stream_context.__exit__, None, None, None))
-            context = None
-            return response
-        payload = SERIALIZED_CACHE.get(key)
-        if payload is None:
-            rows, row_bytes = [], 0
-            for raw in index.select(q=q, kind=kind, scale=scale, limit=LEGACY_FILTER_MAX_OBJECTS + 1, raw=True):
-                row_bytes += len(raw.encode())
-                if len(rows) >= LEGACY_FILTER_MAX_OBJECTS or row_bytes > LEGACY_FILTER_MAX_BYTES:
-                    raise HTTPException(413, "Legacy filtered response exceeds budget; use /api/spatial/v1")
-                rows.append(json.loads(raw))
-            if version == "json":
-                payload = json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode()
-            else:
-                encoder = encode_binary_catalog_v2 if version == "v2" else encode_binary_catalog
-                payload = encoder(rows)
-            if len(payload) > LEGACY_FILTER_MAX_BYTES:
-                raise HTTPException(413, "Legacy filtered response exceeds byte budget")
-            SERIALIZED_CACHE.put(key, payload)
-            count = len(rows)
-        else:
-            count = (int.from_bytes(payload[8:12], "little") if version != "json" else 0)
-        if version != "json":
-            headers.update({"X-Object-Count": str(count), "X-Catalog-Format": version})
-        return Response(payload, media_type="application/json" if version == "json" else "application/octet-stream", headers=headers)
-    finally:
-        if context is not None:
-            context.__exit__(None, None, None)
-
+    return _disk_objects(
+        request, q, kind, scale, version, catalog=CATALOG, cache=SERIALIZED_CACHE,
+        etag_matches=etag_matches, cache_control=CACHE_CONTROL,
+        max_objects=LEGACY_FILTER_MAX_OBJECTS, max_bytes=LEGACY_FILTER_MAX_BYTES,
+    )
 
 def utcnow():
     """Single clock entry point, patched in tests to exercise cache expiry."""
@@ -284,52 +229,8 @@ def utcnow():
 
 
 def fetch_jpl_vector(cmd: str):
-    """Запрашивает у NASA JPL вектор (X, Y, Z) в а.е. относительно центра Солнца (@10)"""
-    base_url = "https://ssd-api.jpl.nasa.gov/horizons.api"
-    now_str = utcnow().strftime("%Y-%m-%d")
-
-    params = {
-        "format": "json",
-        "COMMAND": f"'{cmd}'",
-        "OBJ_DATA": "NO",
-        "MAKE_EPHEM": "YES",
-        "EPHEM_TYPE": "VECTORS",
-        "CENTER": "'@10'",  # Солнце-центрическая система
-        "START_TIME": f"'{now_str}'",
-        "STOP_TIME": f"'{now_str} 00:01'",
-        "STEP_SIZE": "'1d'",
-        "CSV_FORMAT": "YES",
-        "OUT_UNITS": "AU-D",
-        "VEC_TABLE": "2",
-        "VEC_CORR": "NONE",
-        "REF_PLANE": "ECLIPTIC",
-    }
-    url = f"{base_url}?{urllib.parse.urlencode(params)}"
-    req = urllib.request.Request(url, headers={'User-Agent': 'Astroverse/1.0'})
-
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        res = json.loads(resp.read().decode('utf-8'))
-        text = res.get("result", "")
-        if not isinstance(text, str):
-            return None
-        _, start, remainder = text.partition("$$SOE")
-        block, end, _ = remainder.partition("$$EOE")
-        if not start or not end:
-            return None
-        line = next((line for line in block.splitlines() if line.strip()), None)
-        if line is None:
-            return None
-        try:
-            fields = next(csv.reader([line]))
-            if len(fields) < 5:
-                return None
-            x, y, z = (float(value.strip()) for value in fields[2:5])
-        except (ValueError, csv.Error):
-            return None
-        if all(math.isfinite(value) for value in (x, y, z)):
-            # Three.js uses Y as the vertical axis; JPL uses Z.
-            return {"x": x, "y": z, "z": y}
-    return None
+    """Legacy Horizons vector; preserve the application clock injection point."""
+    return _fetch_jpl_vector(cmd, utcnow=utcnow, urlopen=urllib.request.urlopen)
 
 @app.get("/api/health")
 def health():
@@ -432,49 +333,15 @@ def object_by_id(object_id: str):
     return item
 
 
+def solar_ephemeris_targets():
+    return _solar_ephemeris_targets(CATALOG)
+
 @app.get("/api/live-ephemeris")
 def live_ephemeris():
-    """Возвращает реальные текущие координаты планет в пространстве напрямую из NASA"""
-    now = utcnow()
-
-    # Кэшируем на 1 час, чтобы не перегружать NASA и приложение летало
-    if EPHEMERIS_CACHE["timestamp"] and (now - EPHEMERIS_CACHE["timestamp"]).total_seconds() < 3600:
-        return {"timestamp": EPHEMERIS_CACHE["timestamp"].isoformat(), "positions": EPHEMERIS_CACHE["data"], "source": "NASA JPL Horizons (cached)"}
-
-    failed_at = EPHEMERIS_CACHE["failed_at"]
-    if failed_at and (now - failed_at).total_seconds() < EPHEMERIS_FAILURE_TTL_SECONDS:
-        return {
-            "timestamp": now.isoformat(),
-            "positions": EPHEMERIS_CACHE["data"],
-            "source": "NASA JPL Horizons (unavailable, cached)",
-        }
-
-    positions = {}
-    for item in CATALOG:
-        cmd = item.get("jpl_command")
-        if item["scale"] != "solar" or not cmd:
-            continue
-        planet_id = item["id"]
-        try:
-            vec = fetch_jpl_vector(cmd)
-            if vec:
-                positions[planet_id] = vec
-        except Exception as e:
-            print(f"JPL Horizons Error for {planet_id}: {e}")
-
-    if positions:
-        EPHEMERIS_CACHE["timestamp"] = now
-        EPHEMERIS_CACHE["data"] = positions
-        EPHEMERIS_CACHE["failed_at"] = None
-    else:
-        # Do not hammer an unreachable upstream on every request.
-        EPHEMERIS_CACHE["failed_at"] = now
-
-    return {
-        "timestamp": now.isoformat(),
-        "positions": EPHEMERIS_CACHE["data"],
-        "source": "NASA JPL Horizons Live Ephemeris"
-    }
+    return _live_ephemeris(
+        utcnow=utcnow, fetch=fetch_jpl_vector, targets=solar_ephemeris_targets,
+        cache=EPHEMERIS_CACHE, failure_ttl=EPHEMERIS_FAILURE_TTL_SECONDS,
+    )
 
 # Physical positions have their own version; snapshot and render APIs keep their semantics.
 from backend.position_api import install_position_api

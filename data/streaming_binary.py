@@ -78,3 +78,21 @@ def write_representations(db):
         header += struct.pack(f'<{n}Q',*offsets)
         publish('v2',header,sections,True)
     db.execute('DROP TABLE strings')
+
+
+def write_catalog_representations(db):
+    """Explicit O(N) legacy rebuild with compact array indices after deletions.
+
+    Persistent object ordinals remain stable. Legacy parent indices refer to
+    the compact output array, so gaps cannot be used as binary indices.
+    """
+    db.execute("DELETE FROM representations")
+    db.execute("""CREATE TEMP TABLE input AS
+        SELECT o.id,o.payload,row_number() OVER (ORDER BY o.ordinal)-1 AS ordinal,l.parent
+        FROM objects o JOIN object_links l ON l.id=o.id""")
+    db.execute('CREATE UNIQUE INDEX temp.legacy_input_id ON input(id)')
+    db.execute('CREATE INDEX temp.legacy_input_order ON input(ordinal)')
+    try:
+        write_representations(db)
+    finally:
+        db.execute('DROP TABLE temp.input')

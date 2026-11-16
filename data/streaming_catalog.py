@@ -181,6 +181,8 @@ def build_streaming_index(path, source, *, cell_size_ly=32.0, max_objects=4096,
             for sid,scale,frame in db.execute('SELECT * FROM cells ORDER BY sid'):
                 lower = None if frame in ('system','unlocated') else [int(v)*cell_size_ly for v in sid.split(':')[2:]]
                 partition(sid,scale,frame,lower,cell_size_ly,0)
+            from data.incremental_index import install_incremental_index, INCREMENTAL_SCHEMA
+            install_incremental_index(db)
             indexed = time.perf_counter()
             metrics['index_seconds'] = indexed-loaded
             write_representations(db)
@@ -189,7 +191,8 @@ def build_streaming_index(path, source, *, cell_size_ly=32.0, max_objects=4096,
             metadata = {'schema_version':SCHEMA_VERSION,'unit':'ly','cell_size_ly':cell_size_ly,
                         'max_objects':max_objects,'max_depth':max_depth,'object_count':count,
                         'catalog_revision':digest.hexdigest(),'coordinates':coordinate_contract(),
-                        'source_signature':source_signature,'builder':BUILDER_VERSION,'reused_sectors':reused_sectors}
+                        'source_signature':source_signature,'builder':BUILDER_VERSION,'reused_sectors':reused_sectors,
+                        'incremental_schema':INCREMENTAL_SCHEMA}
             if manifest is not None:
                 manifest['semantic_revision'] = metadata['catalog_revision']
                 metadata['import_manifest'] = manifest

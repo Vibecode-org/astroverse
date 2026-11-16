@@ -4,14 +4,13 @@ import logging
 import os
 from pathlib import Path
 import sys
+import sqlite3
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from data.sources import SourceError
-from data.build_catalog import build_enriched_catalog
-from data.catalog import load_catalog
+from backend.prepare_runtime import ensure_runtime
 
 LOG = logging.getLogger(__name__)
 
@@ -26,36 +25,13 @@ def main():
     if command[0] == "uvicorn":
         mode = os.environ.get("ASTROVERSE_CATALOG_MODE", "offline")
         try:
-            if mode in {"offline", "online"}:
-                LOG.info("Preparing catalog before API startup: %s", mode)
-                build_enriched_catalog(offline=mode == "offline")
-            elif mode == "published":
-                from backend.prepare_runtime import ensure_runtime
-                from data.catalog import catalog_path
-                ensure_runtime(catalog_path())
-                LOG.info("Using published SQLite catalog without JSON or network")
-            elif mode == "existing":
-                load_catalog()
-                LOG.info("Using validated existing catalog")
-            else:
-                raise ValueError("ASTROVERSE_CATALOG_MODE must be offline, online, existing or published")
-        # OverflowError обязателен: positive_limit(1e400) даёт int(inf) ->
-        # OverflowError, а не ValueError. Без него внятный LOG.error
-        # превращался в traceback из PID 1.
-        except (SourceError, ValueError, OSError, KeyError, TypeError, OverflowError) as exc:
-            # In online mode, fall back to offline instead of crashing to avoid
-            # restart loops against NASA APIs (M-5).
-            if mode == "online":
-                LOG.warning("Online catalog build failed, falling back to offline: %s", exc)
-                try:
-                    build_enriched_catalog(offline=True)
-                    LOG.info("Offline fallback succeeded")
-                except (SourceError, ValueError, OSError, KeyError, TypeError, OverflowError) as fallback_exc:
-                    LOG.error("Offline fallback also failed; API will not start: %s", fallback_exc)
-                    return 1
-            else:
-                LOG.error("Catalog preparation failed; API will not start: %s", exc)
-                return 1
+            # The API import performs the full integrity check once; this
+            # entrypoint opens/bootstrap-publishes without a duplicate warm scan.
+            target = ensure_runtime(full=False)
+            LOG.info("Using persistent SQLite catalog (%s): %s", mode, target)
+        except (ValueError, OSError, KeyError, TypeError, OverflowError, sqlite3.Error) as exc:
+            LOG.error("Catalog preparation failed; API will not start: %s", exc)
+            return 1
 
     # Replace the entrypoint so Uvicorn receives Docker stop signals directly.
     os.execvp(command[0], command)

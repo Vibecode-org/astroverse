@@ -4,8 +4,9 @@
 Math.random). Каждые 10 объектов — 1 звезда + 9 экзопланет. Экзопланеты
 имеют parent, указывающий на свою звезду.
 
-Генерирует data/objects_100k.json, который можно подать в бэкенд через
-ASTROVERSE_CATALOG_PATH + ASTROVERSE_CATALOG_MODE=existing.
+Генерирует data/objects_100k.json для явной подготовки SQLite через
+backend.prepare_runtime. make scene SCENE=legacy открывает
+готовую stress100k.sqlite в published mode; команды — tests/README.md.
 """
 
 import json

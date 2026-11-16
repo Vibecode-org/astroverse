@@ -1,0 +1,324 @@
+{
+  "schema": "incremental-writer-benchmark/1",
+  "date": "2026-11-15",
+  "scope": "Limited 3.7-B local normalized-card/graph/search/base-cell update; complete publication remains O(N).",
+  "base_revision": "4fe4263",
+  "implementation": "uncommitted working tree, exact source SHA-256 below",
+  "environment": {
+    "host": "macOS-26.3-arm64-arm-64bit-Mach-O",
+    "host_machine": "arm64",
+    "worker_platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+    "python": "3.12.16 (main, Nov 5 2026, 08:06:14) [GCC 14.2.0]",
+    "sqlite": "3.46.1",
+    "worker_machine": "aarch64",
+    "baseline_image": "sha256:dafd21006e8531d328b2ad9a9aeb6857a631ef132f4ab57244614f76e8990dff",
+    "cpu_isolation": false
+  },
+  "source_sha256": {
+    "data/incremental_catalog.py": "954d2dd188becaa1a6fc17fee0322dd2dab38fd2db6204371e0a03826b80b9d8",
+    "data/incremental_index.py": "d6362f22ea5384f19e7620d2e7284a37da656f9b6906d810dba8257ace8ac2a8",
+    "data/streaming_catalog.py": "0c411c64035afa3879c31fd07bf4fe78eea4bfcbefc708d2504cacbac4b6c79b",
+    "data/streaming_binary.py": "6aebf2898908239417e2e96647712e37e073dec9347adeb3ecb2462f1563b4e0",
+    "data/sectors.py": "23c58d1dc2240145997e2817af25ce3b2b517c84e108e76fcce909b58c2e8d48",
+    "tests/benchmark_incremental.py": "e4f836c9d15ba066c03b999061d73c38e0cd25ca0c98fe9531d1611c1078e06b"
+  },
+  "budgets_declared_before_measurement": {
+    "affected_objects_max": 4096,
+    "local_growth_allowance_seconds": 0.05,
+    "local_growth_ratio_max": 3,
+    "local_seconds_max": 2,
+    "normalized_records_max": 1,
+    "process_peak_rss_mib_max": 512,
+    "total_seconds_max": 180
+  },
+  "fixture": {
+    "source": "tests/benchmark_incremental.py:records",
+    "rows": [
+      100000,
+      1000000
+    ],
+    "family_size": 10,
+    "rows_per_base_cell": 1000,
+    "max_objects": 256,
+    "patch": "Same description-only upsert to bench_0000000, then identical no-op repeat.",
+    "synthetic": true
+  },
+  "baseline": [
+    {
+      "binary_sha256": {
+        "v1": "bd860c06b87f219603826781d3ba17fb9095587819f6a361956faa68c5556550",
+        "v2": "4c8c056d899e30d6a6b0cca089292f2e7278bb2b1d5bbae071f32c8643b70a58"
+      },
+      "count": 100000,
+      "disk_peak_sampled_bytes": 199225344,
+      "local_seconds": 2.3317151680000023,
+      "metrics": {
+        "compact_seconds": 0.2910964579999984,
+        "index_seconds": 0.9993134589999926,
+        "legacy_bytes": {
+          "v1": 2600020,
+          "v2": 10100172
+        },
+        "legacy_seconds": 1.6140859590000076,
+        "local_update_seconds": 2.3317151680000023,
+        "normalized_records": 100000,
+        "read_normalize_seconds": 1.3324017090000098
+      },
+      "mode": "baseline",
+      "passed": false,
+      "process_peak_rss_mib": 50.64453125,
+      "published_bytes": 51601408,
+      "total_wall_seconds": 4.43930979400001,
+      "catalog_revision": "f54d08229238b791853e7a23f7f08792f5091d362271f020ebdecd09657054fd",
+      "budgets": {
+        "affected_objects_max": 4096,
+        "local_growth_allowance_seconds": 0.05,
+        "local_growth_ratio_max": 3,
+        "local_seconds_max": 2,
+        "normalized_records_max": 1,
+        "process_peak_rss_mib_max": 512,
+        "total_seconds_max": 180
+      },
+      "build_metrics": {
+        "compact_seconds": 0.32026249999999834,
+        "index_seconds": 1.5364269589999964,
+        "legacy_bytes": {
+          "v1": 2600020,
+          "v2": 10100172
+        },
+        "legacy_seconds": 1.609078960000005,
+        "read_normalize_seconds": 1.1519437080000046
+      },
+      "repeat_metrics": {}
+    },
+    {
+      "binary_sha256": {
+        "v1": "0e93950767d55d7cefd709947362b4b8aa9f031cc9420b83a3ce8c381a344a78",
+        "v2": "6e9a6c29bcf40d0598256ad45d537df0176bc548ee9933c67fbfeebc4a041d38"
+      },
+      "budgets": {
+        "affected_objects_max": 4096,
+        "local_growth_allowance_seconds": 0.05,
+        "local_growth_ratio_max": 3,
+        "local_seconds_max": 2,
+        "normalized_records_max": 1,
+        "process_peak_rss_mib_max": 512,
+        "total_seconds_max": 180
+      },
+      "build_metrics": {
+        "compact_seconds": 3.4149920849999944,
+        "index_seconds": 15.857258758,
+        "legacy_bytes": {
+          "v1": 26000020,
+          "v2": 101000172
+        },
+        "legacy_seconds": 16.47817254900002,
+        "read_normalize_seconds": 11.425110920999998
+      },
+      "catalog_revision": "b32c1b227930728e2c3ba791d5fb987d01e1beae68148a80212550a854f21176",
+      "count": 1000000,
+      "disk_peak_sampled_bytes": 2096729968,
+      "local_seconds": 24.276276760000002,
+      "metrics": {
+        "compact_seconds": 3.0586036680000177,
+        "index_seconds": 10.657183670999984,
+        "legacy_bytes": {
+          "v1": 26000020,
+          "v2": 101000172
+        },
+        "legacy_seconds": 16.285183758000016,
+        "local_update_seconds": 24.276276760000002,
+        "normalized_records": 1000000,
+        "read_normalize_seconds": 13.619093089000017
+      },
+      "mode": "baseline",
+      "passed": false,
+      "process_peak_rss_mib": 223.015625,
+      "published_bytes": 529395712,
+      "repeat_metrics": {},
+      "total_wall_seconds": 45.814257271
+    }
+  ],
+  "incremental": [
+    {
+      "binary_sha256": {
+        "v1": "bd860c06b87f219603826781d3ba17fb9095587819f6a361956faa68c5556550",
+        "v2": "4c8c056d899e30d6a6b0cca089292f2e7278bb2b1d5bbae071f32c8643b70a58"
+      },
+      "budgets": {
+        "affected_objects_max": 4096,
+        "local_growth_allowance_seconds": 0.05,
+        "local_growth_ratio_max": 3,
+        "local_seconds_max": 2,
+        "normalized_records_max": 1,
+        "process_peak_rss_mib_max": 512,
+        "total_seconds_max": 180
+      },
+      "build_metrics": {
+        "compact_seconds": 0.36662537500001235,
+        "index_seconds": 2.1227651259999902,
+        "legacy_bytes": {
+          "v1": 2600020,
+          "v2": 10100172
+        },
+        "legacy_seconds": 1.6255517920000102,
+        "read_normalize_seconds": 1.136287626000012
+      },
+      "catalog_revision": "f54d08229238b791853e7a23f7f08792f5091d362271f020ebdecd09657054fd",
+      "count": 100000,
+      "disk_peak_sampled_bytes": 155600576,
+      "local_seconds": 0.009436458000038783,
+      "metrics": {
+        "affected_cells": 1,
+        "affected_objects": 1000,
+        "affected_payload_bytes": 159769,
+        "affected_sectors": 6,
+        "copy_seconds": 0.11736895899997535,
+        "full_validation_seconds": 0.25808033399999886,
+        "global_hash_seconds": 0.05906095799997502,
+        "legacy_seconds": 1.8190049180000187,
+        "local_update_seconds": 0.00422270900003241,
+        "no_op": false,
+        "normalized_records": 1,
+        "patch_seconds": 6.383300001289172e-05,
+        "publication_seconds": 0.00019804199996542593,
+        "search_rows_written": 1,
+        "total_seconds": 2.2771896680000054,
+        "validation_seconds": 0.005149915999993482
+      },
+      "mode": "incremental",
+      "passed": true,
+      "process_peak_rss_mib": 47.71875,
+      "published_bytes": 76996608,
+      "repeat_metrics": {
+        "affected_cells": 0,
+        "affected_objects": 0,
+        "affected_payload_bytes": 0,
+        "affected_sectors": 0,
+        "copy_seconds": 0,
+        "full_validation_seconds": 0,
+        "global_hash_seconds": 0,
+        "legacy_seconds": 0,
+        "local_update_seconds": 0,
+        "no_op": true,
+        "normalized_records": 0,
+        "patch_seconds": 7.308400000738402e-05,
+        "publication_seconds": 0,
+        "search_rows_written": 0,
+        "total_seconds": 0.0006626669999718615,
+        "validation_seconds": 0
+      },
+      "total_wall_seconds": 2.2771932090000178
+    },
+    {
+      "binary_sha256": {
+        "v1": "0e93950767d55d7cefd709947362b4b8aa9f031cc9420b83a3ce8c381a344a78",
+        "v2": "6e9a6c29bcf40d0598256ad45d537df0176bc548ee9933c67fbfeebc4a041d38"
+      },
+      "budgets": {
+        "affected_objects_max": 4096,
+        "local_growth_allowance_seconds": 0.05,
+        "local_growth_ratio_max": 3,
+        "local_seconds_max": 2,
+        "normalized_records_max": 1,
+        "process_peak_rss_mib_max": 512,
+        "total_seconds_max": 180
+      },
+      "build_metrics": {
+        "compact_seconds": 4.409652501999972,
+        "index_seconds": 22.383911177000073,
+        "legacy_bytes": {
+          "v1": 26000020,
+          "v2": 101000172
+        },
+        "legacy_seconds": 16.137221716,
+        "read_normalize_seconds": 11.282110338999928
+      },
+      "catalog_revision": "b32c1b227930728e2c3ba791d5fb987d01e1beae68148a80212550a854f21176",
+      "count": 1000000,
+      "disk_peak_sampled_bytes": 1581807080,
+      "local_seconds": 0.011134665999975368,
+      "metrics": {
+        "affected_cells": 1,
+        "affected_objects": 1000,
+        "affected_payload_bytes": 159769,
+        "affected_sectors": 6,
+        "copy_seconds": 1.3900430840000126,
+        "full_validation_seconds": 2.7671824589999687,
+        "global_hash_seconds": 0.6619010829999752,
+        "legacy_seconds": 19.278240925999967,
+        "local_update_seconds": 0.005116208000004008,
+        "no_op": false,
+        "normalized_records": 1,
+        "patch_seconds": 0.00031324999997650593,
+        "publication_seconds": 0.000292540999907942,
+        "search_rows_written": 1,
+        "total_seconds": 24.25154055200005,
+        "validation_seconds": 0.005705207999994855
+      },
+      "mode": "incremental",
+      "passed": true,
+      "process_peak_rss_mib": 49.56640625,
+      "published_bytes": 782938112,
+      "repeat_metrics": {
+        "affected_cells": 0,
+        "affected_objects": 0,
+        "affected_payload_bytes": 0,
+        "affected_sectors": 0,
+        "copy_seconds": 0,
+        "full_validation_seconds": 0,
+        "global_hash_seconds": 0,
+        "legacy_seconds": 0,
+        "local_update_seconds": 0,
+        "no_op": true,
+        "normalized_records": 0,
+        "patch_seconds": 0.00010729100006301451,
+        "publication_seconds": 0,
+        "search_rows_written": 0,
+        "total_seconds": 0.0007346660000848715,
+        "validation_seconds": 0
+      },
+      "total_wall_seconds": 24.251574468999934
+    }
+  ],
+  "limitations": [
+    "One measured publication per size; these are elapsed observations without CPU isolation, not distributions or an API SLA.",
+    "Local time includes input patch validation, bounded final-graph validation and local SQL/repartition; baseline local is full normalization+indexing. Copy, global hash, full integrity, legacy and publication are included in total.",
+    "RSS is process high-water mark including initial full build and validation; baseline validates binary with a joined buffer while final benchmark streams SHA-256. Do not interpret their RSS difference as a writer RAM improvement.",
+    "Sampled disk covers named files under private benchmark directory during patch, excludes initial build window and unlinked binary spools and may miss brief peaks. Disk usage is recorded, without a predeclared pass threshold.",
+    "Incremental publication retains SQLite free pages and additive indexes; its published artifact is larger than baseline. No VACUUM is hidden in local update.",
+    "The measured fixture touches 1000 rows, not the maximum allowed 65536-row/64MiB affected region. Graph/moves/split/merge are independent regressions, not million-row timing acceptance.",
+    "Atomicity tests cover process failures before/after rename. Power-loss durability and distributed/network filesystems are not accepted.",
+    "Old schema-2 readers remain compatible; missing incremental capability requires explicit O(N) rebuild. Normal startup/offline DB migration and complete 3.7-B remain open.",
+    "Pre-final 100k run excluded: it preceded oversized no-op payload preflight fix. Recorded final 100k and 1m runs share final production hashes."
+  ],
+  "verification": {
+    "backend": {
+      "tests": 264,
+      "passed": true,
+      "coverage_branch_aware_percent": 97.97,
+      "sectors_percent": 100,
+      "incremental_catalog_percent": 98.1,
+      "incremental_index_percent": 95.24,
+      "streaming_binary_percent": 100,
+      "owner": "reviewer"
+    },
+    "frontend": {
+      "tests": 222,
+      "passed": true,
+      "build": true,
+      "coverage": {
+        "statements": 97.83,
+        "lines": 99.03,
+        "branches": 91.41,
+        "functions": 98.23
+      }
+    },
+    "ordinary_browser_physical": {
+      "checks": 13,
+      "passed": true
+    },
+    "docker_build": true,
+    "ordinary_health_objects": 3471
+  }
+}

@@ -24,7 +24,7 @@ import urllib.request
 import ijson
 from ijson.common import ObjectBuilder
 
-from data.incremental_catalog import publication_lock, RevisionConflict
+from data.publication import publication_lock, RevisionConflict
 from data.normalizers import make_object, measurement, SourceError, small_body_name
 from data.runtime_catalog import DiskCatalog
 from data.sectors import _canonical, SCHEMA_VERSION

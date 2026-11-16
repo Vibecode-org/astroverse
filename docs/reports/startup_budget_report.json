@@ -1,0 +1,245 @@
+{
+  "date": "2026-11-16",
+  "scope": "limited default SQLite startup/offline migration",
+  "environment": {
+    "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+    "python": "3.12.16",
+    "sqlite": "3.46.1",
+    "compose": "v5.6.1",
+    "cpu_isolation": false,
+    "page_cache_flushed": false
+  },
+  "method": {
+    "readiness": "entrypoint process launch to successful HTTP health, including bootstrap and app import",
+    "startup_peak_kib": "maximum sampled pre-exec VmHWM and final API VmHWM; exec resets Linux high-water counters",
+    "api_rss_kib": "VmRSS immediately after HTTP readiness",
+    "fixture": "tests.benchmark_streaming.generate; same generator hash in old/new images; generation excluded",
+    "artifact_preparation": "new explicit full build+integrity+SHA/provenance in fresh child process, outside startup",
+    "cold": "empty private volume, SHA/copy+integrity before publication plus API integrity",
+    "restart": "same publication, full integrity/FK check once, no normalization/build",
+    "samples_per_size": {
+      "first": 1,
+      "restart": 1
+    },
+    "comparison": "sequential runs with no concurrent builds/tests during recorded measurements; no CPU or page-cache isolation; not SLA/distributions",
+    "excluded_runs": "Exploratory runs overlapped other checks and were excluded; recorded comparison is sequential."
+  },
+  "before_image_prefix": "sha256:d75b5c58ea0e",
+  "after_measured_image": "sha256:c0b3e45c22e453eddd525be51efda4bd42e24a8b73d460af38b1599325d50db8",
+  "fixture_generator_sha256": "d1fa3f944249225c58edfa6b95943980365a0ae88828f75049468142ae5bdeb2",
+  "before_source_sha256": {
+    "backend/entrypoint.py": "bc9490a44b4604c334f989cc25eb945b4eaf0b43e2bd57d34e163f4a325d1c6c",
+    "backend/prepare_runtime.py": "997c6c1a3e8d66a2414dcc056cd4af761f3b917ba208f1bfdd81171c44c53ff8",
+    "data/runtime_catalog.py": "ee51637da24e7561311d59c7e0130c75ec2e8e89ec660f48358b2f949800255c"
+  },
+  "after_source_sha256": {
+    "backend/entrypoint.py": "d51dd67081bbde7c67b46ef616378957c4ac474d4412378888b3c0c5b559b94f",
+    "backend/prepare_runtime.py": "cde8229e4f0fd0fc0953af5cc043e896c5c1b7150f21806ef27bfaaa022ebd5f",
+    "backend/app.py": "2bc508d64328d33822ac5c81fe84e6afee3c9a5f972575509ea06d54c3c208b1",
+    "backend/Dockerfile": "d562db2c7e6cf073e978d9c40a790895ef003dd4092dddf85fe466da0b247893",
+    "data/runtime_catalog.py": "b0de680c9534c6b6a63e1b96398bd0ceb76dbae2079a9e4e0935915dda7ede8c",
+    "data/bootstrap_catalog.py": "d13f943019bab8b7a30f61eadc2b65a3b7ec68b77fd6da8ccdcd655865a25853",
+    "tests/benchmark_startup.py": "da71201de09ab4f693a9c3939b5bf76a1fdec75b28b14ac12f9d06abf031b785",
+    "tests/benchmark_streaming.py": "d1fa3f944249225c58edfa6b95943980365a0ae88828f75049468142ae5bdeb2"
+  },
+  "before": [
+    {
+      "count": 100000,
+      "first": {
+        "api_kib": {
+          "VmHWM": 57808,
+          "VmRSS": 57808
+        },
+        "integrity_checks_seconds": [],
+        "ready_seconds": 10.118263879999972,
+        "startup_sampled_peak_kib": 187124,
+        "startup_peak_kib": 187124
+      },
+      "mode": "before",
+      "restart": {
+        "api_kib": {
+          "VmHWM": 57808,
+          "VmRSS": 57808
+        },
+        "integrity_checks_seconds": [],
+        "ready_seconds": 9.299753253999938,
+        "startup_sampled_peak_kib": 187116,
+        "startup_peak_kib": 187116
+      },
+      "source_bytes": 16566665
+    },
+    {
+      "count": 1000000,
+      "first": {
+        "api_kib": {
+          "VmHWM": 57792,
+          "VmRSS": 57792
+        },
+        "integrity_checks_seconds": [],
+        "ready_seconds": 97.17552000399996,
+        "startup_sampled_peak_kib": 1625184,
+        "startup_peak_kib": 1625184
+      },
+      "mode": "before",
+      "restart": {
+        "api_kib": {
+          "VmHWM": 57800,
+          "VmRSS": 57800
+        },
+        "integrity_checks_seconds": [],
+        "ready_seconds": 92.45309104199998,
+        "startup_sampled_peak_kib": 1624848,
+        "startup_peak_kib": 1624848
+      },
+      "source_bytes": 165669310
+    }
+  ],
+  "after": [
+    {
+      "artifact_preparation_seconds": 7.008191878000048,
+      "artifact_sha256": "ad7bda929da3a4ffa80a2c31abf106242b2e14eea495fdd0c8bc8f674297e57c",
+      "count": 100000,
+      "first": {
+        "api_kib": {
+          "VmHWM": 66716,
+          "VmRSS": 66716
+        },
+        "copy_checksum_seconds": [
+          0.084741
+        ],
+        "integrity_checks_seconds": [
+          0.281616,
+          0.280362
+        ],
+        "ready_seconds": 1.4923405840000896,
+        "startup_sampled_peak_kib": 66292,
+        "startup_peak_kib": 66716
+      },
+      "mode": "after",
+      "preparation_output": "",
+      "restart": {
+        "api_kib": {
+          "VmHWM": 66760,
+          "VmRSS": 66760
+        },
+        "copy_checksum_seconds": [],
+        "integrity_checks_seconds": [
+          0.297092
+        ],
+        "ready_seconds": 1.1467964580000398,
+        "startup_sampled_peak_kib": 66340,
+        "startup_peak_kib": 66760
+      },
+      "source_bytes": 16566665,
+      "sqlite_bytes": 65806336
+    },
+    {
+      "artifact_preparation_seconds": 65.66716061400007,
+      "artifact_sha256": "17b947299fa8e2d80b6462c4e2796d6dc0c7cb17ae8988df09240adbab0b3caa",
+      "count": 1000000,
+      "first": {
+        "api_kib": {
+          "VmHWM": 179856,
+          "VmRSS": 82132
+        },
+        "copy_checksum_seconds": [
+          0.525802
+        ],
+        "integrity_checks_seconds": [
+          3.400977,
+          3.126645
+        ],
+        "ready_seconds": 7.931297045000065,
+        "startup_sampled_peak_kib": 179856,
+        "startup_peak_kib": 179856
+      },
+      "mode": "after",
+      "preparation_output": "",
+      "restart": {
+        "api_kib": {
+          "VmHWM": 179904,
+          "VmRSS": 82116
+        },
+        "copy_checksum_seconds": [],
+        "integrity_checks_seconds": [
+          3.277286
+        ],
+        "ready_seconds": 4.107785501999842,
+        "startup_sampled_peak_kib": 179904,
+        "startup_peak_kib": 179904
+      },
+      "source_bytes": 165669310,
+      "sqlite_bytes": 663613440
+    }
+  ],
+  "acceptance": {
+    "backend_tests": 282,
+    "sector_coverage_percent": 100,
+    "frontend_tests": 222,
+    "frontend_coverage": {
+      "statements": 97.83,
+      "lines": 99.03,
+      "branches": 91.41,
+      "functions": 98.23
+    },
+    "docker_build": true,
+    "frontend_build": true,
+    "networkless_seed_free_container": true,
+    "startup_explicit_bad_mode_refused": true,
+    "missing_corrupt_incompatible_db": "unit + independent actual SQLite corruption probes; files preserved",
+    "concurrent_startup_and_sigkill": "real subprocess lifecycle tests",
+    "deterministic_bootstrap_bytes_manifest": true,
+    "chrome_physical": {
+      "passed": 13,
+      "raw_report_sha256": "4ab771aebed01e94fb8ba2364e0ce3eb134610f57c181fcc504a161d70fae6eb"
+    },
+    "chrome_legacy": {
+      "passed": 10,
+      "raw_report_sha256": "387e6190c4685dbcedcc3bdd081fb88fc0aaec6c07ffdf2506143206da550fc8"
+    },
+    "ordinary_health": {
+      "status": "ok",
+      "objects": 3471
+    },
+    "ordinary_migrated_sha256_verified": "fd835b49b826b47b36a2fd5b78802c6467792d54d374216d0163276e8d4331ef",
+    "integrity_info_visible_in_ordinary_logs": true,
+    "image_upgrade": {
+      "before": "sha256:fa25265cff9c072177c1c6cefdd591984854973863fe15b57cd50dbfd7d6e4ea",
+      "after": "sha256:35e7361c59fbd2921948f9d1a4b228f5d081a481afb4e86121e70f498adf164a"
+    },
+    "backend_coverage_log_sha256": "5c718f1cdf1143ac35e6383f27a5432f9ac4e23213cc337593369518425be555",
+    "backend_coverage_with_branches_percent": 97.05,
+    "patch_restart_recreate_image_update": {
+      "stages": [
+        "patch",
+        "restart",
+        "recreate_new_image"
+      ],
+      "all_equal": true,
+      "health": 3471,
+      "json_free": true,
+      "binary_sha256": {
+        "v1": "d77393f61d5aa1ef75aecac8fa4e35da093d4efc44f51f0c1577c21f9767aedc",
+        "v2": "b9ee80d56de9797757fb578b8a613a926271b6953c51fa44f6efe9069df0d365"
+      },
+      "revision": "2fb88101f854077067ebf793194f3d3e03a29e8356c7390d4f14c3b4c9296770"
+    }
+  },
+  "preserved_installation": {
+    "source": "stopped previous container data/catalog_seed.runtime.sqlite",
+    "sha256": "fd835b49b826b47b36a2fd5b78802c6467792d54d374216d0163276e8d4331ef",
+    "bytes": 4591616,
+    "catalog_revision": "b1c80ec9de4f095970c830d935a3dc5fef1971083b490f346b382a0d5bf1d380",
+    "object_count": 3471,
+    "migration": "byte-for-byte copy into ordinary named volume; local .env existing→offline; original .env backed up"
+  },
+  "limitations": [
+    "Only runtime catalog migration; model registry remains separate.",
+    "Integrity/FK verification, cold checksum/copy and artifact preparation remain O(N).",
+    "One million API VmRSS rises from ~56.4 to ~80.2 MiB after retained integrity-check allocations; peak figures include this verification, not just Python body residency.",
+    "Full catalog copy/hash/legacy publication still O(N).",
+    "No CPU isolation, cache flush, power-loss test or GPU performance milestone.",
+    "Offline acceptance covers API/runtime; building uncached base images/dependencies still needs their availability.",
+    "Historical cold path measured two integrity scans. Current pinned-release cold startup performs three; warm startup still performs one. No current cold latency claim."
+  ]
+}

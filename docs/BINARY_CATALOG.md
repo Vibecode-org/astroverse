@@ -1,177 +1,60 @@
 # Бинарный формат каталога v2
 
-Спецификация и контракт для бинарного каталога объектов Astroverse (версия 2).
-Python: `data/catalog_schema.py` проверяет каталог, `catalog_binary.py` содержит
-v1 и общие render/SoA primitives, `catalog_binary_v2.py` — v2. `data/catalog.py`
-сохраняет общий API и JSON I/O для существующих потребителей. JS-декодер —
-`frontend/src/data/readBinaryCatalog.js`, HTTP — `backend/app.py`.
+Legacy render SoA, не physical positions/эпоха/эфемериды. `/` читает `positions/1`;
+`/?scene=legacy` — solar JSON+полный v2, при ошибке binary полный JSON fallback.
+ID-фазы орбит экзопланет иллюстративны, в physical не допускаются.
 
-## Зачем
-
-JSON-каталог из 100 000 объектов занимает сотни мегабайт и парсится долго. Бинарный v2-формат — compact SoA (structure-of-arrays) с UTF-8 строковой таблицей: примерно 130 байт/объект, парсинг ~130 мс на 100 000 объектов (~4 мс на 3 471).
+Ownership: `data/catalog.py` — публичный API/JSON I/O; `catalog_schema.py` —
+validation; `catalog_binary.py` —v1/common render primitives;
+`catalog_binary_v2.py` —v2; `frontend/src/data/readBinaryCatalog.js` —decoder;
+`backend/catalog_responses.py` —SQLite streaming/cache, `app.py` —HTTP dispatch.
 
 ## Формат файла
 
-Все числа little-endian. Заголовок:
+Little-endian header: `ASTV`(4B),version uint32=2,count uint32,
+header_size uint32=172,section_count uint32=19,offsets uint64×19 от начала файла.
+Секции фиксированного порядка, каждая count элементов, кроме указанных:
 
-| Поле | Размер | Описание |
-|------|--------|----------|
-| magic | 4 байта | `"ASTV"` |
-| version | uint32 | `2` |
-| count | uint32 | число объектов |
-| header_size | uint32 | размер заголовка (включая таблицу смещений) |
-| section_count | uint32 | `19` |
-| offsets | uint64 × 19 | смещение каждой секции от начала файла |
+| № | Секция | Тип |
+|---|---|---|
+|1|positions|float32×count×3: x,y,z render units|
+|2|sizes|float32|
+|3|colors|uint32 packed RGBA|
+|4|kinds|uint8, KIND_CODES|
+|5|flags|uint8:bit0 parent,bit1 jet|
+|6|parents|int32 index,−1 отсутствует|
+|7|scales|uint8:solar0/local1/galaxy2|
+|8–12|radius_km,radius_earth,au,period_days,temperature_k|float32|
+|13–18|id_offsets,id_lengths,name_offsets,name_lengths,latin_offsets,latin_lengths|uint32|
+|19|strings|UTF-8 bytes id/name/latin, byte offsets/lengths|
 
-После заголовка идут секции в фиксированном порядке (19 шт., таблица в `BINARY_V2_SECTIONS`):
-
-1. `positions` — float32, `count × 3` (x, y, z)
-2. `sizes` — float32, `count`
-3. `colors` — uint32, `count` (RGBA packed)
-4. `kinds` — uint8, `code → KIND_NAMES`
-5. `flags` — uint8, `bit0 = has parent, bit1 = has jet`
-6. `parents` — int32, `index в массиве, −1 если нет`
-7. `scales` — uint8, `0 = solar, 1 = local, 2 = galaxy`
-8. `radius_km` — float32, `count`
-9. `radius_earth` — float32, `count`
-10. `au` — float32, `count`
-11. `period_days` — float32, `count`
-12. `temperature_k` — float32, `count`
-13. `id_offsets` — uint32, `count`
-14. `id_lengths` — uint32, `count`
-15. `name_offsets` — uint32, `count`
-16. `name_lengths` — uint32, `count`
-17. `latin_offsets` — uint32, `count`
-18. `latin_lengths` — uint32, `count`
-19. `strings` — байты, все id/name/latin подряд (последняя секция, без выравнивания)
-
-Все секции кроме `strings` выровнены по 4 байта. Числовые null кодируются как `0.0`; `scale` неизвестен → `255` (декодируется как `"local"`).
+Все секции кроме strings выровнены по4B. Legacy numeric null→0.0;
+unknown scale255 декодируется local. Это lossy legacy encoding, не правило
+unknown для physics. Parents/границы/offsets/truncation проверяются.
+V1 header `ASTV,version uint32=1,count uint32,offset uint64=20`, далее
+positions/sizes/colors/kinds/flags/parents:26B/object, без строк.
 
 ## HTTP
 
-- `GET /api/objects` — JSON (по умолчанию, для обратной совместимости)
-- `GET /api/objects?format=v2` — v2 бинарный (`Content-Type: application/octet-stream`, заголовок `X-Catalog-Format: v2`)
-- `Accept: application/vnd.astroverse.catalog.v2` — тоже v2
-- `Accept: application/octet-stream` — v1 бинарный (26 байт/объект, без строк)
+`/api/objects`→JSON; `?format=v2` или Accept vendor
+`application/vnd.astroverse.catalog.v2`→v2; Accept `application/octet-stream`→v1.
+Binary Content-Type `application/octet-stream`, X-Catalog-Format v1/v2,
+X-Object-Count. Карточка `/api/objects/{id}`, поиск `/api/search?q=`;
+description/facts/ra/dec отсутствуют в v2.
 
-### Кэширование
-
-Любой ответ `/api/objects` (JSON, v1, v2) несёт:
-
-| Заголовок | Значение |
-|---|---|
-| `ETag` | Непрозрачный SHA-256 ревизии снимка, версии и фильтров |
-| `Cache-Control` | `public, max-age=0, must-revalidate` |
-| `Vary` | `Accept` |
-
-Runtime читает SQLite schema 2: ревизия зависит от содержимого, порядка,
-контракта координат и настроек индекса. `size-mtime_ns` остался только в
-совместимом пути с явно подставленным Python-списком (тесты/встраивание).
-Хеш не содержит кириллицу и безопасен для HTTP-заголовка. `Vary: Accept` обязателен:
-один URL отдаёт JSON, v1 или v2 в зависимости от `Accept`.
-
-Запрос с `If-None-Match` (weak `W/"…"`, сильный ETag или список через запятую)
-возвращает `304 Not Modified` без тела. На 100k это ~2 мс и 0 байт вместо
-повторной передачи 2.46 МБ. nginx ослабляет ETag gzip-ответов до `W/"…"`,
-поэтому сравнение нормализует `W/`.
-
-v1 не ломается; v2 добавляется рядом. Только иллюстративный `/?scene=legacy` грузит `/api/objects?scale=solar` (JSON, солнечная система) + `/api/objects?format=v2` (полный бинарь). При ошибке бинаря — fallback на полный JSON с `console.warn`.
-
-## Что внутри (и чего нет)
-
-**Семантика текущего v2:** `positions` — render-координаты существующей сцены,
-включая её сжатую раскладку. Это не канонические физические положения и не
-эфемериды на выбранную дату. Полного контракта системы отсчёта/эпохи/точности
-в этом payload нет. Требование продукта — [реальные положения](COORDINATES.md);
-физический секторный API должен иметь явно версионированную семантику.
-Нельзя молча переинтерпретировать выпущенный v2 как световые годы или реальные
-положения на текущую дату.
-
-Новый физический `/` не запрашивает бинарный каталог. `positions/1` —
-отдельный контракт геометрических центров на дату; v2 не переинтерпретируется.
-
-Новый `/api/spatial/v1` возвращает JSON-снимки с `coordinates/1`; он не
-переопределяет ни одного поля binary v2. Полные legacy v1/v2 заранее строятся
-отдельным сборщиком и читаются по 64 KiB из SQLite, без полного каталога dict
-в API worker. Фильтрованные legacy-ответы ограничены 4096 объектами / 8 MiB
-(413 при превышении); их кэш ограничен 8 MiB, а не только количеством записей.
-Подробный контракт и пагинация — [SECTORS.md](SECTORS.md).
-
-v2 содержит: позиции, размер, цвет, вид, флаги, индекс родителя, scale, радиусы, орбитальные параметры, id/name/latin.
-
-v2 НЕ содержит: description, facts, ra, dec, галактические координаты. Карточка объекта догружается через `/api/objects/{id}`; поиск — через `/api/search?q=`.
-
-## Экзопланеты
-
-Экзопланеты раскладываются по орбитам фронтендом (см. `buildDeepSky.js`, `animation.js`), их бинарная позиция не используется. Бинарная позиция используется только для корневых звёзд и кластеров (без `parent`).
-
-Текущие фазы/плоскости, полученные из `id`, иллюстративны и не удовлетворяют
-требованию реального местоположения; при отсутствии подтверждённых данных
-положение должно оставаться неизвестным в целевом контракте.
+SQLite prebuilt full v1/v2 читаются блоками64KiB, JSON потоком;
+filtered≤4096objects/8MiB,иначе413; cache≤8MiB. ETag непрозрачный от snapshot
+revision/версии/filters; Cache-Control `public,max-age=0,must-revalidate`,
+Vary Accept. If-None-Match поддерживает weak W/,lists,*→304без тела.
+nginx gzip добавляет Vary Accept-Encoding,ослабляет ETag; gzip chunked без
+Content-Length,identity с длиной. Decoded bytes совпадают с исходным blob;
+gzip уменьшает сеть, не распакованную память. Snapshot API — [SECTORS](SECTORS.md).
 
 ## API чтения/записи (Python)
 
-- `encode_binary_catalog_v2(items) -> bytes` — собрать blob
-- `write_binary_catalog_v2(path, items)` — атомарная запись
-- `read_binary_catalog(buffer)` — диспатч v1/v2
-- `read_binary_catalog_v2(buffer)` — только v2
-- `validate_catalog(items)` — валидация перед записью
-
-## Декодирование строк на фронтенде
-
-`readBinaryCatalog.js` декодирует `id`/`name`/`latin` батчем, а не по одной
-строке:
-
-1. Вся секция `strings` декодируется одним вызовом `TextDecoder.decode`.
-2. `countUnits` считает UTF-16 code units по lead-байтам (continuation-байты
-   пропускаются, 4-байтовая последовательность даёт суррогатную пару).
-3. Каждая строка вырезается через `text.slice(unitStart, unitStart + units)` по
-   смещениям из таблиц.
-
-Это убирает фиксированную стоимость `TextDecoder` на вызов: на 100k было 300k
-вызовов и ~135–166 мс, стало ~122–164 мс (медиана 129 мс) при том же
-результате. Быстрый путь отказывается и падает на построчный `decodeTable`,
-если таблицы не отсортированы по возрастанию, перекрываются, выходят за границы
-или UTF-8 невалиден (декодер подставит `U+FFFD`, и подсчёт юнитов разойдётся).
-
-Компромисс по памяти: строки, полученные `slice`, держат родительскую строку
-всего блока (~12 МБ на 100k), пока жива хотя бы одна из них. Для каталога,
-который живёт весь сеанс, это приемлемо; для стриминга по секторам (Фаза 3)
-блок нужно будет освобождать вместе с сектором.
-
-## Тесты
-
-- `tests/test_catalog.py` — 6 тестов v2 (roundtrip строк/scale/parents, выравнивание заголовка, совпадение с v1, эквивалентность seed JSON, dangling parent, corrupt/truncated).
-- `tests/test_api.py` — API v2/search, индексация каталога и ETag/304
-  (включая поиск по каждому полю, запрет матча поперёк полей и пересборку
-  индекса при подмене каталога).
-- `tests/browser_smoke/smoke_binary.py` — v2 в браузере и gzip-транспорт.
-
-## Размер
-
-| Каталог | Объектов | v2 бинар | На объект | По сети (gzip) |
-|---------|----------|----------|-----------|----------------|
-| seed (реальные) | 3 471 | 319 979 Б | ~92 байт | 83 783 Б (3.8×) |
-| 100k (synthetic) | 100 000 | 13 000 172 Б | ~130 байт | 2 456 590 Б (5.3×) |
-
-100k укладывается в порог < 20 МБ. Для 1 млн линейная оценка — **~130 МБ**
-(71 МБ числа + 59 МБ строки), а не 30 МБ: целевые 30 МБ относятся к v1-core
-(26 байт/объект) без строк. Чтобы отдавать 1 млн, нужен стриминг по секторам
-(Фаза 3) или сжатие/отдельная компактная выдача метаданных. На synthetic-наборе
-gzip даёт ~2.45 МБ на 100k (≈24.5 МБ на 1 млн), но для реальных данных это не
-гарантировано.
-
-## Транспорт: gzip
-
-`frontend/nginx.conf` включает `gzip_types ... application/octet-stream` и
-`gzip_vary on`, поэтому v2 (и v1 binary) отдаются сжатыми:
-
-- `Accept-Encoding: gzip` → `Content-Encoding: gzip`, `Vary: Accept-Encoding`,
-  ответ chunked (без `Content-Length`)
-- `Accept-Encoding: identity` → без сжатия, с `Content-Length`
-- Тело после распаковки побайтово совпадает с файлом `objects.v2.bin`
-
-gzip экономит только трафик: в памяти всё равно лежит распакованный blob, а
-время парсинга не меняется (его ускоряет батчевое декодирование строк, см.
-выше). Тесты транспорта —
-`tests/browser_smoke/smoke_binary.py::TestBinaryTransport`.
+`encode_binary_catalog_v2(items)`, `write_binary_catalog_v2(path,items)` atomic;
+`read_binary_catalog(buffer)` dispatch v1/v2; `read_binary_catalog_v2(buffer)`;
+`validate_catalog(items)` перед записью. JS декодирует strings батчем с переводом
+byte→UTF-16 offsets; malformed/unusual layout использует построчный fallback.
+Slices удерживают исходную строку до освобождения каталога.
+Численные golden fixtures/команды — [tests/README](../tests/README.md).

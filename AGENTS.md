@@ -1,6 +1,6 @@
 # Astroverse
 
-React + Three.js / FastAPI, Docker. Catalog prepared at container startup.
+React + Three.js / FastAPI, Docker. Runtime opens persistent SQLite; clean install copies the pinned bootstrap.
 Start with this file and the relevant document; do not load every document by
 habit. Current sequence/status: `ROADMAP.md`; verification: `docs/TEST_COVERAGE.md`.
 Commands and browser/benchmark details: `tests/README.md`.
@@ -10,8 +10,53 @@ catalog size caps nor proof of complete coverage. Unknown physics stays null.
 Target production storage: all working body/model data lives and updates in the
 DB. Fixed JSON files must not be the primary body catalog; startup must not
 require a full objects.json. JSON remains valid for API, fixtures and tooling.
-Current seed/JSON startup is transitional. Migrate and verify its consumers
-before removing catalog files; retain numeric fixtures, configs and lockfiles.
+Production build/startup require no full catalog JSON. Seed remains test/tooling;
+verify consumers before removing fixtures, configs or lockfiles.
+
+## Team workflow
+
+The primary agent acts as team lead. The user explicitly requests sub-agent
+delegation for substantive tasks to keep the primary context focused. Delegate
+bounded investigation, implementation and review; do not do all work in the
+primary conversation. Small, isolated edits may be handled directly.
+
+- Team lead: clarify scope, split work, assign file ownership, resolve shared
+  contracts, integrate changes and take responsibility for final verification.
+- `physicist`: physical semantics, JPL Horizons, ephemerides,
+  coordinates and simulation time.
+- `renderer`: Three.js rendering, LOD/picking, performance and GPU resources.
+- `data`: catalogs, SQLite, imports, sources/provenance and deterministic,
+  reproducible generation.
+- `reviewer`: independent architecture review, builds, tests, regression
+  analysis and QA, including numerical/browser verification where relevant.
+
+Roles span backend and frontend; ownership follows the responsibility above,
+not the directory. The lead assigns UI and cross-cutting APIs for each task;
+owners agree on shared contracts before implementation. Each implementer
+checks their own changes; the reviewer independently checks the resulting work.
+
+Create or reuse these roles as needed within the available agent limit
+(currently lead + three workers). Engage the four worker roles in stages;
+release an implementation slot for the reviewer once the relevant work is
+ready. Do not schedule four workers simultaneously. Roles persist in these
+instructions; live agents must be recreated in a new session.
+Use the exact agent task names `physicist`, `renderer`, `data`, and `reviewer`.
+Create each role with fresh, focused context; retire the old `backend_data`,
+`frontend_render`, and `qa_review` agents rather than reassigning their roles.
+Give workers fresh, focused context:
+objective, relevant paths/contracts, owned files, acceptance criteria and
+required checks. Avoid copying the full conversation or reading unrelated docs.
+Workers return concise findings, changed paths, checks/results and unresolved
+risks; keep long logs and reports in files and link to them.
+
+Assign one writer per file; coordinate cross-cutting changes before editing.
+All agents share the workspace and Docker/browser resources: one designated
+owner switches stacks, publishes databases or runs conflicting browser checks.
+Use isolated temporary data for independent checks. Schedule QA after the
+relevant changes are ready; report which checks actually ran. The lead reviews
+the integrated diff, resolves findings and reports the outcome to the user.
+Delegate only work within the user's current task; the roadmap is context,
+not authorization to start another stage.
 
 ## Non-negotiable physical contract
 
@@ -37,7 +82,8 @@ before removing catalog files; retain numeric fixtures, configs and lockfiles.
 ```bash
 docker compose up --build -d  # http://localhost:5173
 docker compose build backend
-docker compose run --rm --no-deps -w /app backend python -m unittest discover -s tests -t . -v
+make test-build
+make test
 # From frontend/: npm ci; npm run test:coverage; npm run build
 python3 tests/browser_physical_mcp.py --catalog 3471
 ```
@@ -45,8 +91,10 @@ python3 tests/browser_physical_mcp.py --catalog 3471
 `-w /app` is required (image WORKDIR is /app/backend). One-off commands must
 not start with `uvicorn`, which triggers catalog preparation. Backend :8000
 is internal; frontend nginx proxies /api. Dev Vite proxies to 127.0.0.1:8000.
-After synthetic stress restore `docker compose up --build -d` without override;
-verify `/api/health` has 3471 objects. Both stacks share :5173.
+Test scenes use `make scene SCENE=sectors|s100k|legacy` on :5174; stop with
+`make scene-down`. Ordinary compose remains on :5173 with health3471.
+All test services live in `tests/docker/compose.yml`; unit and acceptance have
+separate project names/volumes. Never delete the ordinary volume for QA.
 Remove only task-created reports, screenshots, generated stress data, temporary
 environments/caches; retain test sources, numeric fixtures, lockfiles, MCP, BSP.
 
@@ -62,19 +110,21 @@ environments/caches; retain test sources, numeric fixtures, lockfiles, MCP, BSP.
   Float64 centers, linear GPU transform; `docs/HIERARCHY.md`. One physical
   sector today; general 3.3/3.8 remain open. Legacy is `/?scene=legacy`.
   Opt-in SQLite synthetic S-100k uses the same path: `docs/S100K.md`;
-  `docker-compose.s100k-test.yml`. Hardware milestone remains open.
+  `make scene SCENE=s100k`. Hardware milestone remains open.
 - `backend/sector_api.py`, `data/sectors.py`: bounded snapshot API/index;
   `docs/SECTORS.md`. `at` always 422. `frontend/src/data/sectorStore.js`
   reads bounded snapshot cards only.
+- `data/publication.py`: shared publication locks/fsync and RevisionConflict;
+  `incremental_region.py`: bounded family/cell updates.
 - `streaming_catalog.py`, `streaming_binary.py`, `incremental_catalog.py`:
   bounded JSON→SQLite/patch preparation; full legacy publication remains O(N).
   `data/import_sbdb.py`: bounded direct SBDB asteroid HTTP→staging→atomic
   runtime SQLite, manifest, explicit owned deletes; 3.7-A accepted. The old
-  online list builder remains for compatibility; incremental writer 3.7-B is open.
+  online list builder remains for compatibility; limited local writer is accepted, full 3.7-B remains open.
   `backend/prepare_runtime.py` runs separately. Runtime `CATALOG` is DiskCatalog;
   never populate the test-only list `catalog_index()` from production data.
-- `backend/entrypoint.py`: offline/online/existing generate/read objects.json;
-  published mode reads existing SQLite via required ASTROVERSE_SECTOR_PATH.
+- `backend/entrypoint.py`: offline opens working SQLite/copies pinned bootstrap;
+  published requires existing ASTROVERSE_SECTOR_PATH. online/existing require CLI preparation.
   `tests/test_api.py` pins catalog_seed.json. unittest ignores smoke_*.py.
 - HTTP limits: filtered legacy 4096 objects/8 MiB; snapshot pages 512/2 MiB;
   separate sector/filtered caches 8 MiB each. Full legacy routes stream.

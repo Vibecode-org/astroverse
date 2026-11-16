@@ -1,0 +1,37 @@
+{
+  "builder": "streaming/1",
+  "capabilities": {
+    "incremental_schema": 1
+  },
+  "catalog_revision": "b1c80ec9de4f095970c830d935a3dc5fef1971083b490f346b382a0d5bf1d380",
+  "coordinates": {
+    "accuracy": null,
+    "axes": "x=d*cos(lat)*cos(lon); y=d*sin(lat); z=d*cos(lat)*sin(lon)",
+    "axis_handedness": "left",
+    "evaluated_at": null,
+    "frames": {
+      "equatorial": "catalog RA hours / Dec degrees; reference system unspecified",
+      "galactic": "catalog l/b degrees; realization unspecified"
+    },
+    "ly_m": 9460730472580800,
+    "origin": null,
+    "reference_system": null,
+    "representation": "catalog_snapshot",
+    "root_motion": "snapshot_only; time queries rejected; rebuild relocates complete families",
+    "simulation_time_supported": false,
+    "source": null,
+    "source_epoch": null,
+    "time_scale": null,
+    "unit": "ly",
+    "unknown_values": "null",
+    "version": "coordinates/1"
+  },
+  "format": "astroverse-bootstrap/1",
+  "incremental_schema": 1,
+  "object_count": 3471,
+  "schema_version": 2,
+  "sha256": "8949847aad7aa584e1314375a563827a3ba6d99c258fda8759386ba8c3e0bf49",
+  "source": "catalog_seed.json",
+  "source_sha256": "080ac4d559e8c1d0cc5f394703c49002ab84228eecdceebdd00a0be491528fa3",
+  "sqlite_version": "3.46.1"
+}

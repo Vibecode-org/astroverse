@@ -1,10 +1,12 @@
 """Общие константы и helpers для браузерных smoke-тестов."""
 import json
+import os
 import re
 import urllib.request
 from datetime import datetime
 
-URL = "http://localhost:5173/?scene=legacy"
+BASE_URL = os.environ.get("SMOKE_URL", "http://localhost:5173").rstrip("/")
+URL = BASE_URL + "/?scene=legacy"
 
 # Object counts the two supported stacks serve. `stack3471` / `stack100k`
 # markers in conftest.py skip modules that do not match the running stack, so
@@ -23,7 +25,7 @@ VIEW_LABELS = {
 def served_object_count(timeout=5):
     """Object count the running stack reports, or 0 when it is unreachable."""
     try:
-        with urllib.request.urlopen(f"{URL}/api/health", timeout=timeout) as response:
+        with urllib.request.urlopen(f"{BASE_URL}/api/health", timeout=timeout) as response:
             return int(json.load(response)["objects"])
     except (OSError, ValueError, KeyError):
         return 0

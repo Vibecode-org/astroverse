@@ -1,0 +1,232 @@
+{
+  "format": "astroverse-backup-budget/1",
+  "date": "2026-11-16",
+  "runs": [
+    {
+      "count": 100000,
+      "environment": {
+        "cpu_count": 10,
+        "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+        "python": "3.12.16 (main, Nov  5 2026, 08:06:14) [GCC 14.2.0]",
+        "sqlite": "3.46.1"
+      },
+      "limitations": [
+        "one run per size",
+        "warm page cache",
+        "no CPU isolation",
+        "disk sampling may miss short transients",
+        "catalog preparation and patch excluded"
+      ],
+      "operations": [
+        {
+          "action": "backup",
+          "baseline_allocated_bytes": 76992512,
+          "extra_peak_allocated_bytes": 76996608,
+          "final_allocated_bytes": 153989120,
+          "metrics": {
+            "copy_seconds": 0.047305661999985205,
+            "file_bytes": 76992512,
+            "hash_seconds": 0.041328504999910365,
+            "publication_seconds": 0.000548250000065309,
+            "total_seconds": 0.3881632920000584,
+            "validation_seconds": 0.29609016699998847
+          },
+          "peak_rss_mib": 49.40234375,
+          "wall_seconds": 0.38817212499998277
+        },
+        {
+          "action": "restore",
+          "baseline_allocated_bytes": 153989120,
+          "extra_peak_allocated_bytes": 76992512,
+          "final_allocated_bytes": 230981632,
+          "metrics": {
+            "copy_seconds": 0.06386125299991363,
+            "file_bytes": 76992512,
+            "hash_seconds": 0.04160141400006978,
+            "publication_seconds": 0.0015045840000311728,
+            "total_seconds": 0.3933922920000441,
+            "validation_seconds": 0.28547654099998
+          },
+          "peak_rss_mib": 49.40234375,
+          "wall_seconds": 0.39340054199999486
+        }
+      ],
+      "revision": "801d3b83c3fe35ddb1b6d3039ef2d155e68f92a7a5dcfc64b85f50ed496a26d9",
+      "sha256": "dd6f4e3372b4dcc58e1a7ae472e9b9e810d5a55bac36160b54fbf69fb38918b4",
+      "source_sha256": {
+        "data/bootstrap_catalog.py": "abe53a261c3695ec6ca4092dc1077d08e3e5ccf975d38fd71f134804f80879d3",
+        "data/catalog_backup.py": "e817dd3e619cc8d22242c94d2c15e47c669f3c5338bc7f8783dca9bb3c1fee2b",
+        "data/runtime_catalog.py": "b0de680c9534c6b6a63e1b96398bd0ceb76dbae2079a9e4e0935915dda7ede8c",
+        "tests/benchmark_backup.py": "abc6820655a6e2b6d04559a25334b525d58de122f133316a5a7f90bc6179c075"
+      },
+      "sqlite_bytes": 76992512
+    },
+    {
+      "count": 1000000,
+      "environment": {
+        "cpu_count": 10,
+        "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+        "python": "3.12.16 (main, Nov  5 2026, 08:06:14) [GCC 14.2.0]",
+        "sqlite": "3.46.1"
+      },
+      "limitations": [
+        "one run per size",
+        "warm page cache",
+        "no CPU isolation",
+        "disk sampling may miss short transients",
+        "catalog preparation and patch excluded"
+      ],
+      "operations": [
+        {
+          "action": "backup",
+          "baseline_allocated_bytes": 782938112,
+          "extra_peak_allocated_bytes": 782942208,
+          "final_allocated_bytes": 1565880320,
+          "metrics": {
+            "copy_seconds": 0.29983087599987357,
+            "file_bytes": 782934016,
+            "hash_seconds": 0.4202726240001766,
+            "publication_seconds": 0.0005857499999137872,
+            "total_seconds": 3.9457439600000725,
+            "validation_seconds": 3.2224436679999826
+          },
+          "peak_rss_mib": 142.51953125,
+          "wall_seconds": 3.945751126999994
+        },
+        {
+          "action": "restore",
+          "baseline_allocated_bytes": 1565880320,
+          "extra_peak_allocated_bytes": 782938112,
+          "final_allocated_bytes": 2348818432,
+          "metrics": {
+            "copy_seconds": 0.2972455500015485,
+            "file_bytes": 782934016,
+            "hash_seconds": 0.4199558259984997,
+            "publication_seconds": 0.001605833999974493,
+            "total_seconds": 3.9092719599999555,
+            "validation_seconds": 3.189422167000089
+          },
+          "peak_rss_mib": 142.51953125,
+          "wall_seconds": 3.909280750999983
+        }
+      ],
+      "revision": "8256774e95427976dc4c4eae37194639937e31b4c24fbcc1fb092e1d45fc3308",
+      "sha256": "a45de663d96b4189ba5f3eae58d1232c180e3b05ac0832cff0aa9c2632318b7b",
+      "source_sha256": {
+        "data/bootstrap_catalog.py": "abe53a261c3695ec6ca4092dc1077d08e3e5ccf975d38fd71f134804f80879d3",
+        "data/catalog_backup.py": "e817dd3e619cc8d22242c94d2c15e47c669f3c5338bc7f8783dca9bb3c1fee2b",
+        "data/runtime_catalog.py": "b0de680c9534c6b6a63e1b96398bd0ceb76dbae2079a9e4e0935915dda7ede8c",
+        "tests/benchmark_backup.py": "abc6820655a6e2b6d04559a25334b525d58de122f133316a5a7f90bc6179c075"
+      },
+      "sqlite_bytes": 782934016
+    }
+  ],
+  "notes": [
+    "Sequential measurements without parallel builds/tests/browser",
+    "O(N) copy and SHA hashing measured separately inside same streaming pass; validation includes full integrity/FK",
+    "Extra disk subtracts baseline working publication/bundle; old-reader-held unlinked inodes are not sampled",
+    "Not a latency distribution or service-level budget",
+    "Following module extraction moved implementations without changing backup/restore operations; full regressions rerun, timings retain exact measured source hashes.",
+    "metadata_sha256 hashes UTF-8 json.dumps(metadata, sort_keys=True, ensure_ascii=False, separators=(comma, colon)); ordinary metadata values retain their raw SQLite strings."
+  ],
+  "preparation_base": "python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",
+  "measured_stage": "SQLite delivery before mechanical extraction into publication.py / incremental_region.py",
+  "acceptance": {
+    "backend_tests": 307,
+    "backend_coverage_percent": 96.16,
+    "sectors_coverage_percent": 100,
+    "frontend_tests": 222,
+    "frontend_coverage": {
+      "statements": 97.84,
+      "branches": 91.41,
+      "functions": 98.23,
+      "lines": 99.03
+    },
+    "chrome": {
+      "physical": 13,
+      "legacy": 10
+    },
+    "production_build_seed_absent": true,
+    "runtime_network_mode": "none",
+    "clean_objects": 3471,
+    "patched_working": {
+      "database_sha256": "66e49692cd522698de8384bc366e166e5a9db78708a127457cd5e312c64b1d01",
+      "etag304": true,
+      "ordered_cards_sha256": "1c01614a2044d0e98848e6a478351543a6cd963cd8c6e3da1ec830a447d87618",
+      "responses": {
+        "/api/health": {
+          "bytes": 30,
+          "etag": null,
+          "sha256": "fd000c6083dbce1cd3001e0ff34f08e17490cf987c56bcb9208d02651d09d3cc"
+        },
+        "/api/objects": {
+          "bytes": 1713997,
+          "etag": "\"2277851df80464c30ea7e5cba33015466321f09281dbd5671c4414d32bc8c2f8\"",
+          "sha256": "a336a51990d536135ce0dae0d154dffddcbaaeff136a8139ad2c5b0110bb3131"
+        },
+        "/api/objects/earth": {
+          "bytes": 1052,
+          "etag": null,
+          "sha256": "58608440325a1f762892d13350b5d11580b0da770b0ad2b73b34e24add21eca6"
+        },
+        "/api/objects?format=v1": {
+          "bytes": 90266,
+          "etag": "\"f1f5a4a87ff10ab47b5f31017d230b8f519abd9c718d056b0f5f8400b6e17533\"",
+          "sha256": "d77393f61d5aa1ef75aecac8fa4e35da093d4efc44f51f0c1577c21f9767aedc"
+        },
+        "/api/objects?format=v2": {
+          "bytes": 319979,
+          "etag": "\"111d91a3ae9725b9fcc9e3e35f801bd60d2df2656b526afcad0c96caa256f27f\"",
+          "sha256": "b9ee80d56de9797757fb578b8a613a926271b6953c51fa44f6efe9069df0d365"
+        },
+        "/api/positions/v1/sectors/solar:verified?at=2026-11-06T12:00:00Z": {
+          "bytes": 3664,
+          "etag": "\"735ae0d9eb9347cf74a7538a0d5669f6b65e8da331cba44cd1e8677678ea3a06\"",
+          "sha256": "735ae0d9eb9347cf74a7538a0d5669f6b65e8da331cba44cd1e8677678ea3a06"
+        },
+        "/api/search?q=%D0%B7%D0%B5%D0%BC%D0%BB%D1%8F": {
+          "bytes": 11601,
+          "etag": null,
+          "sha256": "0b70654c849105b03045e9f168fc28605563e8a87f43e47f24dee846f327499c"
+        },
+        "/api/spatial/v1/nearby?scale=local&frame=equatorial&x=0&y=0&z=0&radius=32": {
+          "bytes": 8033,
+          "etag": "\"53df9f78376e6b66547d8617d10ba8d49d82287a557c3b6922d20a0b493c54ca\"",
+          "sha256": "c9260600e676a986609093ab5a064abefc500f2bd9f7034a9d02b7a5cbe594c2"
+        },
+        "/api/spatial/v1/sectors/local%3Aequatorial%3A-1%3A-1%3A-1": {
+          "bytes": 23059,
+          "etag": "\"feb0303c74acdc89f47757e712bbfb431cd3f1235869b7a92bc7203036de11ae\"",
+          "sha256": "3fd529bbc9ff3e24a7ce3291a8f827dde665c48011a43ab2f1f4d02ce8295bda"
+        }
+      },
+      "metadata_sha256": "f7fa95a2bd3c10ab96e284a4087f62f7e9f7d45cd7685535bbacc38b467aa9e7",
+      "metadata_summary": {
+        "catalog_revision": "480dc4a17fdef7f32ff2a2e8f48c7b907cfec573e2d5296affdf15cf72dd8e02",
+        "incremental_schema": 1,
+        "object_count": 3471,
+        "parent_revision": "b1c80ec9de4f095970c830d935a3dc5fef1971083b490f346b382a0d5bf1d380",
+        "schema_version": 2
+      }
+    },
+    "changed_bootstrap": {
+      "artifact_sha256": "f9b218bdb0ede5b49dcb4736f8cb71e9748604ecc5c4e52b0fbc44055d5fe0a8",
+      "artifact_version": "delivery-test-variant",
+      "source_sha256": "8949847aad7aa584e1314375a563827a3ba6d99c258fda8759386ba8c3e0bf49",
+      "catalog_revision": "f8d324f0a78a445b5d49d31013cd55968166c6169d584fecf0ac62be74c3e08d"
+    },
+    "volume_loss_restore_exact": true,
+    "changed_bootstrap_preserves_working": true,
+    "ordinary_preserved": {
+      "sha256": "fd835b49b826b47b36a2fd5b78802c6467792d54d374216d0163276e8d4331ef",
+      "metadata_sha256": "997b946aa105fb46b2660b2805f409fd50d982770357a29263a10e536ee78e0a",
+      "metadata_summary": {
+        "catalog_revision": "b1c80ec9de4f095970c830d935a3dc5fef1971083b490f346b382a0d5bf1d380",
+        "incremental_schema": 1,
+        "object_count": 3471,
+        "schema_version": 2
+      }
+    },
+    "summary": "../TEST_COVERAGE.md"
+  }
+}

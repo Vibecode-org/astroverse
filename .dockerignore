@@ -7,7 +7,7 @@
 **/__pycache__
 **/*.py[cod]
 README.md
-# Каталог генерируется при старте контейнера, в образ попадать не должен.
+# Legacy outputs are tooling artifacts, never runtime image inputs.
 data/objects.json
 # Бинарный и 100k-каталоги тоже генерируются локально: не раздуваем build context.
 data/objects.bin
@@ -18,6 +18,7 @@ data/sectors*.sqlite
 data/*.runtime.sqlite
 data/*.runtime.sqlite.lock
 data/sectors*.sqlite.lock
+data/runtime/
 
 # Local notes/configuration and generated test output are not image inputs.
 .agent
@@ -25,3 +26,6 @@ data/sectors*.sqlite.lock
 **/coverage
 **/.pytest_cache
 docs
+
+# Versioned, verified delivery artifact is source-controlled; lock is local.
+data/bootstrap/*.lock

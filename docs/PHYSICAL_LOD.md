@@ -1,128 +1,51 @@
 # Физический L0/L1 и CPU/GPU-бюджеты
 
-Граница: два уровня графических маркеров для принятых positions/1. L0 — диск
-5 CSS px, L1 — центр с кольцом 15 CSS px. Размер shader учитывает pixel ratio renderer. Это не физические размеры/поверхности.
-Источники, пять центров DE440s, Float64 и physical-hierarchy/1 не меняются.
+`physical/sectorFrame.js` проверяет/собирает кадр; `sectorManager.js` владеет
+HTTP/admission/отменой; `physicalLayer.js` — GPU slots/LOD/picking.
+`positions/1` centers сохраняются; [единицы/иерархия](HIERARCHY.md).
+Legacy `scene/lodController.js`, `lodPicking.js`, `lodDetailedMeshes.js` — отдельный путь.
 
-`physical/sectorFrame.js` проверяет payload и собирает согласованный кадр;
-`sectorManager.js` владеет HTTP, admission, отменой и атомарной публикацией.
-В legacy-сцене `scene/lodController.js` выбирает уровни и обрабатывает picking,
-а `lodDetailedMeshes.js` владеет L2 meshes, cloned materials и selection pins.
+L0 — диск5CSSpx, L1 — кольцо15CSSpx с учётом DPR; это графические маркеры,
+не измеренные радиусы. L1 enter≤20render units(2e6km), exit≥28(2.8e6km),
+selected приоритетен;≤32L1, остальные L0. Циклически≤128LOD checks/RAF:
+при4096 до32кадров. Загруженные computed centers не скрываются радиусом LOD.
 
-Вход L1 при расстоянии камеры до центра ≤20 render units (2 млн км), выход
-≥28 (2.8 млн км). Выбранный загруженный центр имеет приоритет. До 32 L1;
-при заполнении остальные остаются L0, без скрытия или перемещения.
-Гистерезис сохраняет уровень внутри интервала. Обход циклический, до 128
-центров за RAF; при 4096 требуется до 32 кадров для полного обхода. Быстрое
-движение использует текущую камеру, очередь прошлых решений отсутствует.
-Это предел операций, не гарантия длительности кадра в миллисекундах.
-
-Один Points/ShaderMaterial/BufferGeometry, не более одного draw call.
-Ёмкость 8…4096 степенями двойки: XYZ/color/level Float32, 28 Б/слот,
-максимум 114688 Б атрибутов. Это номинальные данные, не память драйвера.
-ID сохраняет слот пока резидентен, свободные слоты повторно используются;
-дыры отбрасываются fragment shader. Рост освобождает прежнюю геометрию;
-renderer/material/Points сохраняются. Текстур нет. Picking один для обоих
-уровней, до 4096 проекций по клику; перекрытия разрешаются ближайшим
-экранным центром; при совпадении расстояний до клика в пределах 1e-6 CSS px
-выбирается передний центр по view depth, затем лексикографический ID. Перетаскивание
-более 5 CSS px, отменённый жест и вторичный указатель не вызывают picking.
-
-ShaderMaterial включает штатные Three.js log-depth vertex/fragment chunks,
-а не только renderer flag. Это сохраняет порядок глубины дальних маркеров;
-центры, масштаб и near/far от этого не меняются. Пиксельная регрессия —
-`tests/browser_depth_mcp.py` (L0/L1, оба порядка, 1e7…1e12 km, synthetic).
-
-В обычном профиле применение синхронное и атомарное до следующего render, максимум
-4096 строк: декодирование иерархии, согласование слотов, линейное преобразование.
-Нет staging GPU и незавершённых задач позиций: дата/ревизия/область заменяет
-целый набор, пустой/ошибочный кадр очищает его. LOD меняет только level,
-не вызывает fetch и не меняет UTC. Менеджер отдельно ограничивает HTTP и
-resident/staging. Смена области камерой по-прежнему может запросить данные.
-
-Ограниченная свободная камера использует этот же слой/manager/renderer;
-[управление, rebase и бюджеты](NAVIGATION.md). Поверхности/вращение/атмосферы, L2, fade, экстраполяция,
-массовый physical streaming и общий временной индекс вне этого этапа.
-S-100k из ROADMAP требует отдельного расширения/приёмки: текущие 4096 слотов
-и проверенные 2048 resident его не закрывают.
-Синхронная работа до 4096 строк остаётся ограничением; измеренная приёмка
-ниже относится к 2016 одновременно отображаемым маркерам.
+Один Points/material/geometry,≤1draw call. Capacity8…4096 степенями2,
+XYZ/color/level Float32=28B/slot,≤114688B. ID удерживает слот; свободные
+переиспользуются, holes отбрасываются shader. Рост disposes старую geometry,
+сохраняет renderer/material/Points; textures нет. Log-depth chunks включены.
+Picking≤4096проекций: screen distance, при равенстве≤1e−6CSSpx — view depth,
+затем lexical ID. Drag>5CSSpx/cancel/secondary pointer не выбирают.
 
 ## CPU/GPU admission: ограниченный этап 3.4/3.8 (2026-11-10)
 
-HTTP fixture изолирован от production: 32 сектора ×64 = 2048 resident записей,
-в том числе 32 unknown (2016 маркеров). Production остаётся на пяти центрах.
-Лимиты менеджера общие для resident + staging + in-flight: 4096 записей,
-4 MiB serialized и 32 MiB расчётного decoded; 4 HTTP worker, очередь ≤128,
-ответ ≤256 KiB. Резерв ответа берётся до fetch, затем заменяется фактической
-стоимостью. Manifest object_count резервирует также записи активных секторов;
-без object_count число записей проверяется при приёме ответа, память чтения и
-декодирования покрыта байтовым резервом. Слияние резервирует 512 Б/запись.
-Это консервативная модель, не измерение RSS или памяти драйвера.
+Обычный manager: resident+staging+in-flight≤4096records/4MiBserialized/
+32MiBdecoded estimate;4workers,queue≤128,response≤256KiB/128centers.
+Резерв до fetch заменяется actual cost; manifest object_count резервирует rows,
+без него rows проверяются после ответа, bytes покрывают decode; merge512B/row.
+Это модель памяти, не RSS/driverRAM. Production — пять центров; fixture32×64:
+2048rows,32unknown остаются null.
 
-Now удерживает старый набор и собирает новый в том же контексте. Для 2048
-нужен бюджет двух наборов, а также байтовый запас для активных ответов.
-Нехватка бюджета проверяется до изменения счётчиков: весь новый набор
-отклоняется, siblings отменяются, старый набор очищается; ошибка терминальна
-для текущего clock-контекста. Автоматического бесконечного повтора нет.
-Явное действие начинает новый контекст и разрешает новую попытку. При известных
-object_count нехватка места для двух наборов обнаруживается до секторных fetch.
-Явная смена области/даты освобождает прежний набор; отменённые worker дренируются
-до admission новых. Частичная сцена не публикуется, fallback отсутствует.
+Continuous Now удерживает предыдущий набор в том же контексте: нужны место
+двух наборов и запас ответов. Известный oversubscription отклоняется до fetch/
+изменения счётчиков; siblings отменяются, old scene очищается, ошибка terminal
+до явного нового контекста. Explicit дата/область освобождает старый набор;
+отменённые workers дренируются до нового admission. Partial/fallback нет.
 
-Бюджеты ограниченного браузерного сценария выбраны до итогового замера:
-синхронное применение p95 ≤16 ms / max ≤50 ms (один интервал 60 Hz и порог
-long task); LOD p95 ≤1 ms / max ≤8 ms (128 центров за кадр); готовый набор →
-возврат первого renderer.render p95 ≤250 ms / max ≤1000 ms. Последний бюджет
-учитывает RAF/React и программный SwiftShader, не является hardware GPU SLA.
-WeakMap хранит время готовности без удержания истории; optional scene sink
-получает задержку после render. Отчёт runner хранит распределения отдельно
-для полного набора и всех переходов. Это CPU submission, не GPU fence и не
-измерение момента вывода пикселей монитором. HTTP/provider измеряются отдельно.
-
-Итоговая приёмка 2026-11-10 проходит без staged commit: full-set apply
-p95/max 5.70/6.20 ms (21), LOD 0.10/0.20 ms (747), ready→render
-48.30/48.30 ms (19). Все переходы: ready→render max 523 ms.
-Подробности и ограничения — [TEST_COVERAGE](TEST_COVERAGE.md),
-[сохранённый машинный отчёт](physical_budget_report.json).
+Обычный apply синхронен/атомарен≤4096rows до render; ошибка/empty очищает слой.
+LOD меняет level, не fetch/UTC. p95,max budgets:apply16/50ms,LOD1/8ms,
+ready→возврат render250/1000ms. Последняя метрика включает RAF/React/software
+renderer, не monitor/GPU fence. Время готовности WeakMap; production не копит
+историю. Camera/roundoff/rebase — [NAVIGATION](NAVIGATION.md).
 
 ## Opt-in расширение synthetic S-100k
 
-Описанные выше 4096/2048 — пределы обычного режима и прежней приёмки.
-Изолированный synthetic-профиль расширяет этот же слой до 100000 центров:
-порционный staging, атомарный commit, group-AABB picking, сохранение log-depth,
-линейный rebase и обновление level только при изменениях. Контракт, номинальная
-память и ограничения синхронных validation/commit — [S100K](S100K.md).
-Аппаратный критерий и весь S-100k не закрыты по одному счётчику точек.
-
-Загруженные computed-центры целиком участвуют в L0/L1 в локальном виде и
-обзоре. Радиус nearby выбирает resident-сектора в manager, но не скрывает
-отдельные далёкие тела внутри принятого кадра. L1-distance меняет только
-маркер, не доступность L0: при наблюдении Земли видны также известные центры
-Солнца, Меркурия и Венеры, если они попадают в ракурс.
-
-## Ограничение S-100k update (2026-11-12)
-
-Большой плоский synthetic frame декодируется/фильтруется порциями; manager
-собирает глобальные identities и массив ссылок до атомарной публикации.
-Иерархический decoder сохраняет прежний предел 4096, массовая hierarchy не
-включена. Renderer строит позиции/слоты/AABB picking в staging; picking и LOD
-до commit обслуживают предыдущий целый displayed frame. После отмены staging
-не публикуется. Rebase во время подготовки компенсируется uniform на commit.
-Typed bitmap занятых слотов заменяет Set; плоское преобразование пишет XYZ
-сразу в Float32, без временных векторов на каждый центр. Канонические Float64
-не меняются. Commit остаётся синхронным копированием ограниченных атрибутов.
-
-Заранее установленные бюджеты: validation и merge slice target 4/max16 ms,
-prelude target4/max16 ms; commit наследует apply p95 16/max50 ms. Суммарный
-CPU всех порций не сравнивается с бюджетом одной порции. Preparation elapsed
-включает возвраты event loop и ожидание, не является CPU apply. `scheduler.yield`
-используется при наличии, иначе timer fallback; это не гарантия hard realtime.
-Измерения синхронных участков performance.now включают preemption/GC.
-`renderer.render` измеряет CPU submission, GPU upload/fence отдельно недоступны.
-
-Порции manager/renderer разделяют общий deadline 2ms между RAF, чтобы
-непрерывные scheduler continuations не занимали event loop без общей квоты.
-Ожидание RAF имеет timeout32ms для drain скрытой вкладки; отмена проверяется
-после yield. Browser без scheduler использует timer fallback. Самая длинная
-операция/GC может превысить deadline; это не принудительное прерывание CPU.
+[S100K](S100K.md) задаёт увеличенные лимиты и budgets. Большие flat frames
+готовятся отменяемыми порциями; hierarchy decoder остаётся≤4096.
+Renderer staging содержит XYZ/slots/bitmap/AABB; до atomic sync commit
+LOD/picking читают прежний целый displayed frame. Staging origin фиксирован,
+rebase компенсируется renderShift; canonical Float64 неизменны.
+Общий deadline manager/renderer2ms между RAF; hidden-tab timeout32ms,
+scheduler.yield или timer fallback. Операция/GC может превысить deadline.
+Массовый real streaming/временной индекс/L2/поверхности открыты.
+Команды — [tests/README](../tests/README.md), измерения — [HISTORY](HISTORY.md).

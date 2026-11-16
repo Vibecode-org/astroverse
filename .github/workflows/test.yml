@@ -6,15 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker compose build backend
-      - name: Backend coverage and strict sector coverage
+      - name: Build runtime from a context without catalog fixtures
         run: |
-          docker compose run --rm --no-deps -w /app backend sh -c '
-            python -m pip install --target /tmp/coverage -r tests/requirements-coverage.txt &&
-            PYTHONPATH=/tmp/coverage python -m coverage run --branch --source=backend,data -m unittest discover -s tests -t . &&
-            PYTHONPATH=/tmp/coverage python -m coverage report --fail-under=95 &&
-            PYTHONPATH=/tmp/coverage python -m coverage report --include=data/sectors.py --fail-under=100
-          '
+          runtime_context=$(mktemp -d)
+          trap 'rm -rf "$runtime_context"' EXIT
+          tar --exclude=.git --exclude=data/catalog_seed.json --exclude=data/objects.json -cf - . | tar -xf - -C "$runtime_context"
+          docker build -f "$runtime_context/backend/Dockerfile" -t astroverse-backend:latest "$runtime_context"
+          docker run --rm --entrypoint python astroverse-backend:latest -c 'from pathlib import Path; assert not Path("/app/data/catalog_seed.json").exists(); assert not Path("/app/data/objects.json").exists(); assert not Path("/app/tests").exists()'
+      - name: Backend coverage and strict sector coverage
+        run: make coverage
   frontend:
     runs-on: ubuntu-latest
     defaults:

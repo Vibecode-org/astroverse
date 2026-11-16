@@ -13,9 +13,8 @@ LOAD_TIMEOUT_MS = 45_000
 def pytest_collection_modifyitems(config, items):
     """Skip modules that do not match the stack that is actually running.
 
-    Both stacks serve http://localhost:5173, so the catalog size is the only
-    reliable signal. Without this a forgotten `docker compose up` switch shows
-    up as a wall of unrelated timeouts instead of one clear skip reason.
+    SMOKE_URL selects the ordinary (:5173) or isolated legacy (:5174) stack.
+    Check its actual catalog size before running stack-specific modules.
     """
     served = served_object_count()
     reasons = {

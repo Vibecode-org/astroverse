@@ -36,6 +36,9 @@ class StreamingCatalogTests(unittest.TestCase):
             self.assertEqual(before.objects(sector['id']),after.objects(sector['id']))
         with sqlite3.connect(self.target) as db:
             self.assertEqual(db.execute('PRAGMA integrity_check').fetchone()[0],'ok')
+            self.assertEqual(after.metadata['incremental_schema'], 1)
+            self.assertEqual(db.execute('SELECT count(*) FROM object_links').fetchone()[0], len(items))
+            self.assertEqual(db.execute('SELECT sum(n) FROM family_index').fetchone()[0] or 0, len(items))
             self.assertFalse(db.execute("SELECT 1 FROM sqlite_master WHERE name IN ('input','families','strings','cells')").fetchone())
 
     def test_wire_bytes_revisions_order_and_adaptive_partitioning(self):

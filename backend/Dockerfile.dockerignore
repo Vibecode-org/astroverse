@@ -1,0 +1,17 @@
+# Runtime build context is an allowlist. In particular, retained catalog
+# fixtures are physically absent from the input sent to the production builder.
+**
+!backend/
+!backend/**
+!data/
+!data/*.py
+!data/catalog_config.json
+!data/ephemeris/
+!data/ephemeris/de440s.bsp
+!data/bootstrap/
+!data/bootstrap/catalog.sqlite
+!data/bootstrap/catalog.sqlite.manifest.json
+!data/bootstrap/catalog.sqlite.sha256
+!data/bootstrap/release.json
+**/__pycache__
+**/*.py[cod]

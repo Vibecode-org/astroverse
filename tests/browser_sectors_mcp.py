@@ -1,6 +1,6 @@
 """Production manager + isolated HTTP provider + real Chrome/WebGL.
 
-Start docker-compose.sectors-test.yml, then python3 tests/browser_sectors_mcp.py.
+Start make scene SCENE=sectors, then python3 tests/browser_sectors_mcp.py.
 No fetch mocks or direct layer.update calls. Camera/clock controls drive requests.
 """
 import argparse

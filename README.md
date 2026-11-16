@@ -1,89 +1,56 @@
 # Astroverse
 
-Браузерный 3D-планетарий: React + Three.js, FastAPI, Docker.
-Цель — все известные на дату обновления астрономические тела с проверяемыми
-источниками и физическими положениями. Неизвестные параметры остаются null;
-synthetic-нагрузки и иллюстративные орбиты не считаются измерениями.
-
-## Текущее состояние
-
-- `/`: Sun/Earth/Moon/Mercury/Venus, pinned DE440s, ICRF/SSB/km/TDB,
-  UTC[2000-01-01,2027-06-28). Положение на requested time, UTC кадра/лаг в UI.
-- 3471 справочная карточка: серверный поиск и bounded snapshot pages.
-  Наличие карточки не подтверждает положение на дату.
-- 6DoF, origin rebase, L0/L1/picking/refocus; камера не меняет физические центры.
-- Opt-in [synthetic S-100k](docs/S100K.md):100000 центров через обычный physical
-  manager/renderer/UI, один draw call; headless Metal stress принят при p95≤16.8ms.
-  Реальный S-100k, monitor presentation, массовый streaming/LOD и поверхности открыты.
-- `/?scene=legacy`: иллюстративные три вида, прежние LOD/меши/render-v2.
-
-Целевая архитектура хранит и обновляет рабочие body/model данные в БД, без
-обязательного полного objects.json. Сейчас default offline startup ещё
-генерирует JSON и готовит runtime SQLite; published mode уже читает готовую БД
-без каталожного JSON. Полная миграция и incremental3.7-B открыты — [ROADMAP](ROADMAP.md).
-Прямой bounded SBDB import3.7-A реализован; пропуски не означают удаления.
-Следующий этап — ограниченный incremental writer3.7-B для действующей SQLite:
-локальные изменения карточек/индексов, согласованные ревизии и публикация.
-Миграция обычного startup/offline на БД и расширение моделей — отдельные этапы.
-
-## Запуск
-
-Нужны Docker Compose и WebGL2.
+Браузерный 3D-планетарий: React + Three.js, FastAPI, Docker. Цель — все известные
+на дату обновления тела с проверяемыми источниками; неизвестная физика остаётся null.
 
 ```bash
-docker compose up --build -d
-# http://localhost:5173
-docker compose down
+docker compose up --build -d    # http://localhost:5173
+# или make up; make down останавливает, сохраняя рабочую БД
 ```
 
-Nginx проксирует `/api`, backend:8000 наружу закрыт. Настройки —
-[.env.example](.env.example). Localhost:
-`ASTROVERSE_BIND=127.0.0.1 docker compose up -d`; другой порт:
-`ASTROVERSE_PORT=8080 docker compose up -d`. В LAN используйте IP машины;
-публичный HTTPS требует TLS/защиты/наблюдаемости/backup restore из Фазы 9.
-Логи: `docker compose logs -f backend frontend`.
+Нужны Docker Compose v2/WebGL2; для команд Makefile — Make. Настройки порта/LAN —
+[.env.example](.env.example), логи — `docker compose logs -f`. Для старой установки
+до пересоздания контейнера выполните [миграцию SQLite](docs/STARTUP.md).
 
-## Управление
+## Что работает
 
-ЛКМ — вращение, колесо — zoom, ПКМ — панорама; touch — свайп/пинч.
-Поиск/список/маркер выбирают карточку, «Наблюдать» возвращает к телу.
-В свободном полёте: W/S вперёд/назад,A/D вбок,R/F вверх/вниз; стрелки —
-поворот,Q/E — крен, мышь — поворот,+/− — скорость, пробел — стоп.
-Нажмите на сцену для клавиатуры. Скорость относится к реальному времени RAF,
-не к скорости симуляции. Выход из полёта сохраняет место камеры.
-Пауза/«Сейчас»/±день/скорость/реверс доступны в topbar;
-[контракт камеры](docs/NAVIGATION.md).
+- `/`: пять центров Sun/Earth/Moon/Mercury/Venus, offline DE440s, ICRF/SSB/km/TDB,
+  UTC [2000-01-01,2027-06-28), положения выбранной даты и UTC принятого кадра.
+- 3471 справочная карточка, поиск, bounded sectors; карточка не подтверждает положение.
+- 6DoF, линейный floating origin, L0/L1, picking/refocus. `/?scene=legacy` —
+  прежняя иллюстративная сцена. Synthetic S-100k проверен отдельно; аппаратные
+  60+fps, реальный S-100k, поверхности и массовый physical streaming открыты.
+- Startup открывает рабочую SQLite из volume; только чистая установка копирует
+  pinned bootstrap. Build/startup не требуют seed JSON/скачивания научных данных.
+  Patches переживают обновления; backup/restore и ограничения — [STARTUP](docs/STARTUP.md).
 
-## Разработка и данные
+## Управление и разработка
+
+ЛКМ/колесо/ПКМ — вращение/zoom/панорама; touch — swipe/pinch. Поиск/маркер открывают
+карточку, «Наблюдать» возвращает к телу. Полёт: W/S,A/D,R/F — движение,
+стрелки/мышь — поворот,Q/E — крен,+/− — скорость,пробел — стоп.
+Скорость полёта независима от симуляции; выход сохраняет положение камеры.
 
 ```bash
-cd frontend
-npm ci
-npm run dev
-# Vite:5173, API proxy на127.0.0.1:8000
+make test                      # backend
+make coverage                  # backend + пороги
+make scene SCENE=s100k          # отдельная тестовая сцена :5174
+make scene-down
+# frontend/: npm ci; npm run test:coverage; npm run build; npm run dev
 ```
 
-Docker modes: offline(по умолчанию),online,existing JSON,published SQLite через
-`ASTROVERSE_SECTOR_PATH`. Online failure→offline fallback; неудачная подготовка
-не заменяет прежний каталог. `catalog_seed.json` — численный/справочный fixture,
-`catalog_config.json` — источники/лимиты; оба нужны. BSP и lockfiles сохраняются.
+В корне один Compose для приложения; тестовый — `tests/docker/compose.yml`.
+`make` показывает команды. Test images/volumes отделены от рабочих.
+Vite проксирует API на127.0.0.1:8000; обычный nginx публикует только frontend.
+Runtime SQLite проверяется offline; uncached images/packages требуют доступности
+зависимостей. Legacy CDN-текстуры ещё не автономны; chunk>500kB — известное предупреждение.
 
-`data/catalog.py` — общий API; schema и бинарные codecs выделены в отдельные
-модули. Physical manager отделён от проверки/сборки кадра (`sectorFrame.js`);
-legacy LOD — от владения детальными мешами (`lodDetailedMeshes.js`).
-
-| Документ | Назначение |
+| Читать | Для чего |
 |---|---|
-|[ROADMAP](ROADMAP.md)|Статус и порядок следующих этапов|
-|[AGENTS](AGENTS.md)|Владельцы кода, ограничения и pitfalls|
-|[COORDINATES](docs/COORDINATES.md),[HIERARCHY](docs/HIERARCHY.md)|Единицы, frame/time, unknown, requested-time physics|
-|[SOURCES](docs/SOURCES.md),[SOURCE_AUDIT](docs/SOURCE_AUDIT.md)|Реестр и подтверждение источников|
-|[SECTORS](docs/SECTORS.md)|SQLite, streaming/import, snapshot API и лимиты|
-|[PHYSICAL_LOD](docs/PHYSICAL_LOD.md),[S100K](docs/S100K.md)|Renderer/LOD и synthetic acceptance|
-|[BINARY_CATALOG](docs/BINARY_CATALOG.md)|Legacy JSON/v1/v2|
-|[tests/README](tests/README.md),[TEST_COVERAGE](docs/TEST_COVERAGE.md)|Команды, методика и результаты|
-|[HISTORY](docs/HISTORY.md)|Краткая история; полные старые отчёты доступны в Git|
-
-CI проверяет backend/frontend coverage и build; WebGL отдельно через Chrome MCP.
-Legacy CDN-текстуры не становятся автономными от offline-каталога; общий
-frontend chunk>500kB остаётся известным предупреждением сборки.
+|[ROADMAP](ROADMAP.md)|Статус и следующие этапы|
+|[STARTUP](docs/STARTUP.md)|SQLite, backup/restore, миграция|
+|[COORDINATES](docs/COORDINATES.md),[SOURCES](docs/SOURCES.md)|Физические контракты и источники|
+|[SECTORS](docs/SECTORS.md),[BINARY_CATALOG](docs/BINARY_CATALOG.md)|Storage и API|
+|[HIERARCHY](docs/HIERARCHY.md),[NAVIGATION](docs/NAVIGATION.md),[PHYSICAL_LOD](docs/PHYSICAL_LOD.md),[S100K](docs/S100K.md)|Координаты и сцена|
+|[tests/README](tests/README.md),[TEST_COVERAGE](docs/TEST_COVERAGE.md)|Команды и результаты|
+|[AGENTS](AGENTS.md),[HISTORY](docs/HISTORY.md)|Владельцы/правила и краткая история|

@@ -1,6 +1,6 @@
 """Isolated synthetic positions HTTP fixture. NEVER imported by production.
 
-Run only with docker-compose.sectors-test.yml. No BSP, catalog or real bodies.
+Run only with make scene SCENE=sectors. No BSP, catalog or real bodies.
 32 independently delayed sectors, 64 artificial centers each, plus unknowns.
 """
 import asyncio

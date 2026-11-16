@@ -5,7 +5,7 @@ and `conftest.py` skips it unless the running stack reports 100 000 objects, so
 the same command works against either stack:
 
     python3 data/gen_catalog_100k.py
-    docker compose -f docker-compose.yml -f docker-compose.100k.yml up --build -d
+    make scene SCENE=legacy
     /tmp/astroverse-smoke-env/bin/python -m pytest tests/browser_smoke/ -m stack100k -v
 
 It checks the properties Phase 1 promises, not a specific frame rate (fps is

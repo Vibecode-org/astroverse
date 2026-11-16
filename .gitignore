@@ -31,8 +31,12 @@ data/*.runtime.sqlite
 # Persistent advisory lock inodes used by atomic runtime writers.
 data/*.runtime.sqlite.lock
 data/sectors*.sqlite.lock
+data/runtime/
 
 # Runtime/debug logs stay local.
 *.log
 *.log.*
 logs/
+
+# Versioned, verified delivery artifact is source-controlled; lock is local.
+data/bootstrap/*.lock

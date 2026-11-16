@@ -1,0 +1,81 @@
+name: astroverse-tests
+
+x-test-image: &test-image
+  image: astroverse-backend-test:latest
+  build:
+    context: ../..
+    dockerfile: tests/Dockerfile
+    target: test
+  working_dir: /app
+
+x-health: &health
+  test: ["CMD", "python", "-c", "import urllib.request; urllib.request.build_opener(urllib.request.ProxyHandler({})).open('http://127.0.0.1:8000/api/health')"]
+  interval: 2s
+  timeout: 5s
+  retries: 60
+
+x-scene: &scene
+  <<: *test-image
+  healthcheck: *health
+  networks:
+    default:
+      aliases: [backend]
+
+services:
+  unit:
+    <<: *test-image
+    profiles: [unit]
+
+  sectors:
+    <<: *scene
+    profiles: [sectors]
+    command: ["python", "-m", "tests.sector_provider"]
+
+  s100k:
+    <<: *scene
+    profiles: [s100k]
+    command: ["python", "-m", "tests.s100k_provider"]
+
+  legacy:
+    <<: *scene
+    profiles: [legacy]
+    command: ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      ASTROVERSE_CATALOG_MODE: published
+      ASTROVERSE_SECTOR_PATH: /app/data/runtime/stress100k.sqlite
+      ASTROVERSE_CATALOG_PATH: ""
+    volumes:
+      - legacy-catalog:/app/data/runtime
+
+  frontend:
+    profiles: [sectors, s100k, legacy]
+    build:
+      context: ../../frontend
+    ports:
+      - "127.0.0.1:${ASTROVERSE_TEST_PORT:-5174}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8080/"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  runtime:
+    profiles: [acceptance]
+    image: ${ASTROVERSE_DELIVERY_IMAGE:-astroverse-backend:latest}
+    network_mode: none
+    working_dir: /app
+    command: ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      ASTROVERSE_CATALOG_MODE: offline
+      ASTROVERSE_SECTOR_PATH: ""
+      ASTROVERSE_CATALOG_PATH: ""
+    volumes:
+      - catalog-runtime:/app/data/runtime
+      - ../check_delivery_container.py:/app/check_delivery_container.py:ro
+      - ../check_startup_container.py:/app/check_startup_container.py:ro
+      - ${ASTROVERSE_BACKUP_DIR:-/tmp/astroverse-acceptance}:/backups
+    healthcheck: *health
+
+volumes:
+  legacy-catalog:
+  catalog-runtime:

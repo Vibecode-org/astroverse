@@ -1,5 +1,5 @@
 {
-  "version": "s100k-acceptance/2",
+  "version": "s100k-acceptance/3",
   "status": "synthetic_dynamic_passed_real_s100k_and_monitor_open",
   "evidence_revision": "7f6609842f10e9cbfc5516f6193d9e22e4e3d54f",
   "scope": "Historical measurements of the indicated source hashes/revision; cleanup does not create new performance evidence.",
@@ -38,42 +38,10 @@
     "gpu_attribute_bytes_max": 7340032,
     "precision": {"canonical_centers": "bitwise unchanged at paused time", "cpu_km": 1e-06, "gpu_render_absolute": 1e-06, "gpu_render_relative": 1e-07, "rebase_css_px": 0.05}
   },
-  "active_budgets": {
-    "rationale": "16.67 ms per 60 Hz frame: camera 1 ms, LOD 1 ms, preparation 4 ms leaves ~10 ms render/browser. Click is occasional. Startup permits 100 bounded HTTP sectors on four workers. Memory includes two coherent sets for continuous time and four reserved responses.",
-    "camera_p95_ms": 1,
-    "camera_max_ms": 8,
-    "lod_p95_ms": 1,
-    "lod_max_ms": 8,
-    "preparation_slice_target_ms": 4,
-    "preparation_slice_max_ms": 16,
-    "picking_p95_ms": 16,
-    "picking_max_ms": 50,
-    "cold_interactive_ms": 15000,
-    "frame_p95_ms": 16.8,
-    "frame_p99_ms": 33.334,
-    "long_pause_ms": 50,
-    "draw_calls_max": 1,
-    "manager_objects": 200000,
-    "manager_serialized_bytes": 67108864,
-    "manager_decoded_estimate_bytes": 536870912,
-    "http_workers": 4,
-    "response_bytes": 1048576,
-    "gpu_attribute_bytes_max": 7340032,
-    "precision": {"canonical_centers": "bitwise unchanged at paused time", "cpu_km": 1e-06, "gpu_render_absolute": 1e-06, "gpu_render_relative": 1e-07, "rebase_css_px": 0.05},
-    "amendment": "User explicitly accepted frame p95 16.8ms on2026-11-12. Other thresholds unchanged; epsilon1e-6ms only for IEEE timestamp subtraction noise."
-  },
   "inherited_apply_budget_ms": {"p95": 16, "max": 50, "source": "docs/NAVIGATION.md and PHYSICAL_LOD.md existed before this task"},
-  "precision_evidence": {
-    "unit": "frontend/tests/s100k.test.js: all100k canonical/linear transforms; rebase preserves canonical centers; cancel and reuse",
-    "existing_regressions": "hierarchy/flight tests: large common origins1e18km and small supplied offsets; original tolerances unchanged; 100 Horizons vectors in backend/frontend suites"
-  },
-  "memory_model": {
-    "active_gpu_attributes_bytes": 3670016,
-    "active_cpu_attributes_bytes": 3670016,
-    "staging_attributes_bytes_per_preparation": 3670016,
-    "note": "Maps, JSON, hierarchy, canonical double arrays extra; manager decoded estimate not RSS; cancelled staging reclaimed by JS GC; driver memory unknown; heap metrics sampled without forced GC"
-  },
-  "budget_amendment": {"approved_by": "user", "date": "2026-11-12", "frame_p95_ms": 16.8, "previous_frame_p95_ms": 16.667, "comparison_epsilon_ms": 1e-06, "scope": "Headless RAF synthetic profile only; no monitor presentation claim or changes to other budgets"},
+  "precision_evidence": {"unit": "frontend/tests/s100k.test.js: all100k canonical/linear transforms; rebase preserves canonical centers; cancel and reuse", "existing_regressions": "hierarchy/flight tests: large common origins1e18km and small supplied offsets; original tolerances unchanged; 100 Horizons vectors in backend/frontend suites"},
+  "memory_model": {"active_gpu_attributes_bytes": 3670016, "active_cpu_attributes_bytes": 3670016, "staging_attributes_bytes_per_preparation": 3670016, "note": "Maps, JSON, hierarchy, canonical double arrays extra; manager decoded estimate not RSS; cancelled staging reclaimed by JS GC; driver memory unknown; heap metrics sampled without forced GC"},
+  "budget_amendment": {"approved_by": "user", "date": "2026-11-12", "frame_p95_ms": 16.8, "previous_frame_p95_ms": 16.667, "comparison_epsilon_ms": 1e-06, "scope": "Headless RAF synthetic profile only; no monitor presentation claim or changes to other budgets", "active_policy": "budgets_declared_before_implementation with this frame_p95_ms override; all other thresholds unchanged"},
   "baseline_node": {
     "kind": "Node CPU microbenchmark before changes, no WebGL",
     "node": "v26.13.0",
@@ -139,9 +107,6 @@
         },
         "listeners": 26,
         "sameRenderer": true,
-        "framebuffer": [1920, 1080],
-        "dpr": 1,
-        "environment": {"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"},
         "stats": {"applyMs": 0.699999988079071, "maxApplyMs": 0.800000011920929, "lodMs": 0.09999999403953552, "maxLodMs": 0.20000001788139343, "visited": 128, "pickMs": 0, "prepareMs": 628.0999999940395, "sliceMaxMs": 5.200000017881393, "slots": 100000, "capacity": 131072, "bufferBytes": 3670016, "detailed": 0}
       },
       "final": {
@@ -183,9 +148,6 @@
         },
         "listeners": 26,
         "sameRenderer": true,
-        "framebuffer": [1920, 1080],
-        "dpr": 1,
-        "environment": {"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"},
         "stats": {"applyMs": 1, "maxApplyMs": 5.0999999940395355, "lodMs": 0, "maxLodMs": 17.400000005960464, "visited": 128, "pickMs": 0, "prepareMs": 1144.4000000059605, "sliceMaxMs": 96.5, "slots": 100000, "capacity": 131072, "bufferBytes": 3670016, "detailed": 1}
       },
       "windows": {
@@ -228,19 +190,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T13:31:29.865000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 26,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "picking": {
@@ -289,19 +238,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T13:31:29.865000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 26,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "flight": {
@@ -347,19 +283,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T13:31:29.865000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 15578,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 26,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "rebase_eviction": {
@@ -401,19 +324,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T13:31:29.865000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 15578,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 26,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "Сейчас": {
@@ -461,19 +371,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T13:32:40.118000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 26,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "Ускорить": {
@@ -521,19 +418,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T13:38:58.441000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 26,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "⟲": {
@@ -581,19 +465,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T13:38:34.261000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 26,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycles": {
@@ -642,8 +513,13 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 6,
             "displayed": "2026-11-12T13:33:44.599000+00:00"
-          },
-          "numeric_check": {
+          }
+        }
+      },
+      "numeric_checks": [
+        {
+          "windows": ["steady", "picking", "Сейчас", "Ускорить", "⟲", "cycles"],
+          "result": {
             "resident": 100000,
             "computed": 100000,
             "submitted": 100000,
@@ -656,7 +532,30 @@
             "listeners": 26,
             "memory": {"geometries": 1, "textures": 0}
           }
+        },
+        {
+          "windows": ["flight", "rebase_eviction"],
+          "result": {
+            "resident": 100000,
+            "computed": 100000,
+            "submitted": 100000,
+            "in_frustum": 15578,
+            "numeric": 100000,
+            "identities": 100000,
+            "hidden_by_policy": 0,
+            "calls": 1,
+            "sameRenderer": true,
+            "listeners": 26,
+            "memory": {"geometries": 1, "textures": 0}
+          }
         }
+      ],
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+        "cores": 10,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+        "framebuffer": [1920, 1080],
+        "dpr": 1
       }
     },
     "stress": {
@@ -723,9 +622,6 @@
         },
         "listeners": 28,
         "sameRenderer": true,
-        "framebuffer": [1920, 1080],
-        "dpr": 1,
-        "environment": {"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"},
         "stats": {"applyMs": 1.5999999940395355, "maxApplyMs": 1.5999999940395355, "lodMs": 0.30000001192092896, "maxLodMs": 0.30000001192092896, "visited": 128, "pickMs": 0, "prepareMs": 1918.5999999940395, "sliceMaxMs": 2.5999999940395355, "slots": 100000, "capacity": 131072, "bufferBytes": 3670016, "detailed": 0}
       },
       "final": {
@@ -767,9 +663,6 @@
         },
         "listeners": 28,
         "sameRenderer": true,
-        "framebuffer": [1920, 1080],
-        "dpr": 1,
-        "environment": {"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"},
         "stats": {"applyMs": 0.800000011920929, "maxApplyMs": 2, "lodMs": 0, "maxLodMs": 2.2999999821186066, "visited": 128, "pickMs": 0, "prepareMs": 1782.5999999940395, "sliceMaxMs": 4.4000000059604645, "slots": 100000, "capacity": 131072, "bufferBytes": 3670016, "detailed": 1}
       },
       "windows": {
@@ -812,19 +705,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T18:17:18.788000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "picking": {
@@ -879,19 +759,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T18:17:18.788000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "flight": {
@@ -942,19 +809,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 0,
             "displayed": "2026-11-12T18:17:18.788000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 14655,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "rebase_eviction": {
@@ -1002,19 +856,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 2,
             "displayed": "2026-11-12T18:17:18.788000+00:00"
-          },
-          "numeric_check": {
-            "resident": 0,
-            "computed": 0,
-            "submitted": 0,
-            "in_frustum": 0,
-            "numeric": 0,
-            "identities": 0,
-            "hidden_by_policy": 0,
-            "calls": 0,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "Сейчас": {
@@ -1068,19 +909,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 2,
             "displayed": "2026-11-12T18:18:06.139000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "Ускорить": {
@@ -1134,19 +962,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 2,
             "displayed": "2026-11-12T18:18:13.051000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "⟲": {
@@ -1200,19 +1015,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 2,
             "displayed": "2026-11-12T18:25:14.708000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_01": {
@@ -1268,19 +1070,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 4,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_02": {
@@ -1336,19 +1125,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 6,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_03": {
@@ -1404,19 +1180,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 8,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_04": {
@@ -1472,19 +1235,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 10,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_05": {
@@ -1540,19 +1290,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 12,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_06": {
@@ -1608,19 +1345,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 14,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_07": {
@@ -1676,19 +1400,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 16,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_08": {
@@ -1744,19 +1455,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 18,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_09": {
@@ -1812,19 +1510,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 20,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_10": {
@@ -1880,19 +1565,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 22,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_11": {
@@ -1948,19 +1620,6 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 24,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
-            "resident": 100000,
-            "computed": 100000,
-            "submitted": 100000,
-            "in_frustum": 100000,
-            "numeric": 100000,
-            "identities": 100000,
-            "hidden_by_policy": 0,
-            "calls": 1,
-            "sameRenderer": true,
-            "listeners": 28,
-            "memory": {"geometries": 1, "textures": 0}
           }
         },
         "cycle_12": {
@@ -2016,8 +1675,13 @@
             "memory": {"geometries": 1, "textures": 0},
             "rebases": 26,
             "displayed": "2026-11-12T18:19:26.468000+00:00"
-          },
-          "numeric_check": {
+          }
+        }
+      },
+      "numeric_checks": [
+        {
+          "windows": ["steady", "picking", "Сейчас", "Ускорить", "⟲", "cycle_01", "cycle_02", "cycle_03", "cycle_04", "cycle_05", "cycle_06", "cycle_07", "cycle_08", "cycle_09", "cycle_10", "cycle_11", "cycle_12"],
+          "result": {
             "resident": 100000,
             "computed": 100000,
             "submitted": 100000,
@@ -2030,233 +1694,50 @@
             "listeners": 28,
             "memory": {"geometries": 1, "textures": 0}
           }
+        },
+        {
+          "windows": ["flight"],
+          "result": {
+            "resident": 100000,
+            "computed": 100000,
+            "submitted": 100000,
+            "in_frustum": 14655,
+            "numeric": 100000,
+            "identities": 100000,
+            "hidden_by_policy": 0,
+            "calls": 1,
+            "sameRenderer": true,
+            "listeners": 28,
+            "memory": {"geometries": 1, "textures": 0}
+          }
+        },
+        {
+          "windows": ["rebase_eviction"],
+          "result": {
+            "resident": 0,
+            "computed": 0,
+            "submitted": 0,
+            "in_frustum": 0,
+            "numeric": 0,
+            "identities": 0,
+            "hidden_by_policy": 0,
+            "calls": 0,
+            "sameRenderer": true,
+            "listeners": 28,
+            "memory": {"geometries": 1, "textures": 0}
+          }
         }
+      ],
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+        "cores": 10,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+        "framebuffer": [1920, 1080],
+        "dpr": 1
       }
     }
   },
   "assessment": {
-    "stress": {
-      "camera_cpu": {
-        "p95_budget_ms": 1,
-        "max_budget_ms": 8,
-        "windows": {
-          "steady": {"n": 308, "p95": 0.10000002384185791, "max": 0.30000001192092896, "passed": true},
-          "picking": {"n": 426, "p95": 0.10000002384185791, "max": 1.199999988079071, "passed": true},
-          "flight": {"n": 461, "p95": 0.10000002384185791, "max": 2.0999999940395355, "passed": true},
-          "rebase_eviction": {"n": 425, "p95": 0.09999999403953552, "max": 0.10000002384185791, "passed": true},
-          "Сейчас": {"n": 324, "p95": 0.19999998807907104, "max": 0.30000001192092896, "passed": true},
-          "Ускорить": {"n": 331, "p95": 0.10000002384185791, "max": 0.30000001192092896, "passed": true},
-          "⟲": {"n": 323, "p95": 0.10000002384185791, "max": 0.20000001788139343, "passed": true},
-          "cycle_01": {"n": 734, "p95": 0.10000002384185791, "max": 0.5, "passed": true},
-          "cycle_02": {"n": 763, "p95": 0.10000002384185791, "max": 0.6000000238418579, "passed": true},
-          "cycle_03": {"n": 726, "p95": 0.10000002384185791, "max": 0.699999988079071, "passed": true},
-          "cycle_04": {"n": 745, "p95": 0.10000002384185791, "max": 0.4000000059604645, "passed": true},
-          "cycle_05": {"n": 696, "p95": 0.10000002384185791, "max": 0.30000001192092896, "passed": true},
-          "cycle_06": {"n": 762, "p95": 0.10000002384185791, "max": 1.2000000178813934, "passed": true},
-          "cycle_07": {"n": 751, "p95": 0.10000002384185791, "max": 0.5, "passed": true},
-          "cycle_08": {"n": 755, "p95": 0.10000002384185791, "max": 0.30000001192092896, "passed": true},
-          "cycle_09": {"n": 736, "p95": 0.10000002384185791, "max": 1.0999999940395355, "passed": true},
-          "cycle_10": {"n": 744, "p95": 0.10000002384185791, "max": 0.5, "passed": true},
-          "cycle_11": {"n": 753, "p95": 0.10000002384185791, "max": 1.5999999940395355, "passed": true},
-          "cycle_12": {"n": 731, "p95": 0.10000002384185791, "max": 0.5999999940395355, "passed": true}
-        },
-        "passed": true
-      },
-      "lod_cpu": {
-        "p95_budget_ms": 1,
-        "max_budget_ms": 8,
-        "windows": {
-          "steady": {"n": 308, "p95": 0.29999998211860657, "max": 0.699999988079071, "passed": true},
-          "picking": {"n": 426, "p95": 0.30000001192092896, "max": 0.5, "passed": true},
-          "flight": {"n": 461, "p95": 0.20000001788139343, "max": 0.699999988079071, "passed": true},
-          "rebase_eviction": {"n": 425, "p95": 0.09999999403953552, "max": 0.20000001788139343, "passed": true},
-          "Сейчас": {"n": 324, "p95": 0.20000001788139343, "max": 0.30000001192092896, "passed": true},
-          "Ускорить": {"n": 331, "p95": 0.10000002384185791, "max": 0.4000000059604645, "passed": true},
-          "⟲": {"n": 323, "p95": 0.10000002384185791, "max": 0.800000011920929, "passed": true},
-          "cycle_01": {"n": 734, "p95": 0.29999998211860657, "max": 0.6000000238418579, "passed": true},
-          "cycle_02": {"n": 763, "p95": 0.29999998211860657, "max": 0.7000000178813934, "passed": true},
-          "cycle_03": {"n": 726, "p95": 0.20000001788139343, "max": 0.5999999940395355, "passed": true},
-          "cycle_04": {"n": 745, "p95": 0.29999998211860657, "max": 0.7999999821186066, "passed": true},
-          "cycle_05": {"n": 696, "p95": 0.29999998211860657, "max": 0.7000000178813934, "passed": true},
-          "cycle_06": {"n": 762, "p95": 0.20000001788139343, "max": 2.2999999821186066, "passed": true},
-          "cycle_07": {"n": 751, "p95": 0.19999998807907104, "max": 1.7999999821186066, "passed": true},
-          "cycle_08": {"n": 755, "p95": 0.19999998807907104, "max": 0.6000000238418579, "passed": true},
-          "cycle_09": {"n": 736, "p95": 0.20000001788139343, "max": 2.2000000178813934, "passed": true},
-          "cycle_10": {"n": 744, "p95": 0.20000001788139343, "max": 1.2999999821186066, "passed": true},
-          "cycle_11": {"n": 753, "p95": 0.20000001788139343, "max": 1.7999999821186066, "passed": true},
-          "cycle_12": {"n": 731, "p95": 0.29999998211860657, "max": 0.5999999940395355, "passed": true}
-        },
-        "passed": true
-      },
-      "preparation_slice_cpu": {
-        "p95_budget_ms": 4,
-        "max_budget_ms": 16,
-        "windows": {
-          "picking": {"n": 1182, "p95": 0.5, "max": 5, "passed": true},
-          "flight": {"n": 591, "p95": 0.30000001192092896, "max": 2.699999988079071, "passed": true},
-          "Сейчас": {"n": 795, "p95": 0.800000011920929, "max": 5.200000017881393, "passed": true},
-          "Ускорить": {"n": 822, "p95": 0.6000000238418579, "max": 2.699999988079071, "passed": true},
-          "⟲": {"n": 738, "p95": 0.800000011920929, "max": 3.5999999940395355, "passed": true},
-          "cycle_01": {"n": 743, "p95": 0.5, "max": 2.2000000178813934, "passed": true},
-          "cycle_02": {"n": 591, "p95": 0.9000000059604645, "max": 3.699999988079071, "passed": true},
-          "cycle_03": {"n": 591, "p95": 0.800000011920929, "max": 4.9000000059604645, "passed": true},
-          "cycle_04": {"n": 591, "p95": 0.9000000059604645, "max": 4.699999988079071, "passed": true},
-          "cycle_05": {"n": 591, "p95": 0.5, "max": 3.300000011920929, "passed": true},
-          "cycle_06": {"n": 591, "p95": 0.9000000059604645, "max": 2.600000023841858, "passed": true},
-          "cycle_07": {"n": 591, "p95": 0.6000000238418579, "max": 3.5999999940395355, "passed": true},
-          "cycle_08": {"n": 591, "p95": 0.3999999761581421, "max": 2.0999999940395355, "passed": true},
-          "cycle_09": {"n": 591, "p95": 0.7999999821186066, "max": 4.4000000059604645, "passed": true},
-          "cycle_10": {"n": 591, "p95": 0.9000000059604645, "max": 4.0999999940395355, "passed": true},
-          "cycle_11": {"n": 592, "p95": 0.9000000059604645, "max": 3.5999999940395355, "passed": true},
-          "cycle_12": {"n": 591, "p95": 0.800000011920929, "max": 4.4000000059604645, "passed": true}
-        },
-        "passed": true
-      },
-      "merge_slice_cpu": {
-        "p95_budget_ms": 4,
-        "max_budget_ms": 16,
-        "windows": {
-          "picking": {"n": 200, "p95": 0.19999998807907104, "max": 0.5, "passed": true},
-          "flight": {"n": 30, "p95": 1, "max": 1.699999988079071, "passed": true},
-          "Сейчас": {"n": 401, "p95": 0.800000011920929, "max": 2.7000000178813934, "passed": true},
-          "Ускорить": {"n": 401, "p95": 0.800000011920929, "max": 2.600000023841858, "passed": true},
-          "⟲": {"n": 401, "p95": 0.7999999821186066, "max": 3.0999999940395355, "passed": true},
-          "cycle_01": {"n": 200, "p95": 0.9000000059604645, "max": 1.9000000059604645, "passed": true},
-          "cycle_02": {"n": 201, "p95": 1.0999999940395355, "max": 2.300000011920929, "passed": true},
-          "cycle_03": {"n": 200, "p95": 0.7000000178813934, "max": 1.5999999940395355, "passed": true},
-          "cycle_04": {"n": 201, "p95": 0.9000000059604645, "max": 2.2000000178813934, "passed": true},
-          "cycle_05": {"n": 200, "p95": 0.5999999940395355, "max": 1.2999999821186066, "passed": true},
-          "cycle_06": {"n": 201, "p95": 0.9000000059604645, "max": 2, "passed": true},
-          "cycle_07": {"n": 200, "p95": 0.6000000238418579, "max": 1.2999999821186066, "passed": true},
-          "cycle_08": {"n": 200, "p95": 0.6000000238418579, "max": 0.9000000059604645, "passed": true},
-          "cycle_09": {"n": 202, "p95": 0.7000000178813934, "max": 2.2000000178813934, "passed": true},
-          "cycle_10": {"n": 203, "p95": 0.800000011920929, "max": 2, "passed": true},
-          "cycle_11": {"n": 201, "p95": 0.800000011920929, "max": 2, "passed": true},
-          "cycle_12": {"n": 200, "p95": 0.5, "max": 0.9000000059604645, "passed": true}
-        },
-        "passed": true
-      },
-      "validation_cpu": {
-        "p95_budget_ms": 4,
-        "max_budget_ms": 16,
-        "windows": {
-          "picking": {"n": 101, "p95": 0.30000001192092896, "max": 0.30000001192092896, "passed": true},
-          "rebase_eviction": {"n": 1, "p95": 0.09999999403953552, "max": 0.09999999403953552, "passed": true},
-          "Сейчас": {"n": 202, "p95": 0.5, "max": 0.699999988079071, "passed": true},
-          "Ускорить": {"n": 222, "p95": 0.5, "max": 0.699999988079071, "passed": true},
-          "⟲": {"n": 220, "p95": 0.5, "max": 1, "passed": true},
-          "cycle_01": {"n": 147, "p95": 0.5, "max": 0.800000011920929, "passed": true},
-          "cycle_02": {"n": 148, "p95": 0.5, "max": 0.699999988079071, "passed": true},
-          "cycle_03": {"n": 149, "p95": 0.5, "max": 1, "passed": true},
-          "cycle_04": {"n": 147, "p95": 0.5, "max": 0.7999999821186066, "passed": true},
-          "cycle_05": {"n": 149, "p95": 0.5, "max": 0.699999988079071, "passed": true},
-          "cycle_06": {"n": 144, "p95": 0.5, "max": 1.199999988079071, "passed": true},
-          "cycle_07": {"n": 150, "p95": 0.5, "max": 0.5999999940395355, "passed": true},
-          "cycle_08": {"n": 144, "p95": 0.5999999940395355, "max": 0.9000000059604645, "passed": true},
-          "cycle_09": {"n": 146, "p95": 0.4000000059604645, "max": 1.5, "passed": true},
-          "cycle_10": {"n": 146, "p95": 0.5, "max": 0.800000011920929, "passed": true},
-          "cycle_11": {"n": 149, "p95": 0.5, "max": 1, "passed": true},
-          "cycle_12": {"n": 146, "p95": 0.5999999940395355, "max": 0.7000000178813934, "passed": true}
-        },
-        "passed": true
-      },
-      "prepare_prelude_cpu": {
-        "p95_budget_ms": 4,
-        "max_budget_ms": 16,
-        "windows": {
-          "picking": {"n": 2, "p95": 0.19999998807907104, "max": 0.19999998807907104, "passed": true},
-          "flight": {"n": 1, "p95": 0.20000001788139343, "max": 0.20000001788139343, "passed": true},
-          "Сейчас": {"n": 2, "p95": 0.09999999403953552, "max": 0.09999999403953552, "passed": true},
-          "Ускорить": {"n": 2, "p95": 0.3999999761581421, "max": 0.3999999761581421, "passed": true},
-          "⟲": {"n": 2, "p95": 0.20000001788139343, "max": 0.20000001788139343, "passed": true},
-          "cycle_01": {"n": 2, "p95": 0.19999998807907104, "max": 0.19999998807907104, "passed": true},
-          "cycle_02": {"n": 1, "p95": 0.19999998807907104, "max": 0.19999998807907104, "passed": true},
-          "cycle_03": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_04": {"n": 1, "p95": 0.09999999403953552, "max": 0.09999999403953552, "passed": true},
-          "cycle_05": {"n": 1, "p95": 0.09999999403953552, "max": 0.09999999403953552, "passed": true},
-          "cycle_06": {"n": 1, "p95": 0.19999998807907104, "max": 0.19999998807907104, "passed": true},
-          "cycle_07": {"n": 1, "p95": 0.09999999403953552, "max": 0.09999999403953552, "passed": true},
-          "cycle_08": {"n": 1, "p95": 0.20000001788139343, "max": 0.20000001788139343, "passed": true},
-          "cycle_09": {"n": 1, "p95": 0.10000002384185791, "max": 0.10000002384185791, "passed": true},
-          "cycle_10": {"n": 1, "p95": 0.20000001788139343, "max": 0.20000001788139343, "passed": true},
-          "cycle_11": {"n": 1, "p95": 0.30000001192092896, "max": 0.30000001192092896, "passed": true},
-          "cycle_12": {"n": 1, "p95": 0.3999999761581421, "max": 0.3999999761581421, "passed": true}
-        },
-        "passed": true
-      },
-      "commit_cpu": {
-        "p95_budget_ms": 16,
-        "max_budget_ms": 50,
-        "windows": {
-          "picking": {"n": 2, "p95": 2, "max": 2, "passed": true},
-          "flight": {"n": 1, "p95": 0.5, "max": 0.5, "passed": true},
-          "Сейчас": {"n": 1, "p95": 0.9000000059604645, "max": 0.9000000059604645, "passed": true},
-          "Ускорить": {"n": 1, "p95": 0.7000000178813934, "max": 0.7000000178813934, "passed": true},
-          "⟲": {"n": 1, "p95": 0.699999988079071, "max": 0.699999988079071, "passed": true},
-          "cycle_01": {"n": 1, "p95": 0.29999998211860657, "max": 0.29999998211860657, "passed": true},
-          "cycle_02": {"n": 1, "p95": 0.6000000238418579, "max": 0.6000000238418579, "passed": true},
-          "cycle_03": {"n": 1, "p95": 0.5999999940395355, "max": 0.5999999940395355, "passed": true},
-          "cycle_04": {"n": 1, "p95": 0.5, "max": 0.5, "passed": true},
-          "cycle_05": {"n": 1, "p95": 1.199999988079071, "max": 1.199999988079071, "passed": true},
-          "cycle_06": {"n": 1, "p95": 1.4000000059604645, "max": 1.4000000059604645, "passed": true},
-          "cycle_07": {"n": 1, "p95": 0.699999988079071, "max": 0.699999988079071, "passed": true},
-          "cycle_08": {"n": 1, "p95": 0.5, "max": 0.5, "passed": true},
-          "cycle_09": {"n": 1, "p95": 0.7000000178813934, "max": 0.7000000178813934, "passed": true},
-          "cycle_10": {"n": 1, "p95": 0.699999988079071, "max": 0.699999988079071, "passed": true},
-          "cycle_11": {"n": 1, "p95": 0.699999988079071, "max": 0.699999988079071, "passed": true},
-          "cycle_12": {"n": 1, "p95": 0.800000011920929, "max": 0.800000011920929, "passed": true}
-        },
-        "passed": true
-      },
-      "picking_cpu": {
-        "p95_budget_ms": 16,
-        "max_budget_ms": 50,
-        "windows": {
-          "picking": {"n": 20, "p95": 1.199999988079071, "max": 2.4000000059604645, "passed": true},
-          "cycle_01": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_02": {"n": 1, "p95": 0.09999999403953552, "max": 0.09999999403953552, "passed": true},
-          "cycle_03": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_04": {"n": 1, "p95": 0.10000002384185791, "max": 0.10000002384185791, "passed": true},
-          "cycle_05": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_06": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_07": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_08": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_09": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_10": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_11": {"n": 1, "p95": 0, "max": 0, "passed": true},
-          "cycle_12": {"n": 1, "p95": 0, "max": 0, "passed": true}
-        },
-        "passed": true
-      },
-      "frame": {
-        "p95_budget_ms": 16.8,
-        "max_budget_ms": 33.334,
-        "windows": {
-          "steady": {"n": 307, "p95": 16.799999999999272, "max": 16.80000000000109, "passed": true},
-          "picking": {"n": 425, "p95": 16.700000000000728, "max": 16.80000000000291, "passed": true},
-          "flight": {"n": 460, "p95": 16.799999999999272, "max": 16.80000000000291, "passed": true},
-          "rebase_eviction": {"n": 424, "p95": 16.700000000004366, "max": 16.80000000000291, "passed": true},
-          "Сейчас": {"n": 323, "p95": 16.700000000004366, "max": 16.80000000000291, "passed": true},
-          "Ускорить": {"n": 330, "p95": 16.799999999995634, "max": 16.80000000000291, "passed": true},
-          "⟲": {"n": 322, "p95": 16.70000000001164, "max": 16.80000000000291, "passed": true},
-          "cycle_01": {"n": 733, "p95": 16.70000000001164, "max": 16.80000000000291, "passed": true},
-          "cycle_02": {"n": 762, "p95": 16.79999999998836, "max": 16.80000000000291, "passed": true},
-          "cycle_03": {"n": 725, "p95": 16.79999999998836, "max": 16.80000000000291, "passed": true},
-          "cycle_04": {"n": 744, "p95": 16.70000000001164, "max": 16.80000000000291, "passed": true},
-          "cycle_05": {"n": 695, "p95": 16.70000000001164, "max": 16.800000000017462, "passed": true},
-          "cycle_06": {"n": 761, "p95": 16.70000000001164, "max": 16.800000000017462, "passed": true},
-          "cycle_07": {"n": 750, "p95": 16.70000000001164, "max": 16.800000000017462, "passed": true},
-          "cycle_08": {"n": 754, "p95": 16.70000000001164, "max": 16.800000000017462, "passed": true},
-          "cycle_09": {"n": 735, "p95": 16.70000000001164, "max": 16.800000000017462, "passed": true},
-          "cycle_10": {"n": 743, "p95": 16.79999999998836, "max": 16.800000000017462, "passed": true},
-          "cycle_11": {"n": 752, "p95": 16.79999999998836, "max": 16.800000000017462, "passed": true},
-          "cycle_12": {"n": 730, "p95": 16.70000000001164, "max": 16.800000000017462, "passed": true}
-        },
-        "passed": true
-      },
-      "cold": {"ms": 3298.199999988079, "budget_ms": 15000, "passed": true},
-      "draw_calls": {"maximum_observed": 1, "budget": 1, "passed": true}
-    },
     "original_frame_16_667": {
       "budget_ms": 16.667,
       "windows": {
@@ -2274,12 +1755,7 @@
   },
   "functional": {
     "complete": true,
-    "checks": [
-      "100000 identities, known centers, submitted and in frustum via ordinary page load",
-      "search/card selection across sector boundaries and exact overlapping centers",
-      "manual/Now/acceleration/reverse; permanent partial failure clears; revision conflict retries atomically",
-      "three trusted yaw/pitch/roll/move/refocus/overview cycles, stable renderer/resources/listeners"
-    ],
+    "checks": ["100000 identities, known centers, submitted and in frustum via ordinary page load", "search/card selection across sector boundaries and exact overlapping centers", "manual/Now/acceleration/reverse; permanent partial failure clears; revision conflict retries atomically", "three trusted yaw/pitch/roll/move/refocus/overview cycles, stable renderer/resources/listeners"],
     "errors": [],
     "displayed_time_progress": [
       {"mode": "Сейчас", "from": "2026-11-12T18:22:57.010000+00:00", "to": "2026-11-12T18:23:00.309000+00:00"},
@@ -2342,9 +1818,6 @@
       },
       "listeners": 28,
       "sameRenderer": true,
-      "framebuffer": [1920, 1080],
-      "dpr": 1,
-      "environment": {"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"},
       "stats": {"applyMs": 1, "maxApplyMs": 1, "lodMs": 0.4000000059604645, "maxLodMs": 0.4000000059604645, "visited": 128, "pickMs": 0, "prepareMs": 1747.7000000178814, "sliceMaxMs": 3.300000011920929, "slots": 100000, "capacity": 131072, "bufferBytes": 3670016, "detailed": 0}
     },
     "final": {
@@ -2386,13 +1859,17 @@
       },
       "listeners": 28,
       "sameRenderer": true,
-      "framebuffer": [1920, 1080],
-      "dpr": 1,
-      "environment": {"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36", "cores": 10, "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)"},
       "stats": {"applyMs": 0.5, "maxApplyMs": 1.5, "lodMs": 0.09999999403953552, "maxLodMs": 1.5999999940395355, "visited": 128, "pickMs": 0, "prepareMs": 1833.2000000178814, "sliceMaxMs": 2.2999999821186066, "slots": 100000, "capacity": 131072, "bufferBytes": 3670016, "detailed": 1}
     },
     "timing_scope": "Functional action timings include full diagnostic scans; excluded from clean benchmarks.",
-    "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_stress_functional.json"
+    "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_stress_functional.json",
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+      "cores": 10,
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)",
+      "framebuffer": [1920, 1080],
+      "dpr": 1
+    }
   },
   "nonempty_rebase": {
     "complete": true,
@@ -2464,138 +1941,11 @@
   ],
   "hardware_details": {"machine_name": "MacBook Pro", "machine_model": "MacBookPro18,3", "chip_type": "Apple M1 Pro", "physical_memory": "16 GB", "number_processors": "proc 10:8:2"},
   "open_criteria": ["GPU upload completion, driver memory and monitor presentation unavailable", "Baseline private validation/merge CPU phases unavailable", "Pre-admission desired coalescing wait not isolated"],
-  "history": {
-    "s100k_dynamic_attempt1.json": {
-      "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_dynamic_attempt1.json",
-      "complete": true,
-      "cold_interactive_ms": 4657.199999988079,
-      "served_scripts": [
-        {"url": "http://localhost:5174/assets/index-B46CfOuf.js", "sha256": "3bc8abfae5503badba7a6632993e41ede883a7341274524db65e13043f62c5f7"}
-      ],
-      "completed_windows": 7,
-      "timing_maxima_ms": {
-        "camera_cpu": 16,
-        "commit_cpu": 6.300000011920929,
-        "decode_cpu": 13.300000011920929,
-        "frame": 200,
-        "lod_cpu": 16.599999994039536,
-        "merge_elapsed": 1987,
-        "merge_slice_cpu": 17,
-        "picking_cpu": 0,
-        "preparation_slice_cpu": 100,
-        "prepare_elapsed": 4027.5999999940395,
-        "prepare_prelude_cpu": 1.100000023841858,
-        "prepare_slice_max": 100,
-        "ready_to_display_elapsed": 4031.2000000178814,
-        "render_submission_cpu": 20.900000005960464,
-        "selection_elapsed": 3026.2999999821186,
-        "validation_cpu": 12.699999988079071
-      }
-    },
-    "s100k_dynamic_unpaced.json": {
-      "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_dynamic_unpaced.json",
-      "complete": true,
-      "cold_interactive_ms": 1544.7000000178814,
-      "served_scripts": [
-        {"url": "http://localhost:5174/assets/index-BfHK0kgv.js", "sha256": "8cca2085c4c2f1e69e2112e5bcec3d3624216842f22c20abfe1bd2d13b7c5b3e"}
-      ],
-      "completed_windows": 8,
-      "timing_maxima_ms": {
-        "camera_cpu": 16.5,
-        "commit_cpu": 18.799999982118607,
-        "decode_cpu": 12,
-        "frame": 216.6999999999971,
-        "lod_cpu": 16.69999998807907,
-        "merge_elapsed": 270.2999999821186,
-        "merge_slice_cpu": 17,
-        "picking_cpu": 2.5,
-        "preparation_slice_cpu": 94.09999999403954,
-        "prepare_elapsed": 1468.199999988079,
-        "prepare_prelude_cpu": 1.5,
-        "prepare_slice_max": 94.09999999403954,
-        "ready_to_display_elapsed": 3644.5,
-        "render_submission_cpu": 21.400000005960464,
-        "selection_elapsed": 1352.3999999761581,
-        "validation_cpu": 10.799999982118607
-      }
-    },
-    "s100k_stress_interrupted.json": {
-      "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_stress_interrupted.json",
-      "complete": false,
-      "termination": {"kind": "target_closed_after_session_interruption", "message": "Runtime.callFunctionOn: Target closed during cycle10; nine completed cycles saved. Cause of target closure not independently established; not a passing stress run."},
-      "cold_interactive_ms": 3308.5999999940395,
-      "served_scripts": [
-        {"url": "http://localhost:5174/assets/index-CeKNjtcF.js", "sha256": "59f933e1b98946d8c318adcefb0e8c16d5d2b9298a679d12ccddab592bc03dd3"}
-      ],
-      "completed_windows": 16,
-      "timing_maxima_ms": {
-        "camera_cpu": 2.600000023841858,
-        "commit_cpu": 1.2999999821186066,
-        "decode_cpu": 2.4000000059604645,
-        "frame": 16.800000000046566,
-        "http_elapsed": 474.2999999821186,
-        "lod_cpu": 3.699999988079071,
-        "merge_cpu": 0.19999998807907104,
-        "merge_elapsed": 881.5999999940395,
-        "merge_slice_cpu": 4.5999999940395355,
-        "picking_cpu": 2.699999988079071,
-        "preparation_slice_cpu": 6.899999976158142,
-        "prepare_elapsed": 2830.7000000178814,
-        "prepare_prelude_cpu": 0.5999999940395355,
-        "prepare_slice_max": 6.899999976158142,
-        "ready_to_display_elapsed": 2849,
-        "render_submission_cpu": 5.399999976158142,
-        "selection_elapsed": 2033.699999988079,
-        "validation_cpu": 1
-      }
-    },
-    "s100k_stress_unavailable.json": {
-      "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_stress_unavailable.json",
-      "complete": false,
-      "error": "RuntimeError(\"evaluate_script: Error: Regression condition timed out: document.querySelector('canvas') && document.querySelector('.objectRow')\\n{}\\npptr:evaluateHandle;performEvaluation%20(file%3A%2F%2F%2Fopt%2Fhomebrew%2Flib%2Fnode_modules%2Fchrome-devtools-mcp%2Fbuild%2Fsrc%2Ftools%2Fscript.js%3A233%3A73):9:19\")",
-      "completed_windows": 0,
-      "timing_maxima_ms": {}
-    },
-    "baseline_swiftshader": {
-      "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_dynamic_baseline.json",
-      "complete": true,
-      "served_scripts": [
-        {"url": "http://localhost:5174/assets/index-B3ZCIpqP.js", "sha256": "0781c316409196f6812ecf1398a7f44d795c8282789bb366a572e9d5a3389758"}
-      ],
-      "cold_interactive_ms": 3736.4000000059605,
-      "frame_by_window": {
-        "steady": {"n": 93, "p50": 100, "p95": 116.70000000000073, "p99": 249.90000000000146, "max": 249.90000000000146, "over50ms": 92, "fraction_60hz": 0.0},
-        "flight": {"n": 138, "p50": 83.40000000000146, "p95": 116.60000000000218, "p99": 116.70000000000073, "max": 133.39999999999782, "over50ms": 135, "fraction_60hz": 0.0},
-        "rebase_eviction": {"n": 148, "p50": 83.29999999999563, "p95": 100.09999999999854, "p99": 300, "max": 350, "over50ms": 144, "fraction_60hz": 0.0},
-        "Сейчас": {"n": 120, "p50": 99.90000000000146, "p95": 133.3000000000029, "p99": 400, "max": 450, "over50ms": 83, "fraction_60hz": 0.016666666666666666},
-        "Ускорить": {"n": 113, "p50": 100, "p95": 133.3000000000029, "p99": 216.6999999999971, "max": 250.10000000000582, "over50ms": 95, "fraction_60hz": 0.02654867256637168},
-        "⟲": {"n": 113, "p50": 100, "p95": 133.29999999998836, "p99": 150, "max": 199.89999999999418, "over50ms": 95, "fraction_60hz": 0.0},
-        "cycles": {"n": 408, "p50": 66.80000000000291, "p95": 116.69999999999709, "p99": 133.29999999998836, "max": 166.6999999999971, "over50ms": 327, "fraction_60hz": 0.0024509803921568627}
-      }
-    },
-    "dynamic": {
-      "raw_evidence": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_dynamic_result.json",
-      "complete": true,
-      "served_scripts": [
-        {"url": "http://localhost:5174/assets/index-CeKNjtcF.js", "sha256": "59f933e1b98946d8c318adcefb0e8c16d5d2b9298a679d12ccddab592bc03dd3"}
-      ],
-      "cold_interactive_ms": 2965.5999999940395,
-      "frame_by_window": {
-        "steady": {"n": 606, "p50": 16.69999999999891, "p95": 16.700000000000728, "p99": 16.80000000000109, "max": 16.80000000000291, "over50ms": 0, "fraction_60hz": 0.37458745874587457},
-        "picking": {"n": 729, "p50": 16.69999999999709, "p95": 16.700000000004366, "p99": 16.80000000000291, "max": 16.80000000000291, "over50ms": 0, "fraction_60hz": 0.37448559670781895},
-        "flight": {"n": 756, "p50": 16.69999999999709, "p95": 16.799999999995634, "p99": 16.80000000000291, "max": 16.80000000000291, "over50ms": 0, "fraction_60hz": 0.38227513227513227},
-        "rebase_eviction": {"n": 722, "p50": 16.69999999999709, "p95": 16.700000000004366, "p99": 16.80000000000291, "max": 16.80000000000291, "over50ms": 0, "fraction_60hz": 0.37950138504155123},
-        "Сейчас": {"n": 623, "p50": 16.69999999999709, "p95": 16.70000000001164, "p99": 16.80000000000291, "max": 16.80000000000291, "over50ms": 0, "fraction_60hz": 0.3852327447833066},
-        "Ускорить": {"n": 689, "p50": 16.69999999999709, "p95": 16.70000000001164, "p99": 16.80000000000291, "max": 16.80000000000291, "over50ms": 0, "fraction_60hz": 0.38461538461538464},
-        "⟲": {"n": 648, "p50": 16.69999999999709, "p95": 16.70000000001164, "p99": 16.80000000000291, "max": 16.80000000000291, "over50ms": 0, "fraction_60hz": 0.37808641975308643},
-        "cycles": {"n": 1922, "p50": 16.69999999999709, "p95": 16.70000000001164, "p99": 16.80000000000291, "max": 16.800000000017462, "over50ms": 0, "fraction_60hz": 0.3761706555671176}
-      }
-    }
-  },
-  "historical_raw_evidence": {
-    "original": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_report.json",
-    "paced_first": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_dynamic_paced_first.json",
-    "previous_functional": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_update_functional.json",
-    "previous_regressions": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_update_regressions.json"
+  "historical_raw_evidence": {"original": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_report.json", "paced_first": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_dynamic_paced_first.json", "previous_functional": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_update_functional.json", "previous_regressions": "git:7f6609842f10e9cbfc5516f6193d9e22e4e3d54f:docs/s100k_update_regressions.json"},
+  "consolidation": {
+    "scope": "Compacted historical evidence only; no measurements rerun or rounded.",
+    "numeric_checks": "Per-run groups list every window with an identical complete numeric-check result.",
+    "assessment": "Recompute current checks with tests/report_s100k_dynamic.py; cached per-window duplicates removed.",
+    "history": "Superseded attempts summarized in docs/HISTORY.md; original complete evidence remains at evidence_revision."
   }
 }
