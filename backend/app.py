@@ -1,4 +1,5 @@
 import logging
+import json
 import os
 import sys
 import time
@@ -302,9 +303,16 @@ def search(q: str = ""):
         if not q.strip():
             return []
         with CATALOG.snapshot() as index:
-            return [{"id": item["id"], "name": item["name"], "latin": item.get("latin") or "",
-                     "kind": item["kind"], "scale": item["scale"]}
-                    for item in index.select(q=q, limit=min(SEARCH_LIMIT if SEARCH_LIMIT > 0 else 500, 500))]
+            limit = min(SEARCH_LIMIT if SEARCH_LIMIT > 0 else 500, 500)
+            # Revision pins search results to this publication. Share the existing
+            # filtered-response byte budget; never retain a full Python catalog.
+            key = ("search/1", index.metadata["catalog_revision"], q.strip().lower(), limit)
+            def serialize():
+                rows = [{"id": item["id"], "name": item["name"], "latin": item.get("latin") or "",
+                         "kind": item["kind"], "scale": item["scale"]}
+                        for item in index.select(q=q, limit=limit)]
+                return json.dumps(rows, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode()
+            return Response(SERIALIZED_CACHE.get_or_build(key, serialize), media_type="application/json")
     results = []
     for item in matching_items(q):
         results.append({

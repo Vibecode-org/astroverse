@@ -1,10 +1,12 @@
 import * as THREE from 'three';
+import { createBodyMeshes } from './bodyMeshes.js';
 import { physicalFrame, physicalFrameAsync, yieldPhysicalWork, renderPosition, relativeToReference } from './coordinates.js';
 
 export const LOD_LIMITS = Object.freeze({ objects:4096, detailed:32, scan:128, enter:20, exit:28 });
 // Both levels are screen markers, never measured radii. One logical ID/slot.
 export function createPhysicalLayer(scene) {
   let capacity=8, geometry, positions, colors, levels;
+  const bodyMeshes=createBodyMeshes(scene);
   const material=new THREE.ShaderMaterial({ vertexColors:true, uniforms:{markerPixelRatio:{value:1},renderShift:{value:new THREE.Vector3()}},
     vertexShader:`#include <common>
       #include <logdepthbuf_pars_vertex>
@@ -46,6 +48,7 @@ export function createPhysicalLayer(scene) {
       const start=performance.now();
       // Explicit eviction must not synchronously delete 100k Map entries.
       if(!frame){
+        bodyMeshes.update(null,[],()=>[]);
         rows=[];hierarchy=null;selected=null;cursor=0;slots=new Map();details.clear();
         levels.fill(-1);geometry.attributes.level.needsUpdate=true;
         geometry.setDrawRange(0,0);points.visible=false;
@@ -62,6 +65,7 @@ export function createPhysicalLayer(scene) {
       const relative=row=>reference?relativeToReference(row,hierarchy,reference):hierarchy?.relative(row.id,centerId)||row.position.map((v,a)=>v-origin[a]);
       // The manager selects resident sectors. Submit every known center in
       // that frame; a camera-distance cutoff would hide distant visible bodies.
+      bodyMeshes.update(frame,rows,row=>renderPosition(relative(row),[0,0,0]));
       const live=new Set(rows.map(row=>row.id));
       for(const [id,slot] of slots)if(!live.has(id)){slots.delete(id);details.delete(id);levels[slot]=-1;}
       if(rows.length>capacity){while(capacity<rows.length)capacity*=2;allocate();}
@@ -139,6 +143,7 @@ export function createPhysicalLayer(scene) {
       const committedOrigin=liveReference?liveReference.position.map((v,a)=>v+liveReference.offset[a]):nextOrigin;
       material.uniforms.renderShift.value.fromArray(renderPosition(committedOrigin,nextOrigin));
       positions.fill(0);positions.set(p);colors.set(c);levels.fill(-1);levels.set(l);
+      bodyMeshes.update(null,[],()=>[]);
       slots=nextSlots;
       pickGroups=[...groups.values()];rows=nextRows;origin=committedOrigin;hierarchy=parsed.hierarchy;selected=selectedId;details.clear();cursor=0;
       for(const attr of Object.values(geometry.attributes))attr.needsUpdate=true;
@@ -149,9 +154,11 @@ export function createPhysicalLayer(scene) {
     rebase(deltaKm){
       const delta=renderPosition(deltaKm,[0,0,0]);
       material.uniforms.renderShift.value.add(new THREE.Vector3(...delta));
+      bodyMeshes.rebase(new THREE.Vector3(...delta));
       origin=origin.map((v,a)=>v+deltaKm[a]);
     },
-    tick(camera,pixelRatio=1){
+    tick(camera,pixelRatio=1,height=600){
+      bodyMeshes.tick(camera,height,selected,pixelRatio);
       material.uniforms.markerPixelRatio.value=pixelRatio;
       const start=performance.now();let visited=0;
       if(slots.has(selected)&&!details.has(selected)){
@@ -167,11 +174,16 @@ export function createPhysicalLayer(scene) {
           else if(!details.has(row.id)&&distance<=LOD_LIMITS.enter&&details.size<LOD_LIMITS.detailed)level(row.id,1);
         }
       }
+      for(const id of bodyMeshes.ids())if(bodyMeshes.visible(id)){
+        const slot=slots.get(id),next=-2;
+        if(levels[slot]!==next){levels[slot]=next;levelDirty=true;}
+      }else if(levels[slots.get(id)]===-2){levels[slots.get(id)]=details.has(id)?1:0;levelDirty=true;}
       if(levelDirty){geometry.attributes.level.needsUpdate=true;levelDirty=false;}
       metrics.visited=visited;metrics.lodMs=performance.now()-start;metrics.maxLodMs=Math.max(metrics.maxLodMs,metrics.lodMs);
     },
     pick(camera,x,y,width,height){
       const started=performance.now();camera.updateMatrixWorld();let result=null,best=Infinity,bestDepth=Infinity;
+      const surface=bodyMeshes.pick(camera,x,y,width,height);
       const view=camera.matrixWorldInverse.elements;
       let candidates=rows;
       if(pickGroups){
@@ -187,7 +199,9 @@ export function createPhysicalLayer(scene) {
         }
       }
       for(const row of candidates){
+        if(bodyMeshes.visible(row.id))continue;
         const slot=slots.get(row.id);vector.fromArray(positions,slot*3).sub(material.uniforms.renderShift.value);
+        if(surface && vector.distanceTo(camera.position)>surface.distance)continue;
         const depth=-(view[2]*vector.x+view[6]*vector.y+view[10]*vector.z+view[14]);vector.project(camera);
         if(vector.z < -1||vector.z>1)continue;
         const distance=Math.hypot((vector.x+1)*width/2-x,(1-vector.y)*height/2-y);
@@ -196,17 +210,17 @@ export function createPhysicalLayer(scene) {
           best=distance;bestDepth=depth;result=row.id;
         }
       }
-      metrics.pickMs=performance.now()-started;return result;
+      metrics.pickMs=performance.now()-started;return result || surface?.id || null;
     },
-    timing:()=>({...metrics,slots:slots.size,capacity,bufferBytes:capacity*28,detailed:details.size}),
-    stats:()=>({...metrics,capacity,bufferBytes:capacity*28,slots:slots.size,detailed:details.size,
-      assignments:rows.map(row=>({id:row.id,slot:slots.get(row.id),level:details.has(row.id)?1:0}))}),
+    timing:()=>({...metrics,l2:bodyMeshes.inspect(),slots:slots.size,capacity,bufferBytes:capacity*28,detailed:details.size}),
+    stats:()=>({...metrics,l2:bodyMeshes.inspect(),capacity,bufferBytes:capacity*28,slots:slots.size,detailed:details.size,
+      assignments:rows.map(row=>({id:row.id,slot:slots.get(row.id),level:bodyMeshes.visible(row.id)?2:details.has(row.id)?1:0}))}),
     cameraChart:id=>({position:[...(rows.find(row=>row.id===id)?.position||origin)],
       path:hierarchy?.path(id)||null,offset:[0,0,0]}),
     inspect:(limit=rows.length)=>({origin:[...origin],rows:rows.slice(0,limit).map(row=>({id:row.id,position:[...row.position]})),
       render:rows.slice(0,limit).flatMap(row=>Array.from(positions.slice(slots.get(row.id)*3,slots.get(row.id)*3+3),(v,a)=>v-material.uniforms.renderShift.value.getComponent(a))),
       hierarchy:hierarchy?{binding:hierarchy.binding,addresses:rows.slice(0,limit).map(row=>hierarchy.address(row.id))}:null}),
-    dispose(){preparation++;pickGroups=null;scene.remove(points);geometry.dispose();material.dispose();rows=[];slots.clear();details.clear();hierarchy=null;},
+    dispose(){bodyMeshes.dispose();preparation++;pickGroups=null;scene.remove(points);geometry.dispose();material.dispose();rows=[];slots.clear();details.clear();hierarchy=null;},
   };
   return api;
 }

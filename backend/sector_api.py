@@ -42,12 +42,12 @@ def install_sector_api(app, catalog, etag_matches, cache_bytes):
                    "X-Coordinate-Contract": "coordinates/1"}
         if snapshot is not None:
             headers["X-Catalog-Snapshot"] = snapshot
-        payload = cache.get(key)
-        if payload is None:
+        def serialize():
             payload = json.dumps(build(), ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode()
             if len(payload) > MAX_RESPONSE_BYTES:
                 raise HTTPException(413, "Response byte budget exceeded; reduce limit")
-            cache.put(key, payload)
+            return payload
+        payload = cache.get_or_build(key, serialize)
         # Validate an uncached representation before evaluating conditions:
         # If-None-Match must not turn a normal 413 into a successful 304.
         if etag_matches(request.headers.get("if-none-match"), etag):

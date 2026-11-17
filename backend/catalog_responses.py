@@ -24,7 +24,7 @@ def disk_objects(request, q, kind, scale, version, *, catalog, cache, etag_match
         key = ("legacy", revision, version, q, kind, scale)
         etag = '"' + hashlib.sha256(repr(key).encode()).hexdigest() + '"'
         headers = {"ETag": etag, "Cache-Control": cache_control, "Vary": "Accept"}
-        if etag_matches(request.headers.get("if-none-match"), etag):
+        if not any((q, kind, scale)) and etag_matches(request.headers.get("if-none-match"), etag):
             return Response(status_code=304, headers=headers)
         if version != "json" and not any((q, kind, scale)):
             headers.update({"X-Object-Count": str(index.metadata["object_count"]),
@@ -79,6 +79,9 @@ def disk_objects(request, q, kind, scale, version, *, catalog, cache, etag_match
             count = len(rows)
         else:
             count = (int.from_bytes(payload[8:12], "little") if version != "json" else 0)
+        # A conditional cannot bypass filtered object/byte budget validation.
+        if etag_matches(request.headers.get("if-none-match"), etag):
+            return Response(status_code=304, headers=headers)
         if version != "json":
             headers.update({"X-Object-Count": str(count), "X-Catalog-Format": version})
         return Response(payload, media_type="application/json" if version == "json" else "application/octet-stream", headers=headers)

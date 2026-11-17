@@ -2,9 +2,9 @@
 
 import hashlib
 import json
-import math
 import asyncio
 import re
+import sqlite3
 from uuid import uuid4
 from contextlib import asynccontextmanager
 from threading import Lock
@@ -18,12 +18,22 @@ from data.ephemeris import Ephemeris, contract
 from data.source_registry import REGISTRY
 
 
-def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=None, work_limits=None):
-    targets = registry.targets
+def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=None, work_limits=None,
+                         temporal_index_factory=None):
+    from data.temporal_index import ensure_real
+    from backend.temporal_api import install_temporal_api
+    temporal_index = None
+    def get_index():
+        nonlocal temporal_index
+        if temporal_index is None:
+            temporal_index = temporal_index_factory() if temporal_index_factory else ensure_real(registry=registry)
+        return temporal_index
+
     cache = ByteLRU(1024 * 1024)
     lock = Lock()
     engine = None
     work = PositionWork(**(work_limits or {}))
+    app.state.position_work = work
 
     @app.middleware('http')
     async def position_trace(request, call_next):
@@ -55,6 +65,25 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
     def sources(request: Request, offset: int = Query(0, ge=0, le=1000000),
                 limit: int = Query(128, ge=1, le=128), q: str = Query('', max_length=128),
                 revision: str | None = Query(None, max_length=64)):
+        try:
+            with get_index().snapshot() as snapshot:
+                if snapshot.metadata['profile'] == 'synthetic-affine':
+                    current = snapshot.metadata['registry_revision']
+                    if revision is not None and revision != current:
+                        raise HTTPException(409, 'Registry changed; restart paging')
+                    rows = snapshot.db.execute('SELECT id,n FROM bodies WHERE n>=? AND instr(id,?)>0 ORDER BY n LIMIT ?', (offset,q,limit+1)).fetchall()
+                    result = {'version':'sources/1', 'revision':current, 'synthetic':True,
+                              'objects':[{'id':row['id'], 'name':row['id'], 'kind':'star', 'color':'#66bbff', 'model_id':'synthetic-affine'} for row in rows[:limit]],
+                              'models':[{'id':'synthetic-affine', 'source':'SYNTHETIC affine lattice; no measured astronomy'}],
+                              'total':snapshot.metadata['count'], 'next_offset':rows[limit-1]['n']+1 if len(rows)>limit else None}
+                    payload = json.dumps(result,separators=(',',':'),allow_nan=False).encode()
+                    etag = '"'+hashlib.sha256(payload).hexdigest()+'"'
+                    headers = {'ETag':etag,'Cache-Control':'public, max-age=0, must-revalidate'}
+                    return Response(status_code=304,headers=headers) if etag_matches(request.headers.get('if-none-match'),etag) else Response(payload,media_type='application/json',headers=headers)
+        except HTTPException:
+            raise
+        except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
+            raise HTTPException(503, 'Temporal publication unavailable', headers={'Cache-Control':'no-store'}) from exc
         if revision is not None and revision != registry.revision:
             raise HTTPException(409, 'Registry changed; restart paging')
         payload = json.dumps(registry.page(offset, limit, q), separators=(',', ':'), allow_nan=False).encode()
@@ -66,23 +95,26 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
 
     @router.get('/contract')
     def get_contract(request: Request):
-        payload = json.dumps(contract(registry), separators=(',', ':'), allow_nan=False).encode()
+        try:
+            with get_index().snapshot() as snapshot:
+                model_contract = dict(snapshot.metadata['coordinates'])
+                model_contract['temporal_revision'] = snapshot.metadata['temporal_revision']
+                model_contract['temporal_selection'] = {'max_sectors':16,'max_members_per_sector':128,'max_candidate_members':2048,'max_response_bytes':262144}
+        except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
+            raise HTTPException(503, 'Temporal publication unavailable', headers={'Cache-Control':'no-store'}) from exc
+        payload = json.dumps(model_contract, separators=(',', ':'), allow_nan=False).encode()
         etag = '"' + hashlib.sha256(payload).hexdigest() + '"'
         headers = {'ETag': etag, 'Cache-Control': 'public, max-age=0, must-revalidate'}
         if etag_matches(request.headers.get('if-none-match'), etag):
             return Response(status_code=304, headers=headers)
         return Response(payload, media_type='application/json', headers=headers)
 
-    def evaluate(request, at, jd_tdb, ids, neighborhood=None, expected_revision=None, cancelled=None):
+    def compute(at, jd_tdb, ids, cancelled):
         nonlocal engine
         def check():
             if cancelled is not None and cancelled.is_set():
                 raise PositionWorkCancelled()
         check()
-        if expected_revision is not None and expected_revision != contract(registry)['revision']:
-            raise HTTPException(409, detail={'code': 'position_revision_changed',
-                                           'message': 'Position revision changed; rediscover sectors'},
-                                headers={'Cache-Control': 'no-store'})
         # Poll the engine lock so disconnected callers cannot wait indefinitely.
         while not lock.acquire(timeout=.025):
             check()
@@ -96,8 +128,6 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
             check()
             # Parsing and interval validation precede validators, including *.
             try:
-                if ids is None and len(targets) > 128:
-                    raise HTTPException(413, 'Physical sector exceeds 128 centers; use individual reads')
                 key = (registry.revision, at, jd_tdb, tuple(ids) if ids is not None else None)
                 payload = cache.get(key)
                 if payload is None:
@@ -113,57 +143,8 @@ def install_position_api(app, etag_matches, registry=REGISTRY, engine_factory=No
         finally:
             lock.release()
         check()
-        if neighborhood is not None:
-            anchor, dx, dy, dz, radius, fixed_origin = neighborhood
-            result = json.loads(payload)
-            vectors = {row['id']: row['position'] for row in result['objects']}
-            origin = vectors[anchor] if fixed_origin is None else fixed_origin
-            center = [origin[axis] + delta for axis, delta in enumerate((dx, dy, dz))]
-            lower = [min(v[axis] for v in vectors.values()) for axis in range(3)]
-            upper = [max(v[axis] for v in vectors.values()) for axis in range(3)]
-            delta = [max(lower[a]-center[a], 0, center[a]-upper[a]) for a in range(3)]
-            result['objects'] = []
-            result.pop('hierarchy', None)  # manifest only; it carries no body placements
-            result['sectors'] = ([{'id': 'solar:verified', 'revision': result['revision'],
-                                   'min': lower, 'max': upper, 'object_count': len(vectors)}]
-                                 if math.hypot(*delta) <= radius else [])
-            result['query'] = {'anchor': anchor, 'offset_km': [dx,dy,dz], 'radius_km': radius}
-            if fixed_origin is not None:
-                result['query']['origin_km'] = fixed_origin
-            payload = json.dumps(result, separators=(',', ':'), allow_nan=False).encode()
-        etag = '"' + hashlib.sha256(payload).hexdigest() + '"'
-        headers = {'ETag': etag, 'Cache-Control': 'public, max-age=0, must-revalidate',
-                   'X-Coordinate-Contract': 'positions/1'}
-        if etag_matches(request.headers.get('if-none-match'), etag):
-            return Response(status_code=304, headers=headers)
-        return Response(payload, media_type='application/json', headers=headers)
+        return json.loads(payload)
 
-    @router.get('/sectors/solar:verified')
-    async def solar(request: Request, at: str | None = Query(None, max_length=64), jd_tdb: float | None = None,
-              revision: str | None = Query(None, max_length=256)):
-        return await work.run(request, lambda cancelled: evaluate(request, at, jd_tdb, None, expected_revision=revision, cancelled=cancelled))
-
-    @router.get('/nearby')
-    async def nearby(request: Request, anchor: str, dx: float, dy: float, dz: float,
-               radius: float, at: str | None = Query(None, max_length=64), jd_tdb: float | None = None,
-               revision: str | None = Query(None, max_length=256),
-               ox: float | None = None, oy: float | None = None, oz: float | None = None):
-        # The camera offset is ICRF km relative to a confirmed moving anchor.
-        # Re-evaluating both anchor and bounds prevents static-root omissions.
-        if (anchor not in targets or any(not math.isfinite(v) or abs(v)>1e13 for v in (dx,dy,dz,radius))
-                or radius < 0):
-            raise HTTPException(422, 'Invalid physical neighborhood; expected supported anchor and finite km within 1e13')
-        fixed_origin = None if all(v is None for v in (ox,oy,oz)) else [ox,oy,oz]
-        if fixed_origin is not None and any(v is None or not math.isfinite(v) or abs(v)>1e13 for v in fixed_origin):
-            raise HTTPException(422, 'Expected complete finite ICRF/SSB origin km within 1e13')
-        return await work.run(request, lambda cancelled: evaluate(request, at, jd_tdb, None, (anchor, dx, dy, dz, radius, fixed_origin), expected_revision=revision, cancelled=cancelled))
-
-    @router.get('/objects/{object_id}')
-    async def object_position(request: Request, object_id: str,
-                        at: str | None = Query(None, max_length=64), jd_tdb: float | None = None,
-                        revision: str | None = Query(None, max_length=256)):
-        if len(object_id) > 512:
-            raise HTTPException(422, 'Object ID too long')
-        return await work.run(request, lambda cancelled: evaluate(request, at, jd_tdb, [object_id], expected_revision=revision, cancelled=cancelled))
+    install_temporal_api(router, etag_matches, work, get_index, compute)
 
     app.include_router(router)

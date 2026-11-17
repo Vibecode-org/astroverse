@@ -43,14 +43,19 @@ export class PhysicalSectorManager {
     // Transport correlation only; never a source identity or a physical phase.
     this.clientId = clientIdentity();
     this.metrics = {requests:0, active:0, peakActive:0, responseBytes:0, retries:0,
+      selections:0, published:0, cancellations:0, cancelledRequests:0, staleResponses:0, coalescedTicks:0,
       conflicts:0, evictions:0, peakQueue:0, peakPending:0, peakObjects:0, peakSerialized:0, peakDecoded:0};
   }
   cancel() {
     this.generation++;
-    if (this.current) { this.current.controller.abort(); this.draining = this.current.promise.then(() => {}, () => {}); }
+    if (this.current) { this.abortSelection(this.current); this.draining = this.current.promise.then(() => {}, () => {}); }
     this.current = null;
     if (this.resident) this.metrics.evictions++;
     this.resident = null;
+  }
+  abortSelection(state) {
+    if (!state.controller.signal.aborted) this.metrics.cancellations++;
+    state.controller.abort();
   }
   inspect() {
     const state = this.current, result = {...this.metrics, clientId:this.clientId, generation:this.generation,
@@ -88,7 +93,7 @@ export class PhysicalSectorManager {
     if (this.current?.key === key && this.current.signal === signal && !signal?.aborted) return this.current.promise;
     const previous = this.current;
     const drained = previous?.promise.then(() => {}, () => {}) || this.draining;
-    previous?.controller.abort();
+    if (previous) this.abortSelection(previous);
     if (!retainPrevious || this.resident?.context !== context) {
       if (this.resident) this.metrics.evictions++;
       this.resident = null;
@@ -96,7 +101,8 @@ export class PhysicalSectorManager {
     const state = {key, context, signal, milliseconds, generation:++this.generation,
       controller:new AbortController(), cost:emptyCost(), reserved:emptyCost(), pending:0, queue:0};
     this.current = state;
-    const abort = () => state.controller.abort();
+    this.metrics.selections++;
+    const abort = () => this.abortSelection(state);
     signal?.addEventListener('abort', abort, {once:true});
     if (signal?.aborted) abort();
     // Drain aborted workers before admitting the next selection, so context
@@ -157,6 +163,8 @@ export class PhysicalSectorManager {
         if (body.objects?.length > this.limits.sectorObjects) fail('Превышен размер физического сектора');
         const validationStart=performance.now();
         validatePositionFrame(body, state.milliseconds);
+        if (body.temporal_revision !== undefined && (typeof body.temporal_revision !== 'string'
+            || !body.temporal_revision || body.temporal_revision.length > 256)) fail('Некорректная ревизия временного индекса');
         this.onPhase?.({kind:"validation_cpu",ms:performance.now()-validationStart});
         if (body.objects.length > this.limits.sectorObjects) fail('Превышен размер физического сектора');
         // Transfer the reservation to decoded residency without double counting.
@@ -180,6 +188,7 @@ export class PhysicalSectorManager {
         state.controller.signal.removeEventListener('abort', stop);
         attemptSignal.removeEventListener('abort', stop);
         for (const key of Object.keys(reserve)) state.reserved[key] -= reserve[key];
+        if (outcome === 'cancelled') this.metrics.cancelledRequests++;
         if (headers) this.onRequest?.({request:headers['X-Astroverse-Request'],
           selection:headers['X-Astroverse-Selection'],outcome,ms:performance.now()-started});
       }
@@ -198,7 +207,7 @@ export class PhysicalSectorManager {
     let response;
     try { response = await this.fetcher(url, {signal, headers}); }
     catch (error) { if (error instanceof TypeError) error.network = true; throw error; }
-    if (signal.aborted) throw abortError();
+    if (signal.aborted) { this.metrics.staleResponses++; throw abortError(); }
     if (response.status === 409) { await response.body?.cancel(); return {status:409, bytes:0}; }
     let body, bytes;
     if (response.body?.getReader) {
@@ -206,7 +215,7 @@ export class PhysicalSectorManager {
       try {
         for (;;) {
           const part = await reader.read();
-          if (signal.aborted) throw abortError();
+          if (signal.aborted) { this.metrics.staleResponses++; throw abortError(); }
           if (part.done) break;
           bytes += part.value.byteLength;
           if (bytes > this.limits.response) fail('Превышен размер ответа сектора');
@@ -221,6 +230,7 @@ export class PhysicalSectorManager {
     } else {
       // Compatibility with injected test fetchers, native HTTP uses bounded reads.
       body = await response.json().catch(() => null);
+      if (signal.aborted) { this.metrics.staleResponses++; throw abortError(); }
       bytes = new TextEncoder().encode(JSON.stringify(body)).length;
     }
     if (bytes > this.limits.response) fail('Превышен размер ответа сектора');
@@ -261,8 +271,10 @@ export class PhysicalSectorManager {
                 this.check(state, controller.signal);
                 const index = next++, sector = manifest.sectors[index]; state.queue--;
                 const query = new URLSearchParams({at:params.get('at'), revision:manifest.revision});
+                if (manifest.temporal_revision !== undefined) query.set('temporal_revision', manifest.temporal_revision);
                 const body = await this.request(state, this.root+'sectors/'+encodeURIComponent(sector.id)+'?'+query, controller.signal, Number.isSafeInteger(sector.object_count) && sector.object_count >= 0 && sector.object_count <= this.limits.sectorObjects ? sector.object_count : 0);
-                if (body.revision !== manifest.revision || body.registry_revision !== manifest.registry_revision) throw new PositionRevisionChanged();
+                if (body.revision !== manifest.revision || body.registry_revision !== manifest.registry_revision
+                    || body.temporal_revision !== manifest.temporal_revision) throw new PositionRevisionChanged();
                 if (body.sector !== sector.id || body.jd_tdb !== manifest.jd_tdb
                     || body.evaluated_at !== manifest.evaluated_at
                     || POSITION_COORDINATE_FIELDS.some(key => body.coordinates[key] !== manifest.coordinates[key])) fail('Несогласованный сектор или момент положений');
@@ -296,6 +308,7 @@ export class PhysicalSectorManager {
   }
   publish(state, frame) {
     this.check(state); this.account(state);
+    this.metrics.published++;
     if (this.resident) this.metrics.evictions++;
     this.resident = {cost:{...state.cost}, context:state.context};
     state.cost = emptyCost(); state.pending = 0; state.queue = 0;

@@ -1,27 +1,27 @@
 # SQLite-каталог и snapshot API
 
-Runtime читает `DiskCatalog`: schema2 хранит карточки, ordinal, поисковый текст,
-индексы, секторы/R-tree, metadata и legacy v1/v2 BLOB. На запрос открывается
-read-only snapshot; atomic rename не меняет уже открытые ответы/BLOB.
+Runtime — `DiskCatalog` (schema2): карточки, ordinal, поисковый текст, индексы,
+секторы/R-tree, metadata, legacy v1/v2 BLOB. Запрос открывает read-only snapshot;
+atomic rename не меняет открытые ответы/BLOB.
 Запуск, поставка, backup/restore и migration — [STARTUP](STARTUP.md).
 
 ## Координаты и разбиение
 
 `coordinates/1` — каталоговые снимки, не положения на выбранную дату.
-Frame/epoch/origin/accuracy не выводятся из имени источника; неизвестное — null.
-Legacy v2 содержит render-координаты. Физическая сцена использует отдельный
-`positions/1` пяти проверенных центров; снимки туда не передаются.
+Frame/epoch/origin/accuracy не выводить из имени источника; неизвестное — null.
+Legacy v2 содержит render-координаты. Физическая сцена — `positions/1` пяти проверенных
+центров, без снимков.
 Контракты — [COORDINATES](COORDINATES.md), [HIERARCHY](HIERARCHY.md).
 
-Семейство `parent` неделимо, сектор задаётся позицией корня; циклы, сироты и
+Семейство `parent` неделимо; сектор задан позицией корня. Циклы, сироты и
 cross-scale связи отклоняются. Solar — `solar:system`, неизвестная позиция —
-`<scale>:unlocated` с null bounds, доступная для карточек/поиска.
+`<scale>:unlocated` с null bounds для карточек/поиска.
 
 Сетка по умолчанию 32 ly, мягкий порог 4096 объектов, octree до 16 уровней.
-ID — `<scale>:<frame>:ix:iy:iz[/octant…]`; большие неделимые семьи могут
-превышать порог. Переразбиение меняет ID листьев. Предел R-tree — 3e38 ly;
-непредставимые численные конфигурации отклоняются. Nearby пересекает сферу
-с bounds корней, отдельно по frame/scale; это не точный список тел и не frustum.
+ID — `<scale>:<frame>:ix:iy:iz[/octant…]` ; неделимые семьи могут превышать порог.
+Переразбиение меняет ID листьев. Предел R-tree — 3e38 ly;
+непредставимые численные конфигурации отклоняются. Nearby — пересечение сферы
+с bounds корней по frame/scale, не точный список тел и не frustum.
 
 ## HTTP `spatial/1`
 
@@ -34,25 +34,25 @@ ID — `<scale>:<frame>:ix:iy:iz[/octant…]`; большие неделимые
 
 Nearby: `local/galaxy`, `equatorial/galactic`, центр ±1e12 ly, радиус 0…1e6 ly.
 Solar/unlocated доступны по ID. Страница: 1…512 карточек, `after` ≤512 символов;
-семейство замкнуто в листе, не обязательно в странице. Ответ ≤2 MiB.
+семейство замкнуто в листе, но не обязательно в странице. Ответ ≤2 MiB.
 Превышение числа листьев/bytes — 413 без усечения; неизвестный ID — 404,
 неверные параметры или любой `at` — 422, недоступная публикация — 503.
 
-`snapshot` фиксирует общую ревизию между запросами: несовпадение даёт
-409 `snapshot_changed` до ETag; выборку начать заново. Без параметра каждый
-запрос согласован отдельно. Страница сообщает `X-Catalog-Snapshot`, включая 304.
+`snapshot` фиксирует общую ревизию запросов: несовпадение —
+409 `snapshot_changed` до ETag, выборку начать заново. Без него запросы
+согласованы по отдельности. Страница сообщает `X-Catalog-Snapshot`, включая 304.
 ETag листа зависит от его revision/limit/after; независимый patch его сохраняет.
 Nearby/locate используют общую ревизию. Weak/list/`*` поддерживаются;
-лимиты проверяются до 304. Курсор без snapshot не гарантирует согласованную
-пагинацию между публикациями.
+лимиты проверяются до 304. Курсор без snapshot не гарантирует согласованность
+пагинации между публикациями.
 
 LRU snapshot-ответов — 8 MiB (`ASTROVERSE_SECTOR_CACHE_BYTES`); filtered legacy —
 отдельные 8 MiB (`ASTROVERSE_BINARY_CACHE_BYTES`). Это бюджеты кэшей, не RSS.
 Filtered legacy ≤4096 объектов/8 MiB, иначе 413. Полные JSON/v1/v2 stream по 64 KiB
-без полного Python-каталога, но трафик O(N); исходный порядок и wire format
-сохранены. Поиск — SQL substring scan, до 500 результатов, не inverted index.
-Frontend snapshot-кэш ограничен 4 MiB/4096 декодированными карточками запроса;
-он обслуживает карточки. Physical admission/selection — [PHYSICAL_LOD](PHYSICAL_LOD.md).
+без полного Python-каталога; трафик O(N), порядок и wire format сохранены. Поиск — SQL
+substring scan, до 500 результатов, не inverted index.
+Frontend snapshot-кэш карточек: 4 MiB/4096 декодированных карточек запроса. Physical
+admission/selection — [PHYSICAL_LOD](PHYSICAL_LOD.md).
 
 ## Подготовка и публикация
 
@@ -61,16 +61,16 @@ Frontend snapshot-кэш ограничен 4 MiB/4096 декодированн�
 python -m backend.prepare_runtime SOURCE TARGET
 ```
 
-Streaming builder читает ijson по объекту; graph, сортировки и strings живут
-на диске, SQLite cache 8 MiB/`temp_store=FILE`. `data/sectors.py` сохраняет
-списочный builder для тестов/малых явных каталогов. JSON остаётся API/fixture/
+Streaming builder читает ijson по объекту; graph, сортировки и strings
+на диске, SQLite cache 8 MiB/`temp_store=FILE`. `data/sectors.py` — списочный builder для
+тестов/малых явных каталогов. JSON остаётся API/fixture/
 tooling-форматом; изменение JSON не сбрасывает рабочие patches при рестарте.
 
-Writers используют постоянный `data.publication.publication_lock`, проверяют
-expected revision и публикуют проверенный/fsync кандидат atomic rename.
-Lock inode сохранять. Старые readers держат прежний inode; ошибка/SIGKILL до
-rename сохраняет прежнюю публикацию. Следующий writer удаляет только своё
-private staging. Самовольная запись SQL поверх активного inode не поддерживается.
+Writers: постоянный `data.publication.publication_lock`, проверка expected
+revision, проверка/fsync кандидата, atomic rename.
+Lock inode сохранять. Старые readers держат прежний inode; ошибка/SIGKILL до rename
+сохраняет публикацию. Следующий writer удаляет только своё private staging.
+Запись SQL поверх активного inode не поддерживается.
 
 ### Ограниченный этап 3.7-B: локальный writer
 
@@ -80,24 +80,24 @@ metadata = publish_changes(path, expected_revision=revision,
                            upserts=changed_cards, deletes=removed_ids, metrics={})
 ```
 
-Предел входа — 4096 upserts +4096 deletes, вместе 8 MiB. Indexed closure и
+Вход ≤4096 upserts +4096 deletes, вместе ≤8 MiB. Indexed closure и
 переразбиение старых/новых базовых ячеек ограничены объединением 65536 ID,
 64 MiB payload (максимум старого/нового по ID), 4096 cells. Превышение даёт
-`ResultLimitExceeded` до copy; это предел patch-работы, не размера каталога.
+`ResultLimitExceeded` до copy; предел ограничивает patch-работу, не каталог.
 
 `incremental_region.py` проверяет семьи и split/merge; меняются только effective
-upserts/search rows и затронутые секторы. Исходный порядок старых ID сохраняется,
-новые добавляются по ID. No-op не меняет inode/revision, но устаревший expected
-revision всё равно отклоняется (`RevisionConflict`). Старый import manifest
+upserts/search rows и затронутые секторы. Порядок старых ID сохраняется, новые добавляются
+по ID. No-op сохраняет inode/revision; устаревший expected revision
+отклоняется (`RevisionConflict`) и при no-op. Старый import manifest
 переносится в `previous_import_manifest` после административного patch.
 
-Writer требует `incremental_schema=1`; старая schema2 читается, но для patch
-нужна явная полная подготовка с индексами и сохранением её текущих карточек.
+Writer требует `incremental_schema=1`; старая schema2 читается, но patch
+требует явной полной подготовки с индексами и сохранением текущих карточек.
 SQLite copy, общий hash, полные v1/v2 и integrity/FK остаются **O(N)**.
 Метрики разделяют локальный граф/update и полные copy/hash/legacy/validation/
 publication; total включает lock и cleanup. Нужны staging/journal/binary spools
-и место старым readers. Это ограниченная локальная работа, не O(изменений)
-публикация и не закрытие всего 3.7-B/общего body-model registry.
+и место старым readers. Локальная работа ограничена, но публикация не O(изменений);
+весь 3.7-B/общий body-model registry не закрыт.
 
 ### Прямой SBDB import: ограниченный 3.7-A
 
@@ -106,15 +106,15 @@ python -m data.import_sbdb PATH --expected-revision HEX --limit 400
 ```
 
 Один HTTP→bounded events→staging SQLite→normalization/merge→проверки→rename.
-Upsert астероидов по `pdes`; пропуск во входе сохраняет запись. `--delete-id`
-удаляет только явно перечисленные принадлежащие адаптеру ID, отсутствующие
-во входе (≤4096). Новый ID — `sbdb:a:{pdes}`; старые source IDs сохраняют identity,
+Upsert астероидов по `pdes`; пропущенные записи сохраняются. `--delete-id`
+удаляет только явно перечисленные ID адаптера, отсутствующие во входе (≤4096). Новый ID —
+`sbdb:a:{pdes}` ; старые source IDs сохраняют identity,
 legacy name-match допустим только однозначный. Overrides сохраняются;
 registry физических центров не расширяется.
 
 Metadata `catalog-import/1` хранит source/query/input SHA, версии и timestamps,
-semantic/parent revisions. Карточки хранят input hash/версии; получение не эпоха,
-неизвестные frame/epoch/accuracy — null. Повтор без semantic change не публикуется;
+semantic/parent revisions. В карточках — input hash/версии; получение не эпоха,
+неизвестные frame/epoch/accuracy — null. Без semantic change повтор не публикуется;
 timestamps не входят в revision. Pin входа —`--expected-sha256`.
 
 Пределы: 2 млн строк, 1 GiB, пять полей, 4096 wire bytes/token, nesting 4, read ≤64 KiB.

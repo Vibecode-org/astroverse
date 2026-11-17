@@ -1,0 +1,2364 @@
+{
+  "version": "temporal-streaming-report/1",
+  "timestamp": "2026-11-17T13:51:51.182367+00:00",
+  "budgets": {
+    "selection_p95_ms": 100,
+    "selection_p99_ms": 250,
+    "positions_p95_ms": 250,
+    "positions_p99_ms": 500,
+    "accepted_p95_ms": 500,
+    "accepted_p99_ms": 1500,
+    "backend_peak_mib": 512,
+    "late_growth_mib": 32,
+    "sectors": 16,
+    "members": 2048,
+    "sector_members": 128,
+    "response_bytes": 262144,
+    "render_callback_cpu_p95_ms": 16.8
+  },
+  "environment": {
+    "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+    "python": "3.12.16 (main, Nov  5 2026, 08:06:14) [GCC 14.2.0]",
+    "sqlite": "3.46.1",
+    "packages": {
+      "fastapi": "0.162.3",
+      "uvicorn": "0.34.3",
+      "skyfield": "1.53",
+      "numpy": "2.2.6"
+    }
+  },
+  "method": {
+    "cold": "fresh process/application cache; OS page cache untouched",
+    "rss": "backend /proc RSS/HWM every50ms; generator/driver separate processes",
+    "windows": "three process repeats; final repeat sustained; fixed origins; four HTTP sector workers",
+    "timing": "HTTP client wall latency; driver assembly is not browser frame acceptance",
+    "complexity": "fixture/index construction/hash/integrity/publication O(N), excluded from request timings"
+  },
+  "sizes": [
+    {
+      "count": 100000,
+      "build": {
+        "seconds": 3.2038115420000395,
+        "builder_peak_mib": 32.31640625,
+        "bytes": 18370560,
+        "phases": {
+          "fill_seconds": 3.0602512919999754,
+          "integrity_seconds": 0.13064558399992166,
+          "fsync_publish_seconds": 0.0028884590000188837,
+          "total_seconds": 3.2037257499999896
+        }
+      },
+      "runs": [
+        {
+          "cycles": 96,
+          "duration_s": 3.571874127000001,
+          "selection_http_ms": {
+            "samples": 96,
+            "p50": 9.048,
+            "p95": 11.691,
+            "p99": 147.843,
+            "maximum": 147.84341699999004
+          },
+          "positions_http_ms": {
+            "samples": 432,
+            "p50": 15.478,
+            "p95": 26.064,
+            "p99": 30.613,
+            "maximum": 36.53066700007912
+          },
+          "driver_assembly_ms": {
+            "samples": 96,
+            "p50": 20.171,
+            "p95": 97.343,
+            "p99": 230.131,
+            "maximum": 230.1311670000814
+          },
+          "first_driver_frame_ms": 230.1311670000814,
+          "resident_min": 0,
+          "resident_max": 2048,
+          "candidate_sector_counts": {
+            "samples": 96,
+            "p50": 1,
+            "p95": 16,
+            "p99": 16,
+            "maximum": 16
+          },
+          "response_max_bytes": 40719,
+          "errors": 0,
+          "dense_overflow_status": 413,
+          "repeat": 0,
+          "ready_s": 0.7326177500000313,
+          "baseline_rss_mib": 53.4140625,
+          "peak_rss_mib": 75.984375,
+          "post_rss_mib": 75.984375,
+          "late_rss_min_mib": 75.92578125,
+          "late_rss_max_mib": 75.984375,
+          "rss_samples": 85
+        },
+        {
+          "cycles": 96,
+          "duration_s": 3.5402870010000242,
+          "selection_http_ms": {
+            "samples": 96,
+            "p50": 8.948,
+            "p95": 10.921,
+            "p99": 138.777,
+            "maximum": 138.7768329999517
+          },
+          "positions_http_ms": {
+            "samples": 432,
+            "p50": 15.609,
+            "p95": 26.753,
+            "p99": 39.659,
+            "maximum": 54.428708000045845
+          },
+          "driver_assembly_ms": {
+            "samples": 96,
+            "p50": 19.592,
+            "p95": 98.98,
+            "p99": 224.813,
+            "maximum": 224.81258300001628
+          },
+          "first_driver_frame_ms": 224.81258300001628,
+          "resident_min": 0,
+          "resident_max": 2048,
+          "candidate_sector_counts": {
+            "samples": 96,
+            "p50": 1,
+            "p95": 16,
+            "p99": 16,
+            "maximum": 16
+          },
+          "response_max_bytes": 40719,
+          "errors": 0,
+          "dense_overflow_status": 413,
+          "repeat": 1,
+          "ready_s": 0.727988499999924,
+          "baseline_rss_mib": 53.40625,
+          "peak_rss_mib": 75.95703125,
+          "post_rss_mib": 75.95703125,
+          "late_rss_min_mib": 75.890625,
+          "late_rss_max_mib": 75.95703125,
+          "rss_samples": 85
+        },
+        {
+          "cycles": 4851,
+          "duration_s": 180.018656415,
+          "selection_http_ms": {
+            "samples": 4851,
+            "p50": 9.287,
+            "p95": 11.633,
+            "p99": 14.703,
+            "maximum": 136.8313750000425
+          },
+          "positions_http_ms": {
+            "samples": 21833,
+            "p50": 15.945,
+            "p95": 29.971,
+            "p99": 46.18,
+            "maximum": 97.55204199996115
+          },
+          "driver_assembly_ms": {
+            "samples": 4851,
+            "p50": 20.431,
+            "p95": 100.979,
+            "p99": 121.079,
+            "maximum": 305.32750000008946
+          },
+          "first_driver_frame_ms": 224.93041699999594,
+          "resident_min": 0,
+          "resident_max": 2048,
+          "candidate_sector_counts": {
+            "samples": 4851,
+            "p50": 1,
+            "p95": 16,
+            "p99": 16,
+            "maximum": 16
+          },
+          "response_max_bytes": 40719,
+          "errors": 0,
+          "dense_overflow_status": 413,
+          "repeat": 2,
+          "ready_s": 0.7747042089999923,
+          "baseline_rss_mib": 53.4140625,
+          "peak_rss_mib": 76.109375,
+          "post_rss_mib": 76.109375,
+          "late_rss_min_mib": 76.109375,
+          "late_rss_max_mib": 76.109375,
+          "rss_samples": 3512
+        }
+      ],
+      "known_count": 99219,
+      "unknown_count": 781,
+      "candidate_sector_count_range": [
+        0,
+        16
+      ],
+      "fixture_sector_count": 782,
+      "fixture_metadata": {
+        "schema": 1,
+        "profile": "synthetic-affine",
+        "count": 100000,
+        "bucket_days": 365,
+        "epoch_jd": 2461041.5,
+        "interval": [
+          2451544.5,
+          2462502.5
+        ],
+        "generator": "affine-lattice/1",
+        "revision": "synthetic-temporal-b496f2110e6cdd47ddd6418afe40a511736fd87d30309f1e4800cd2b7c2cbba2",
+        "temporal_revision": "synthetic-temporal-b496f2110e6cdd47ddd6418afe40a511736fd87d30309f1e4800cd2b7c2cbba2",
+        "registry_revision": "b496f2110e6cdd47ddd6418afe40a511736fd87d30309f1e4800cd2b7c2cbba2"
+      },
+      "fixture_sha256": "736509d56d62d9d42dc7dd200551d4c228771ef5c3ed3e778ed506cd29e8486e",
+      "browser": {
+        "complete": true,
+        "count": 100000,
+        "seconds_requested": 120,
+        "cycles": 3,
+        "checks": {
+          "sparse_dense_empty_density_budget": true,
+          "rapid_context_replacement": true,
+          "requested_time_oracle_all_accepted": true,
+          "disposal_recreation_resources": true
+        },
+        "cases": [
+          {
+            "cycle": 0,
+            "name": "sparse",
+            "resident": 128,
+            "computed": 127,
+            "submitted": 127,
+            "in_frustum": 127,
+            "layer": {
+              "applyMs": 1.300000011920929,
+              "maxApplyMs": 1.300000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0,
+              "visited": 0,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 127,
+              "capacity": 128,
+              "bufferBytes": 3584,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 127
+            }
+          },
+          {
+            "cycle": 0,
+            "name": "dense16",
+            "resident": 2048,
+            "computed": 2032,
+            "submitted": 2032,
+            "in_frustum": 2032,
+            "layer": {
+              "applyMs": 6.300000011920929,
+              "maxApplyMs": 6.300000011920929,
+              "lodMs": 0.09999999403953552,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 127,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 2032,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            }
+          },
+          {
+            "cycle": 0,
+            "name": "empty",
+            "resident": 0,
+            "computed": 0,
+            "submitted": 0,
+            "in_frustum": 0,
+            "layer": {
+              "applyMs": 0.10000002384185791,
+              "maxApplyMs": 6.300000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 0,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 0,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 0,
+              "points": 0
+            }
+          },
+          {
+            "cycle": 1,
+            "name": "sparse",
+            "resident": 128,
+            "computed": 127,
+            "submitted": 127,
+            "in_frustum": 127,
+            "layer": {
+              "applyMs": 0.4000000059604645,
+              "maxApplyMs": 6.300000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 0,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 127,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 127
+            }
+          },
+          {
+            "cycle": 1,
+            "name": "dense16",
+            "resident": 2048,
+            "computed": 2032,
+            "submitted": 2032,
+            "in_frustum": 2032,
+            "layer": {
+              "applyMs": 5,
+              "maxApplyMs": 6.300000011920929,
+              "lodMs": 0.09999999403953552,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 127,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 2032,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            }
+          },
+          {
+            "cycle": 1,
+            "name": "empty",
+            "resident": 0,
+            "computed": 0,
+            "submitted": 0,
+            "in_frustum": 0,
+            "layer": {
+              "applyMs": 0,
+              "maxApplyMs": 6.300000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 128,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 0,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 0,
+              "points": 0
+            }
+          },
+          {
+            "cycle": 2,
+            "name": "sparse",
+            "resident": 128,
+            "computed": 127,
+            "submitted": 127,
+            "in_frustum": 127,
+            "layer": {
+              "applyMs": 0.30000001192092896,
+              "maxApplyMs": 6.300000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 0,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 127,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 127
+            }
+          },
+          {
+            "cycle": 2,
+            "name": "dense16",
+            "resident": 2048,
+            "computed": 2032,
+            "submitted": 2032,
+            "in_frustum": 2032,
+            "layer": {
+              "applyMs": 4.800000011920929,
+              "maxApplyMs": 6.300000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 127,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 2032,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            }
+          },
+          {
+            "cycle": 2,
+            "name": "empty",
+            "resident": 0,
+            "computed": 0,
+            "submitted": 0,
+            "in_frustum": 0,
+            "layer": {
+              "applyMs": 0.09999999403953552,
+              "maxApplyMs": 6.300000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 0,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 0,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 0,
+              "points": 0
+            }
+          }
+        ],
+        "cycles_resources": [
+          {
+            "cycle": 0,
+            "disposed": {
+              "geometries": 0,
+              "textures": 0,
+              "programs": 0,
+              "calls": 0,
+              "points": 0
+            },
+            "recreated": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            },
+            "buffer_bytes": 57344
+          },
+          {
+            "cycle": 1,
+            "disposed": {
+              "geometries": 0,
+              "textures": 0,
+              "programs": 0,
+              "calls": 0,
+              "points": 0
+            },
+            "recreated": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            },
+            "buffer_bytes": 57344
+          },
+          {
+            "cycle": 2,
+            "disposed": {
+              "geometries": 0,
+              "textures": 0,
+              "programs": 0,
+              "calls": 0,
+              "points": 0
+            },
+            "recreated": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            },
+            "buffer_bytes": 57344
+          }
+        ],
+        "metrics": {
+          "transition_raf_interval_ms": {
+            "count": 7199,
+            "retained": 7199,
+            "mean": 16.665995277121823,
+            "p50": 16.69999999999709,
+            "p95": 16.70000000001164,
+            "p99": 16.80000000000291,
+            "max": 16.80000000000291,
+            "over50": 0
+          },
+          "transition_frame_cpu_ms": {
+            "count": 7201,
+            "retained": 7201,
+            "mean": 0.11358144688549977,
+            "p50": 0.09999999403953552,
+            "p95": 0.20000001788139343,
+            "p99": 0.4000000059604645,
+            "max": 1,
+            "over50": 0
+          },
+          "transition_longtask_ms": {
+            "count": 0,
+            "retained": 0,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null,
+            "max": 0,
+            "over50": 0
+          },
+          "transition_accepted_frame_ms": {
+            "count": 560,
+            "retained": 560,
+            "mean": 61.93499999998936,
+            "p50": 80.80000001192093,
+            "p95": 100,
+            "p99": 109.59999999403954,
+            "max": 1081,
+            "over50": 350
+          },
+          "lod_cpu_ms": {
+            "count": 7248,
+            "retained": 7248,
+            "mean": 0.040176600324726,
+            "p50": 0,
+            "p95": 0.10000002384185791,
+            "p99": 0.20000001788139343,
+            "max": 1,
+            "over50": 0
+          },
+          "render_submission_cpu_ms": {
+            "count": 7248,
+            "retained": 7248,
+            "mean": 0.07360651212483316,
+            "p50": 0.09999999403953552,
+            "p95": 0.19999998807907104,
+            "p99": 0.30000001192092896,
+            "max": 7.9000000059604645,
+            "over50": 0
+          },
+          "frame_cpu_ms": {
+            "count": 7248,
+            "retained": 7248,
+            "mean": 0.11581125813916687,
+            "p50": 0.09999999403953552,
+            "p95": 0.20000001788139343,
+            "p99": 0.4000000059604645,
+            "max": 8.300000011920929,
+            "over50": 0
+          },
+          "longtask_ms": {
+            "count": 1,
+            "retained": 1,
+            "mean": 1867,
+            "p50": 1867,
+            "p95": 1867,
+            "p99": 1867,
+            "max": 1867,
+            "over50": 1
+          },
+          "raf_interval_ms": {
+            "count": 7247,
+            "retained": 7247,
+            "mean": 16.77639023044018,
+            "p50": 16.69999999999709,
+            "p95": 16.70000000001164,
+            "p99": 16.80000000000291,
+            "max": 800.0000000000002,
+            "over50": 1
+          },
+          "decode_cpu_ms": {
+            "count": 6432,
+            "retained": 6432,
+            "mean": 0.11421019886041162,
+            "p50": 0.09999999403953552,
+            "p95": 0.20000001788139343,
+            "p99": 0.30000001192092896,
+            "max": 0.5999999940395355,
+            "over50": 0
+          },
+          "validation_cpu_ms": {
+            "count": 6428,
+            "retained": 6428,
+            "mean": 0.20278469197261978,
+            "p50": 0.19999998807907104,
+            "p95": 0.4000000059604645,
+            "p99": 0.5,
+            "max": 1,
+            "over50": 0
+          },
+          "http_elapsed_ms": {
+            "count": 6436,
+            "retained": 6436,
+            "mean": 15.72565257942421,
+            "p50": 15.400000005960464,
+            "p95": 24.19999998807907,
+            "p99": 32.20000001788139,
+            "max": 145.69999998807907,
+            "over50": 4
+          },
+          "merge_cpu_ms": {
+            "count": 573,
+            "retained": 573,
+            "mean": 1.5933682380234384,
+            "p50": 1.9000000059604645,
+            "p95": 4.4000000059604645,
+            "p99": 4.899999976158142,
+            "max": 5.299999982118607,
+            "over50": 0
+          },
+          "selection_elapsed_ms": {
+            "count": 572,
+            "retained": 572,
+            "mean": 58.844755245099115,
+            "p50": 76.40000000596046,
+            "p95": 94.5,
+            "p99": 105.90000000596046,
+            "max": 1077.0999999940395,
+            "over50": 357
+          },
+          "oracle_cpu_ms": {
+            "count": 573,
+            "retained": 573,
+            "mean": 0.19336823721206625,
+            "p50": 0.19999998807907104,
+            "p95": 0.5,
+            "p99": 0.7000000178813934,
+            "max": 1.0999999940395355,
+            "over50": 0
+          },
+          "apply_cpu_ms": {
+            "count": 573,
+            "retained": 573,
+            "mean": 2.769458987533942,
+            "p50": 3.5999999940395355,
+            "p95": 6.4000000059604645,
+            "p99": 9.099999994039536,
+            "max": 10.5,
+            "over50": 0
+          },
+          "accepted_frame_ms": {
+            "count": 572,
+            "retained": 572,
+            "mean": 61.8410839161256,
+            "p50": 80.7999999821186,
+            "p95": 100,
+            "p99": 110.19999998807907,
+            "max": 1081,
+            "over50": 357
+          }
+        },
+        "method": "Actual production manager/layer + WebGLRenderer. Direct manager stress; React clock coalescing separately unit-tested. RAF is browser scheduling, not monitor/GPU completion. CPU includes explicit oracle validation. All-run metrics preserve startup/disposal outliers; transition_* metrics cover only the sustained phase. Bounded last 20000 samples per metric; no full graph history.",
+        "memory_scope": "performance.memory is whole-tab JS heap (if available), not component memory or browser RSS; renderer.info counts resources, not driver GPU bytes.",
+        "heap": {
+          "baseline": {
+            "used": 3520201,
+            "total": 4422345,
+            "limit": 4395630592
+          },
+          "peak_used": 46508753,
+          "late": {
+            "used": 18492386,
+            "total": 81168662,
+            "limit": 4395630592
+          },
+          "window_ms": 10000,
+          "window_limit": 360,
+          "windows": [
+            {
+              "index": 0,
+              "from_s": 0.0010999999940395355,
+              "to_s": 9.59859999999404,
+              "samples": 18,
+              "transition_samples": 14,
+              "first": 3520201,
+              "last": 14316280,
+              "min": 3520201,
+              "max": 46508753
+            },
+            {
+              "index": 1,
+              "from_s": 10.114800000011922,
+              "to_s": 19.897699999988077,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 25447277,
+              "last": 38173365,
+              "min": 6635441,
+              "max": 41952385
+            },
+            {
+              "index": 2,
+              "from_s": 20.41409999999404,
+              "to_s": 29.6975,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 12271345,
+              "last": 16781511,
+              "min": 7421401,
+              "max": 34234977
+            },
+            {
+              "index": 3,
+              "from_s": 30.1975,
+              "to_s": 39.49680000001192,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 16159579,
+              "last": 15839982,
+              "min": 12573533,
+              "max": 30197937
+            },
+            {
+              "index": 4,
+              "from_s": 40.01290000000596,
+              "to_s": 49.81359999999404,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 13536019,
+              "last": 34895181,
+              "min": 6606080,
+              "max": 34895181
+            },
+            {
+              "index": 5,
+              "from_s": 50.33,
+              "to_s": 59.6295,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 28848199,
+              "last": 13282286,
+              "min": 12376330,
+              "max": 34484558
+            },
+            {
+              "index": 6,
+              "from_s": 60.14530000001192,
+              "to_s": 69.92980000001192,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 13861794,
+              "last": 28807842,
+              "min": 9968858,
+              "max": 38826529
+            },
+            {
+              "index": 7,
+              "from_s": 70.44480000001192,
+              "to_s": 79.71219999998807,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 13385879,
+              "last": 32394627,
+              "min": 13385879,
+              "max": 34931454
+            },
+            {
+              "index": 8,
+              "from_s": 80.22769999998808,
+              "to_s": 89.49440000000597,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 32989319,
+              "last": 25650301,
+              "min": 11119872,
+              "max": 38373543
+            },
+            {
+              "index": 9,
+              "from_s": 90.01140000000596,
+              "to_s": 99.79480000001192,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 26517282,
+              "last": 35029999,
+              "min": 13696438,
+              "max": 40711015
+            },
+            {
+              "index": 10,
+              "from_s": 100.31119999998808,
+              "to_s": 109.59330000001192,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 24467879,
+              "last": 7687289,
+              "min": 7687289,
+              "max": 43979731
+            },
+            {
+              "index": 11,
+              "from_s": 110.11069999998809,
+              "to_s": 119.878,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 14956455,
+              "last": 18029435,
+              "min": 8462386,
+              "max": 38737018
+            },
+            {
+              "index": 12,
+              "from_s": 120.39369999998807,
+              "to_s": 122.80209999999404,
+              "samples": 8,
+              "transition_samples": 4,
+              "first": 37161108,
+              "last": 18492386,
+              "min": 18492386,
+              "max": 42930988
+            }
+          ]
+        },
+        "renderer": {
+          "geometries": 1,
+          "textures": 0,
+          "programs": 1,
+          "calls": 1,
+          "points": 2032
+        },
+        "error": null,
+        "health": {
+          "status": "ok",
+          "objects": 100000,
+          "synthetic": true,
+          "profile": "synthetic-temporal"
+        },
+        "webgl": {
+          "vendor": "Google Inc. (Google)",
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+        },
+        "longtask_observer_available": true,
+        "first_usable_scene_ms": 2033.0999999940395,
+        "churn": {
+          "attempts": 12,
+          "cancelled": 11
+        },
+        "manager": {
+          "requests": 6436,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 232334027,
+          "retries": 1,
+          "selections": 587,
+          "published": 573,
+          "cancellations": 11,
+          "cancelledRequests": 4,
+          "staleResponses": 0,
+          "coalescedTicks": 0,
+          "conflicts": 0,
+          "evictions": 572,
+          "peakQueue": 16,
+          "peakPending": 16,
+          "peakObjects": 4096,
+          "peakSerialized": 2173550,
+          "peakDecoded": 18576240,
+          "clientId": "e692e570-dd27-427a-93ca-f17de9ece9ef",
+          "generation": 590,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 2048,
+          "objects": 2048,
+          "serialized": 639486,
+          "decoded": 6234096
+        },
+        "layer": {
+          "applyMs": 3.899999976158142,
+          "maxApplyMs": 3.899999976158142,
+          "lodMs": 0,
+          "maxLodMs": 0,
+          "visited": 0,
+          "pickMs": 0,
+          "prepareMs": 0,
+          "sliceMaxMs": 0,
+          "l2": {
+            "meshes": 0,
+            "visible": [],
+            "resources": {
+              "geometries": 0,
+              "materials": 0,
+              "textures": 0
+            },
+            "bodies": []
+          },
+          "slots": 2032,
+          "capacity": 2048,
+          "bufferBytes": 57344,
+          "detailed": 0
+        },
+        "sustained": {
+          "iterations": 560,
+          "elapsed_seconds": 120.02880000001193,
+          "from_ms": 2438.199999988079,
+          "to_ms": 122467,
+          "classification": "CPU/accepted frames while sustained flag active; RAF intervals wholly inside phase; long tasks whose start timestamp is inside phase. All-run metrics retain every sample."
+        },
+        "before_disposal": {
+          "resident": 2048,
+          "computed": 2032,
+          "submitted": 2032,
+          "in_frustum": 2032,
+          "layer": {
+            "applyMs": 3.600000023841858,
+            "maxApplyMs": 10.199999988079071,
+            "lodMs": 0,
+            "maxLodMs": 0.9000000059604645,
+            "visited": 128,
+            "pickMs": 0,
+            "prepareMs": 0,
+            "sliceMaxMs": 0,
+            "l2": {
+              "meshes": 0,
+              "visible": [],
+              "resources": {
+                "geometries": 0,
+                "materials": 0,
+                "textures": 0
+              },
+              "bodies": []
+            },
+            "slots": 2032,
+            "capacity": 2048,
+            "bufferBytes": 57344,
+            "detailed": 0
+          },
+          "resources": {
+            "geometries": 1,
+            "textures": 0,
+            "programs": 1,
+            "calls": 1,
+            "points": 2032
+          }
+        },
+        "after_disposal": {
+          "geometries": 0,
+          "textures": 0,
+          "programs": 0,
+          "calls": 0,
+          "points": 0
+        },
+        "environment": {
+          "agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "hardwareConcurrency": 10,
+          "deviceMemory": 16,
+          "viewport": [
+            1440,
+            1000
+          ],
+          "pixelRatio": 1
+        },
+        "console": "## Console messages\nShowing 1-4 of 4 (Page 1 of 1).\nmsgid=1 [warn] [.WebGL-0x12c0050a200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (0 args) [3 times]\nmsgid=4 [warn] [.WebGL-0x12c0050a200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat) (0 args)\nmsgid=5 [error] Failed to load resource: the server responded with a status of 413 (Request Entity Too Large) (0 args) [3 times]\nmsgid=8 [error] Failed to load resource: the server responded with a status of 503 (Service Unavailable) (0 args)"
+      },
+      "browser_diagnostic_passed": true
+    },
+    {
+      "count": 1000000,
+      "build": {
+        "seconds": 32.96057155699998,
+        "builder_peak_mib": 120.40234375,
+        "bytes": 187813888,
+        "phases": {
+          "fill_seconds": 31.55173868099996,
+          "integrity_seconds": 1.3727086259998487,
+          "fsync_publish_seconds": 0.01732270800016522,
+          "total_seconds": 32.96047530700014
+        }
+      },
+      "runs": [
+        {
+          "cycles": 96,
+          "duration_s": 3.6339396679998117,
+          "selection_http_ms": {
+            "samples": 96,
+            "p50": 9.259,
+            "p95": 12.003,
+            "p99": 165.069,
+            "maximum": 165.069166999956
+          },
+          "positions_http_ms": {
+            "samples": 432,
+            "p50": 15.447,
+            "p95": 28.88,
+            "p99": 47.464,
+            "maximum": 51.71854099990014
+          },
+          "driver_assembly_ms": {
+            "samples": 96,
+            "p50": 20.026,
+            "p95": 106.348,
+            "p99": 243.214,
+            "maximum": 243.21375099998477
+          },
+          "first_driver_frame_ms": 243.21375099998477,
+          "resident_min": 0,
+          "resident_max": 2048,
+          "candidate_sector_counts": {
+            "samples": 96,
+            "p50": 1,
+            "p95": 16,
+            "p99": 16,
+            "maximum": 16
+          },
+          "response_max_bytes": 40720,
+          "errors": 0,
+          "dense_overflow_status": 413,
+          "repeat": 0,
+          "ready_s": 0.7744397920000665,
+          "baseline_rss_mib": 53.41796875,
+          "peak_rss_mib": 76.01953125,
+          "post_rss_mib": 76.01953125,
+          "late_rss_min_mib": 75.9296875,
+          "late_rss_max_mib": 76.01953125,
+          "rss_samples": 87
+        },
+        {
+          "cycles": 96,
+          "duration_s": 3.5911294600000474,
+          "selection_http_ms": {
+            "samples": 96,
+            "p50": 9.282,
+            "p95": 12.341,
+            "p99": 122.82,
+            "maximum": 122.81966599994121
+          },
+          "positions_http_ms": {
+            "samples": 432,
+            "p50": 15.36,
+            "p95": 29.021,
+            "p99": 42.751,
+            "maximum": 45.30754200004594
+          },
+          "driver_assembly_ms": {
+            "samples": 96,
+            "p50": 20.054,
+            "p95": 104.783,
+            "p99": 201.889,
+            "maximum": 201.88858400001664
+          },
+          "first_driver_frame_ms": 201.88858400001664,
+          "resident_min": 0,
+          "resident_max": 2048,
+          "candidate_sector_counts": {
+            "samples": 96,
+            "p50": 1,
+            "p95": 16,
+            "p99": 16,
+            "maximum": 16
+          },
+          "response_max_bytes": 40720,
+          "errors": 0,
+          "dense_overflow_status": 413,
+          "repeat": 1,
+          "ready_s": 0.7154598749998513,
+          "baseline_rss_mib": 53.3984375,
+          "peak_rss_mib": 75.890625,
+          "post_rss_mib": 75.890625,
+          "late_rss_min_mib": 75.8359375,
+          "late_rss_max_mib": 75.890625,
+          "rss_samples": 85
+        },
+        {
+          "cycles": 5065,
+          "duration_s": 180.10377295700005,
+          "selection_http_ms": {
+            "samples": 5065,
+            "p50": 9.153,
+            "p95": 11.328,
+            "p99": 13.032,
+            "maximum": 168.02574999996978
+          },
+          "positions_http_ms": {
+            "samples": 22804,
+            "p50": 15.231,
+            "p95": 27.581,
+            "p99": 40.595,
+            "maximum": 71.874292000075
+          },
+          "driver_assembly_ms": {
+            "samples": 5065,
+            "p50": 20.007,
+            "p95": 96.447,
+            "p99": 110.01,
+            "maximum": 258.27045799996995
+          },
+          "first_driver_frame_ms": 258.27045799996995,
+          "resident_min": 0,
+          "resident_max": 2048,
+          "candidate_sector_counts": {
+            "samples": 5065,
+            "p50": 1,
+            "p95": 16,
+            "p99": 16,
+            "maximum": 16
+          },
+          "response_max_bytes": 40720,
+          "errors": 0,
+          "dense_overflow_status": 413,
+          "repeat": 2,
+          "ready_s": 0.7814590000000408,
+          "baseline_rss_mib": 53.4140625,
+          "peak_rss_mib": 76.1015625,
+          "post_rss_mib": 76.1015625,
+          "late_rss_min_mib": 76.1015625,
+          "late_rss_max_mib": 76.1015625,
+          "rss_samples": 3520
+        }
+      ],
+      "known_count": 992188,
+      "unknown_count": 7812,
+      "candidate_sector_count_range": [
+        0,
+        16
+      ],
+      "fixture_sector_count": 7813,
+      "fixture_metadata": {
+        "schema": 1,
+        "profile": "synthetic-affine",
+        "count": 1000000,
+        "bucket_days": 365,
+        "epoch_jd": 2461041.5,
+        "interval": [
+          2451544.5,
+          2462502.5
+        ],
+        "generator": "affine-lattice/1",
+        "revision": "synthetic-temporal-8f0f5c4f4b1497cf5124a820c62ff580de8d12d2e4cde368678bdb44fd31ecf7",
+        "temporal_revision": "synthetic-temporal-8f0f5c4f4b1497cf5124a820c62ff580de8d12d2e4cde368678bdb44fd31ecf7",
+        "registry_revision": "8f0f5c4f4b1497cf5124a820c62ff580de8d12d2e4cde368678bdb44fd31ecf7"
+      },
+      "fixture_sha256": "e48aa6fcdea1686ac3f831088c75a5ea3d925a55f4112219ff995214f3b05c3e",
+      "browser": {
+        "complete": true,
+        "count": 1000000,
+        "seconds_requested": 120,
+        "cycles": 3,
+        "checks": {
+          "sparse_dense_empty_density_budget": true,
+          "rapid_context_replacement": true,
+          "requested_time_oracle_all_accepted": true,
+          "disposal_recreation_resources": true
+        },
+        "cases": [
+          {
+            "cycle": 0,
+            "name": "sparse",
+            "resident": 128,
+            "computed": 127,
+            "submitted": 127,
+            "in_frustum": 127,
+            "layer": {
+              "applyMs": 1.5999999940395355,
+              "maxApplyMs": 1.5999999940395355,
+              "lodMs": 0,
+              "maxLodMs": 0,
+              "visited": 0,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 127,
+              "capacity": 128,
+              "bufferBytes": 3584,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 127
+            }
+          },
+          {
+            "cycle": 0,
+            "name": "dense16",
+            "resident": 2048,
+            "computed": 2032,
+            "submitted": 2032,
+            "in_frustum": 2032,
+            "layer": {
+              "applyMs": 6.800000011920929,
+              "maxApplyMs": 6.800000011920929,
+              "lodMs": 0.09999999403953552,
+              "maxLodMs": 0.09999999403953552,
+              "visited": 127,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 2032,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            }
+          },
+          {
+            "cycle": 0,
+            "name": "empty",
+            "resident": 0,
+            "computed": 0,
+            "submitted": 0,
+            "in_frustum": 0,
+            "layer": {
+              "applyMs": 0,
+              "maxApplyMs": 6.800000011920929,
+              "lodMs": 0.10000002384185791,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 128,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 0,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 0,
+              "points": 0
+            }
+          },
+          {
+            "cycle": 1,
+            "name": "sparse",
+            "resident": 128,
+            "computed": 127,
+            "submitted": 127,
+            "in_frustum": 127,
+            "layer": {
+              "applyMs": 0.4000000059604645,
+              "maxApplyMs": 6.800000011920929,
+              "lodMs": 0.10000002384185791,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 128,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 127,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 127
+            }
+          },
+          {
+            "cycle": 1,
+            "name": "dense16",
+            "resident": 2048,
+            "computed": 2032,
+            "submitted": 2032,
+            "in_frustum": 2032,
+            "layer": {
+              "applyMs": 5,
+              "maxApplyMs": 6.800000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 127,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 2032,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            }
+          },
+          {
+            "cycle": 1,
+            "name": "empty",
+            "resident": 0,
+            "computed": 0,
+            "submitted": 0,
+            "in_frustum": 0,
+            "layer": {
+              "applyMs": 0,
+              "maxApplyMs": 6.800000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 128,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 0,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 0,
+              "points": 0
+            }
+          },
+          {
+            "cycle": 2,
+            "name": "sparse",
+            "resident": 128,
+            "computed": 127,
+            "submitted": 127,
+            "in_frustum": 127,
+            "layer": {
+              "applyMs": 0.29999998211860657,
+              "maxApplyMs": 6.800000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 0,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 127,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 127
+            }
+          },
+          {
+            "cycle": 2,
+            "name": "dense16",
+            "resident": 2048,
+            "computed": 2032,
+            "submitted": 2032,
+            "in_frustum": 2032,
+            "layer": {
+              "applyMs": 4.799999982118607,
+              "maxApplyMs": 6.800000011920929,
+              "lodMs": 0.09999999403953552,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 127,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 2032,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            }
+          },
+          {
+            "cycle": 2,
+            "name": "empty",
+            "resident": 0,
+            "computed": 0,
+            "submitted": 0,
+            "in_frustum": 0,
+            "layer": {
+              "applyMs": 0.09999999403953552,
+              "maxApplyMs": 6.800000011920929,
+              "lodMs": 0,
+              "maxLodMs": 0.10000002384185791,
+              "visited": 0,
+              "pickMs": 0,
+              "prepareMs": 0,
+              "sliceMaxMs": 0,
+              "l2": {
+                "meshes": 0,
+                "visible": [],
+                "resources": {
+                  "geometries": 0,
+                  "materials": 0,
+                  "textures": 0
+                },
+                "bodies": []
+              },
+              "slots": 0,
+              "capacity": 2048,
+              "bufferBytes": 57344,
+              "detailed": 0
+            },
+            "resources": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 0,
+              "points": 0
+            }
+          }
+        ],
+        "cycles_resources": [
+          {
+            "cycle": 0,
+            "disposed": {
+              "geometries": 0,
+              "textures": 0,
+              "programs": 0,
+              "calls": 0,
+              "points": 0
+            },
+            "recreated": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            },
+            "buffer_bytes": 57344
+          },
+          {
+            "cycle": 1,
+            "disposed": {
+              "geometries": 0,
+              "textures": 0,
+              "programs": 0,
+              "calls": 0,
+              "points": 0
+            },
+            "recreated": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            },
+            "buffer_bytes": 57344
+          },
+          {
+            "cycle": 2,
+            "disposed": {
+              "geometries": 0,
+              "textures": 0,
+              "programs": 0,
+              "calls": 0,
+              "points": 0
+            },
+            "recreated": {
+              "geometries": 1,
+              "textures": 0,
+              "programs": 1,
+              "calls": 1,
+              "points": 2032
+            },
+            "buffer_bytes": 57344
+          }
+        ],
+        "metrics": {
+          "transition_raf_interval_ms": {
+            "count": 7211,
+            "retained": 7211,
+            "mean": 16.66599639439745,
+            "p50": 16.69999999999709,
+            "p95": 16.70000000001164,
+            "p99": 16.80000000000291,
+            "max": 16.80000000000291,
+            "over50": 0
+          },
+          "transition_frame_cpu_ms": {
+            "count": 7212,
+            "retained": 7212,
+            "mean": 0.11953688288935012,
+            "p50": 0.09999999403953552,
+            "p95": 0.29999998211860657,
+            "p99": 0.4000000059604645,
+            "max": 0.8999999761581421,
+            "over50": 0
+          },
+          "transition_longtask_ms": {
+            "count": 0,
+            "retained": 0,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null,
+            "max": 0,
+            "over50": 0
+          },
+          "transition_accepted_frame_ms": {
+            "count": 560,
+            "retained": 560,
+            "mean": 62.30607142842242,
+            "p50": 81.19999998807907,
+            "p95": 100.2000000178814,
+            "p99": 110.09999999403954,
+            "max": 1082.199999988079,
+            "over50": 350
+          },
+          "lod_cpu_ms": {
+            "count": 7318,
+            "retained": 7318,
+            "mean": 0.04216999179207911,
+            "p50": 0,
+            "p95": 0.10000002384185791,
+            "p99": 0.20000001788139343,
+            "max": 0.800000011920929,
+            "over50": 0
+          },
+          "render_submission_cpu_ms": {
+            "count": 7318,
+            "retained": 7318,
+            "mean": 0.07730254159090329,
+            "p50": 0.09999999403953552,
+            "p95": 0.20000001788139343,
+            "p99": 0.30000001192092896,
+            "max": 7.0999999940395355,
+            "over50": 0
+          },
+          "frame_cpu_ms": {
+            "count": 7318,
+            "retained": 7318,
+            "mean": 0.12156326856630101,
+            "p50": 0.09999999403953552,
+            "p95": 0.29999998211860657,
+            "p99": 0.4000000059604645,
+            "max": 7.5,
+            "over50": 0
+          },
+          "longtask_ms": {
+            "count": 1,
+            "retained": 1,
+            "mean": 1382,
+            "p50": 1382,
+            "p95": 1382,
+            "p99": 1382,
+            "max": 1382,
+            "over50": 1
+          },
+          "raf_interval_ms": {
+            "count": 7317,
+            "retained": 7317,
+            "mean": 16.745715457154574,
+            "p50": 16.69999999999709,
+            "p95": 16.70000000001164,
+            "p99": 16.80000000000291,
+            "max": 583.3,
+            "over50": 1
+          },
+          "decode_cpu_ms": {
+            "count": 6433,
+            "retained": 6433,
+            "mean": 0.1138970932136997,
+            "p50": 0.09999999403953552,
+            "p95": 0.20000001788139343,
+            "p99": 0.30000001192092896,
+            "max": 1,
+            "over50": 0
+          },
+          "validation_cpu_ms": {
+            "count": 6428,
+            "retained": 6428,
+            "mean": 0.20502489088908737,
+            "p50": 0.19999998807907104,
+            "p95": 0.4000000059604645,
+            "p99": 0.5,
+            "max": 1.399999976158142,
+            "over50": 0
+          },
+          "http_elapsed_ms": {
+            "count": 6437,
+            "retained": 6437,
+            "mean": 15.753409973750374,
+            "p50": 15.599999994039536,
+            "p95": 23.799999982118607,
+            "p99": 31,
+            "max": 121.5,
+            "over50": 1
+          },
+          "merge_cpu_ms": {
+            "count": 573,
+            "retained": 573,
+            "mean": 1.5853403139384836,
+            "p50": 1.9000000059604645,
+            "p95": 4.5,
+            "p99": 5.200000017881393,
+            "max": 7.299999982118607,
+            "over50": 0
+          },
+          "selection_elapsed_ms": {
+            "count": 572,
+            "retained": 572,
+            "mean": 59.160314685866965,
+            "p50": 76.90000000596046,
+            "p95": 95.7999999821186,
+            "p99": 103.5,
+            "max": 1075.7999999821186,
+            "over50": 357
+          },
+          "oracle_cpu_ms": {
+            "count": 573,
+            "retained": 573,
+            "mean": 0.1835951131571858,
+            "p50": 0.19999998807907104,
+            "p95": 0.5,
+            "p99": 0.6000000238418579,
+            "max": 0.800000011920929,
+            "over50": 0
+          },
+          "apply_cpu_ms": {
+            "count": 573,
+            "retained": 573,
+            "mean": 2.7598603834344453,
+            "p50": 3.5999999940395355,
+            "p95": 6.199999988079071,
+            "p99": 9.5,
+            "max": 12.099999994039536,
+            "over50": 0
+          },
+          "accepted_frame_ms": {
+            "count": 572,
+            "retained": 572,
+            "mean": 62.135489510385305,
+            "p50": 81,
+            "p95": 100.2000000178814,
+            "p99": 110.2999999821186,
+            "max": 1082.199999988079,
+            "over50": 357
+          }
+        },
+        "method": "Actual production manager/layer + WebGLRenderer. Direct manager stress; React clock coalescing separately unit-tested. RAF is browser scheduling, not monitor/GPU completion. CPU includes explicit oracle validation. All-run metrics preserve startup/disposal outliers; transition_* metrics cover only the sustained phase. Bounded last 20000 samples per metric; no full graph history.",
+        "memory_scope": "performance.memory is whole-tab JS heap (if available), not component memory or browser RSS; renderer.info counts resources, not driver GPU bytes.",
+        "heap": {
+          "baseline": {
+            "used": 3520153,
+            "total": 4422345,
+            "limit": 4395630592
+          },
+          "peak_used": 46667299,
+          "late": {
+            "used": 24484731,
+            "total": 75863423,
+            "limit": 4395630592
+          },
+          "window_ms": 10000,
+          "window_limit": 360,
+          "windows": [
+            {
+              "index": 0,
+              "from_s": 0.0009000000059604645,
+              "to_s": 9.641800000011921,
+              "samples": 19,
+              "transition_samples": 14,
+              "first": 3520153,
+              "last": 15795197,
+              "min": 3520153,
+              "max": 46667299
+            },
+            {
+              "index": 1,
+              "from_s": 10.159100000023843,
+              "to_s": 19.95810000002384,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 13249258,
+              "last": 35894811,
+              "min": 5909468,
+              "max": 35894811
+            },
+            {
+              "index": 2,
+              "from_s": 20.475100000023843,
+              "to_s": 29.77470000001788,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 28362415,
+              "last": 17397619,
+              "min": 10048346,
+              "max": 29572609
+            },
+            {
+              "index": 3,
+              "from_s": 30.29080000001192,
+              "to_s": 39.59090000000596,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 14132554,
+              "last": 14006032,
+              "min": 10729277,
+              "max": 30147135
+            },
+            {
+              "index": 4,
+              "from_s": 40.1075,
+              "to_s": 49.90790000000596,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 16098333,
+              "last": 31183347,
+              "min": 6765555,
+              "max": 36877663
+            },
+            {
+              "index": 5,
+              "from_s": 50.42360000002384,
+              "to_s": 59.67320000001788,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 26385483,
+              "last": 33189192,
+              "min": 12658639,
+              "max": 33189192
+            },
+            {
+              "index": 6,
+              "from_s": 60.19130000001192,
+              "to_s": 69.97280000001192,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 16171395,
+              "last": 13904123,
+              "min": 8387087,
+              "max": 38498287
+            },
+            {
+              "index": 7,
+              "from_s": 70.4885,
+              "to_s": 79.77290000000596,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 8051667,
+              "last": 26816582,
+              "min": 8051667,
+              "max": 35883608
+            },
+            {
+              "index": 8,
+              "from_s": 80.28890000000597,
+              "to_s": 89.57230000001192,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 28021285,
+              "last": 36895804,
+              "min": 8465775,
+              "max": 46128386
+            },
+            {
+              "index": 9,
+              "from_s": 90.0895,
+              "to_s": 99.88830000001192,
+              "samples": 20,
+              "transition_samples": 20,
+              "first": 38523163,
+              "last": 16703425,
+              "min": 11981226,
+              "max": 39725113
+            },
+            {
+              "index": 10,
+              "from_s": 100.40540000000595,
+              "to_s": 109.70470000001788,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 14080104,
+              "last": 26722360,
+              "min": 9723966,
+              "max": 37785242
+            },
+            {
+              "index": 11,
+              "from_s": 110.22180000001192,
+              "to_s": 119.487,
+              "samples": 19,
+              "transition_samples": 19,
+              "first": 18811037,
+              "last": 32926797,
+              "min": 13553837,
+              "max": 39066271
+            },
+            {
+              "index": 12,
+              "from_s": 120.00370000001789,
+              "to_s": 123.46070000001788,
+              "samples": 10,
+              "transition_samples": 7,
+              "first": 29863635,
+              "last": 24484731,
+              "min": 17175277,
+              "max": 43533487
+            }
+          ]
+        },
+        "renderer": {
+          "geometries": 1,
+          "textures": 0,
+          "programs": 1,
+          "calls": 1,
+          "points": 2032
+        },
+        "error": null,
+        "health": {
+          "status": "ok",
+          "objects": 1000000,
+          "synthetic": true,
+          "profile": "synthetic-temporal"
+        },
+        "webgl": {
+          "vendor": "Google Inc. (Google)",
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+        },
+        "longtask_observer_available": true,
+        "first_usable_scene_ms": 1525.6000000238419,
+        "churn": {
+          "attempts": 12,
+          "cancelled": 11
+        },
+        "manager": {
+          "requests": 6437,
+          "active": 0,
+          "peakActive": 4,
+          "responseBytes": 232340537,
+          "retries": 2,
+          "selections": 587,
+          "published": 573,
+          "cancellations": 11,
+          "cancelledRequests": 4,
+          "staleResponses": 0,
+          "coalescedTicks": 0,
+          "conflicts": 0,
+          "evictions": 572,
+          "peakQueue": 16,
+          "peakPending": 16,
+          "peakObjects": 4096,
+          "peakSerialized": 2173326,
+          "peakDecoded": 18574448,
+          "clientId": "9b831271-2cc5-4de9-a5c4-0e8650ea70e7",
+          "generation": 590,
+          "queue": 0,
+          "pending": 0,
+          "residentObjects": 2048,
+          "objects": 2048,
+          "serialized": 639503,
+          "decoded": 6234232
+        },
+        "layer": {
+          "applyMs": 4.4000000059604645,
+          "maxApplyMs": 4.4000000059604645,
+          "lodMs": 0,
+          "maxLodMs": 0.09999999403953552,
+          "visited": 0,
+          "pickMs": 0,
+          "prepareMs": 0,
+          "sliceMaxMs": 0,
+          "l2": {
+            "meshes": 0,
+            "visible": [],
+            "resources": {
+              "geometries": 0,
+              "materials": 0,
+              "textures": 0
+            },
+            "bodies": []
+          },
+          "slots": 2032,
+          "capacity": 2048,
+          "bufferBytes": 57344,
+          "detailed": 0
+        },
+        "sustained": {
+          "iterations": 560,
+          "elapsed_seconds": 120.205,
+          "from_ms": 2937.7000000178814,
+          "to_ms": 123142.70000001788,
+          "classification": "CPU/accepted frames while sustained flag active; RAF intervals wholly inside phase; long tasks whose start timestamp is inside phase. All-run metrics retain every sample."
+        },
+        "before_disposal": {
+          "resident": 2048,
+          "computed": 2032,
+          "submitted": 2032,
+          "in_frustum": 2032,
+          "layer": {
+            "applyMs": 3.5999999940395355,
+            "maxApplyMs": 12.099999994039536,
+            "lodMs": 0,
+            "maxLodMs": 0.800000011920929,
+            "visited": 128,
+            "pickMs": 0,
+            "prepareMs": 0,
+            "sliceMaxMs": 0,
+            "l2": {
+              "meshes": 0,
+              "visible": [],
+              "resources": {
+                "geometries": 0,
+                "materials": 0,
+                "textures": 0
+              },
+              "bodies": []
+            },
+            "slots": 2032,
+            "capacity": 2048,
+            "bufferBytes": 57344,
+            "detailed": 0
+          },
+          "resources": {
+            "geometries": 1,
+            "textures": 0,
+            "programs": 1,
+            "calls": 1,
+            "points": 2032
+          }
+        },
+        "after_disposal": {
+          "geometries": 0,
+          "textures": 0,
+          "programs": 0,
+          "calls": 0,
+          "points": 0
+        },
+        "environment": {
+          "agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+          "hardwareConcurrency": 10,
+          "deviceMemory": 16,
+          "viewport": [
+            1440,
+            1000
+          ],
+          "pixelRatio": 1
+        },
+        "console": "## Console messages\nShowing 1-4 of 4 (Page 1 of 1).\nmsgid=1 [warn] [.WebGL-0x13c00599600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (0 args) [3 times]\nmsgid=4 [warn] [.WebGL-0x13c00599600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat) (0 args)\nmsgid=5 [error] Failed to load resource: the server responded with a status of 413 (Request Entity Too Large) (0 args) [3 times]\nmsgid=8 [error] Failed to load resource: the server responded with a status of 503 (Service Unavailable) (0 args) [2 times]"
+      },
+      "browser_diagnostic_passed": true
+    }
+  ],
+  "driver_peak_mib": 120.40234375,
+  "diagnostic_passed": true,
+  "host": {
+    "cpu": "Apple M1 Pro",
+    "host_memory_bytes": 17179869184,
+    "host_os": "macOS26.3 build25D125",
+    "docker_server": "29.9.2",
+    "docker_vm_cpus": 10,
+    "docker_vm_memory_bytes": 16745824256,
+    "container_cgroup_memory_max": "max",
+    "container_cgroup_cpu_max": "max 100000",
+    "node": "v26.13.0",
+    "compose": "v5.6.1",
+    "cpu_isolation": false,
+    "os_page_cache_flushed": false
+  },
+  "verification": {
+    "backend": {
+      "command": "make coverage",
+      "tests": 336,
+      "branch_aware_percent": 96.4,
+      "sectors_percent": 100,
+      "passed": true
+    },
+    "frontend": {
+      "commands": [
+        "npm run test:coverage",
+        "npm run build"
+      ],
+      "suites": 24,
+      "tests": 255,
+      "statements": 97.63,
+      "branches": 91.22,
+      "functions": 98.17,
+      "lines": 99.08,
+      "passed": true
+    },
+    "builds": {
+      "production_backend": true,
+      "production_frontend": true,
+      "test_image": true,
+      "warning": "frontend chunk845.79kB >500kB"
+    },
+    "numeric": {
+      "bodies": [
+        "sun",
+        "earth",
+        "moon",
+        "mercury",
+        "venus"
+      ],
+      "horizons_vectors": 100,
+      "max_regression_error_km": 0.002420538,
+      "tolerance_km": 1.0,
+      "absolute_uncertainty": null
+    },
+    "independent_review": {
+      "role": "reviewer",
+      "frozen_backend_tests": 37,
+      "frontend_tests": 255,
+      "correctness_blockers": [],
+      "fixed_findings": [
+        "publication-specific time interval enforced before304 on every position route",
+        "temporal revision included for unknown real object",
+        "synthetic registry paging revision fits64-char contract"
+      ]
+    },
+    "chrome_real": {
+      "checks": 13,
+      "passed": true
+    },
+    "chrome_recovery": {
+      "checks": 7,
+      "passed": true
+    },
+    "synthetic_backend_work_after_million_chrome": {
+      "active": 0,
+      "peak": 4,
+      "queue": 0,
+      "queue_scope": "PositionWork admits without backlog; tested by regression"
+    },
+    "reproduce_commands": [
+      "make coverage",
+      "npm run test:coverage (frontend/)",
+      "npm run build (frontend/)",
+      "docker compose up --build -d --wait",
+      "make temporal",
+      "python3 tests/browser_temporal_mcp.py --count 100000 --seconds 120 --report /tmp/astroverse-temporal/browser-100000.json",
+      "python3 tests/browser_temporal_mcp.py --count 1000000 --seconds 120 --report /tmp/astroverse-temporal/browser-1000000.json",
+      "python3 tests/browser_physical_mcp.py --catalog 3471 --report /tmp/astroverse-temporal/physical-real-final.json",
+      "python3 tests/browser_positions_recovery_mcp.py --catalog 3471 --report /tmp/astroverse-temporal/positions-recovery-final.json"
+    ],
+    "benchmark_executed": "docker compose -f tests/docker/compose.yml -p astroverse-tests run --rm -v /Users/anatolii/Downloads/astroverse:/app:ro -v /tmp/astroverse-temporal:/reports unit python -m tests.benchmark_temporal_streaming --counts 100000 1000000 --repeats 3 --requests 96 --seconds 180",
+    "final_stack": {
+      "ordinary_backend": "healthy",
+      "ordinary_frontend": "healthy",
+      "health": {
+        "status": "ok",
+        "objects": 3471
+      },
+      "ordinary_volume_retained": true,
+      "test_scene_stopped": true
+    }
+  },
+  "required_limits_passed": true,
+  "measured_diagnostics_passed": true,
+  "unverified_diagnostics": [
+    "Full per-frame main-thread CPU budget including asynchronous tasks; only render callback and separate task metrics measured."
+  ],
+  "initial_exploration": [
+    {
+      "count": 100000,
+      "source_scope": "earlier implementation/build; retained outliers, not final acceptance",
+      "first_usable_scene_ms": 1913.0999999940395,
+      "longtask_ms": {
+        "count": 1,
+        "retained": 1,
+        "mean": 1754,
+        "p50": 1754,
+        "p95": 1754,
+        "p99": 1754,
+        "max": 1754,
+        "over50": 1
+      },
+      "raf_interval_ms": {
+        "count": 7258,
+        "retained": 7258,
+        "mean": 16.762441443923944,
+        "p50": 16.69999999999709,
+        "p95": 16.70000000001164,
+        "p99": 16.80000000000291,
+        "max": 666.5999999999999,
+        "over50": 1
+      }
+    },
+    {
+      "count": 1000000,
+      "source_scope": "earlier implementation/build; retained outliers, not final acceptance",
+      "first_usable_scene_ms": 1864.4000000059605,
+      "longtask_ms": {
+        "count": 1,
+        "retained": 1,
+        "mean": 1707,
+        "p50": 1707,
+        "p95": 1707,
+        "p99": 1707,
+        "max": 1707,
+        "over50": 1
+      },
+      "raf_interval_ms": {
+        "count": 7255,
+        "retained": 7255,
+        "mean": 16.7578911095796,
+        "p50": 16.69999999999709,
+        "p95": 16.70000000001164,
+        "p99": 16.80000000000291,
+        "max": 633.3,
+        "over50": 1
+      }
+    }
+  ],
+  "limitations": [
+    "Only five existing DE440s body centers are real astronomy; million-row scaling is explicitly synthetic affine data.",
+    "Real candidate lane is unconditional five; synthetic broad-phase permits false positives and rejects >16 candidates even if exact sphere would contain fewer.",
+    "Three process/application-cold repeats, OS page cache unchanged; shared host without CPU isolation, concurrent builds/coverage/Chrome occurred.",
+    "Server budgets are compared to stricter end-to-end HTTP wall times. Driver assembly does not measure browser acceptance.",
+    "Render callback CPU measures layer.tick+renderer.render submission; asynchronous decode/merge/apply and all-run longtasks are separate.",
+    "SwiftShader proves functional WebGL only; neither hardware60fps, monitor presentation nor GPU driver memory is measured.",
+    "Heap samples cover whole Chrome tab; renderer.info counts and allocated attribute bytes are not GPU driver RSS.",
+    "Finite180s backend and120s browser windows plus resource cycles support this workload, not asymptotic bounded memory or all workloads.",
+    "Fixture/index construction/integrity/publication are O(N); no full catalog copy/hash occurs in temporal query path."
+  ],
+  "final_source_sha256": {
+    "backend/position_api.py": "062df876dc6247fde07b73d9617530106eefe8f11ae40381174164902ddb5d4c",
+    "backend/temporal_api.py": "66426d6838d8dea5cbcebf9bfde92383e7e6f65c4407ff19f3e916e468a155df",
+    "data/temporal_index.py": "fb20655ad781a1f35dbbe6273b0fbe3ed301d39624db0b3fbd481b4cb526679a",
+    "frontend/src/physical/sectorManager.js": "4073c74a97589a246cddba5d1532ccb9a226789bfe833cad98c8c017027bc422",
+    "frontend/src/physical/useVerifiedFrame.js": "0cdf5220afca72c2e6f18db8f1e4a614cca1dc6f1bab778bcc42de74009ebb2e",
+    "tests/benchmark_temporal_streaming.py": "cc3e09be483609494743b49cb8d7afc6462b5e8843539e22d4bdc73e618f1285",
+    "tests/benchmark_temporal_streaming.mjs": "571b26564d6f78d3430abb5610a988b269499425c54c53c0f9a1c83026f58be1",
+    "tests/temporal_provider.py": "182e297a362fae5d4637ba2a5ca22a64074f1f9754b46d429a5b9aca729860d8",
+    "docs/PHYSICAL_STREAMING.md": "068aed4f0ad17c8bfc7878779a305992aa00fa2b62de81b2687903fbb1805a80"
+  }
+}

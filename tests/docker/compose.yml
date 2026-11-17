@@ -36,6 +36,15 @@ services:
     profiles: [s100k]
     command: ["python", "-m", "tests.s100k_provider"]
 
+  temporal:
+    <<: *scene
+    profiles: [temporal]
+    command: ["python", "-m", "uvicorn", "tests.temporal_provider:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment:
+      ASTROVERSE_TEMPORAL_DB: /reports/temporal-${ASTROVERSE_TEMPORAL_COUNT:-100000}.sqlite
+    volumes:
+      - ${ASTROVERSE_TEMPORAL_DIR:-/tmp/astroverse-temporal}:/reports:ro
+
   legacy:
     <<: *scene
     profiles: [legacy]
@@ -48,7 +57,7 @@ services:
       - legacy-catalog:/app/data/runtime
 
   frontend:
-    profiles: [sectors, s100k, legacy]
+    profiles: [sectors, s100k, legacy, temporal]
     build:
       context: ../../frontend
     ports:

@@ -266,6 +266,31 @@ class SpatialTests(unittest.TestCase):
             with patch.object(api, "LEGACY_FILTER_MAX_BYTES", 2):
                 self.assertEqual(client.get("/api/objects?q=far").status_code, 413)
 
+    def test_disk_search_cache_normalizes_queries_and_isolates_publications(self):
+        from data.runtime_catalog import Snapshot
+        client = TestClient(isolated_app([]))
+        cache = ByteLRU(8192)
+        original = Snapshot.select
+        with patch.object(api, "CATALOG", self.disk), patch.object(api, "SERIALIZED_CACHE", cache):
+            with patch.object(Snapshot, "select", autospec=True, side_effect=original) as selected:
+                first = client.get('/api/search?q=КИРИЛЛИЦА').json()
+                self.assertEqual(client.get('/api/search?q=%20кириллица%20').json(), first)
+                self.assertEqual(selected.call_count, 1)
+                # Distinct cold misses must preserve actual substring semantics.
+                for query in ('not-present-alpha', 'not-present-beta', 'not-present-gamma'):
+                    self.assertEqual(client.get('/api/search', params={'q': query}).json(), [])
+                self.assertEqual(selected.call_count, 4)
+                self.assertEqual(client.get('/api/search?q=not-present-alpha').json(), [])
+                self.assertEqual(selected.call_count, 4)
+                self.items[0]['name'] = 'Changed name'
+                self.build()
+                updated = client.get('/api/search?q=кириллица').json()
+                self.assertEqual(updated[0]['name'], 'Changed name')
+                self.assertNotEqual(first, updated)
+                self.assertEqual(selected.call_count, 5)
+            self.assertLessEqual(cache.bytes, cache.max_bytes)
+            self.assertEqual(cache.pending, {})
+
     def test_disk_search_stays_bounded_when_legacy_config_disables_limit(self):
         self.items = [star(f"star{i}", None) for i in range(600)]
         self.build()

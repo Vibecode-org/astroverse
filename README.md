@@ -1,14 +1,14 @@
 # Astroverse
 
 Браузерный 3D-планетарий: React + Three.js, FastAPI, Docker. Цель — все известные
-на дату обновления тела с проверяемыми источниками; неизвестная физика остаётся null.
+на дату обновления тела с проверяемыми источниками; неизвестная физика — null.
 
 ```bash
 docker compose up --build -d    # http://localhost:5173
 # или make up; make down останавливает, сохраняя рабочую БД
 ```
 
-Нужны Docker Compose v2/WebGL2; для команд Makefile — Make. Настройки порта/LAN —
+Нужны Docker Compose v2/WebGL2, для Makefile — Make. Порт/LAN —
 [.env.example](.env.example), логи — `docker compose logs -f`. Для старой установки
 до пересоздания контейнера выполните [миграцию SQLite](docs/STARTUP.md).
 
@@ -20,8 +20,8 @@ docker compose up --build -d    # http://localhost:5173
 - 6DoF, линейный floating origin, L0/L1, picking/refocus. `/?scene=legacy` —
   прежняя иллюстративная сцена. Synthetic S-100k проверен отдельно; аппаратные
   60+fps, реальный S-100k, поверхности и массовый physical streaming открыты.
-- Startup открывает рабочую SQLite из volume; только чистая установка копирует
-  pinned bootstrap. Build/startup не требуют seed JSON/скачивания научных данных.
+- Startup открывает SQLite из volume; чистая установка копирует pinned bootstrap.
+  Build/startup не требуют seed JSON/скачивания научных данных.
   Patches переживают обновления; backup/restore и ограничения — [STARTUP](docs/STARTUP.md).
 
 ## Управление и разработка
@@ -39,11 +39,11 @@ make scene-down
 # frontend/: npm ci; npm run test:coverage; npm run build; npm run dev
 ```
 
-В корне один Compose для приложения; тестовый — `tests/docker/compose.yml`.
-`make` показывает команды. Test images/volumes отделены от рабочих.
+Compose приложения — в корне, тестовый — `tests/docker/compose.yml`.
+Команды — `make`. Test images/volumes отделены от рабочих.
 Vite проксирует API на127.0.0.1:8000; обычный nginx публикует только frontend.
-Runtime SQLite проверяется offline; uncached images/packages требуют доступности
-зависимостей. Legacy CDN-текстуры ещё не автономны; chunk>500kB — известное предупреждение.
+Runtime SQLite проверяется offline; uncached images/packages требуют доступа
+к зависимостям. Legacy CDN-текстуры ещё не автономны; chunk>500kB — известное предупреждение.
 
 | Читать | Для чего |
 |---|---|

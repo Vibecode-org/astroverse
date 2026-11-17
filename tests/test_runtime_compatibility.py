@@ -110,6 +110,24 @@ api.build_catalog_index = forbidden
                 assert api._CATALOG_INDEX['catalog'] is None
         """)
 
+    def test_filtered_conditional_cannot_bypass_object_or_byte_budget(self):
+        self.run_api("""
+            with TestClient(api.app) as client:
+                for version in ('json', 'v1', 'v2'):
+                    route = '/api/objects?kind=star&format=' + version
+                    accept = {'Accept': 'application/octet-stream'} if version == 'v1' else {}
+                    valid = client.get(route, headers=accept)
+                    assert valid.status_code == 200
+                    for budget, value in (('LEGACY_FILTER_MAX_OBJECTS', 1),
+                                          ('LEGACY_FILTER_MAX_BYTES', 1)):
+                        # New cache instances avoid a payload validated under old limits.
+                        from backend.byte_cache import ByteLRU
+                        with patch.object(api, budget, value), patch.object(api, 'SERIALIZED_CACHE', ByteLRU(8192)):
+                            for condition in ('*', valid.headers['etag'], 'W/' + valid.headers['etag']):
+                                response = client.get(route, headers={**accept, 'If-None-Match': condition})
+                                assert response.status_code == 413, (budget, version, response.status_code)
+        """)
+
     def test_snapshot_pages_keep_id_order_null_physics_and_time_rejection(self):
         self.run_api("""
             with TestClient(api.app) as client:

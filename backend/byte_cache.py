@@ -1,7 +1,7 @@
 """Serialized-byte budget, including keys and fixed entry overhead; thread safe."""
 
 from collections import OrderedDict
-from threading import RLock
+from threading import Event, RLock
 
 
 class ByteLRU:
@@ -10,6 +10,7 @@ class ByteLRU:
         self.entries = OrderedDict()
         self.bytes = 0
         self.lock = RLock()
+        self.pending = {}
 
     @staticmethod
     def cost(key, payload):
@@ -35,3 +36,34 @@ class ByteLRU:
                 self.bytes -= self.cost(old_key, old)
             self.entries[key] = payload
             self.bytes += cost
+
+    def get_or_build(self, key, build):
+        """Coalesce concurrent fills for one key, without blocking other keys.
+
+        Coordination entries exist only for active owners, bounded by admitted
+        server worker threads rather than catalog/query cardinality. Errors are not cached;
+        the owner always wakes waiters and releases its pending entry.
+        """
+        if not self.max_bytes:
+            return build()
+        while True:
+            with self.lock:
+                value = self.get(key)
+                if value is not None:
+                    return value
+                event = self.pending.get(key)
+                if event is None:
+                    event = self.pending[key] = Event()
+                    owner = True
+                else:
+                    owner = False
+            if owner:
+                try:
+                    payload = build()
+                    self.put(key, payload)
+                    return payload
+                finally:
+                    with self.lock:
+                        self.pending.pop(key, None)
+                        event.set()
+            event.wait()

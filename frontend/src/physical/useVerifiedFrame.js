@@ -14,6 +14,10 @@ export function useVerifiedFrame(simDate, neighborhood = null, anchor = 'earth',
   const requestedMilliseconds = continuous && admitted.contextKey === contextKey ? admitted.milliseconds : milliseconds;
   useEffect(() => () => manager.current.cancel(), []);
   useEffect(() => { setAdmitted({contextKey, milliseconds}); }, [contextKey]);
+  useEffect(() => {
+    if (continuous && admitted.contextKey === contextKey && milliseconds !== admitted.milliseconds)
+      manager.current.metrics.coalescedTicks++;
+  }, [milliseconds, contextKey]);
   // One in-flight selection and one latest desired instant. Clock ticks do not
   // cancel useful work; explicit controls/context changes start a new generation.
   useEffect(() => {
@@ -45,5 +49,6 @@ export function useVerifiedFrame(simDate, neighborhood = null, anchor = 'earth',
   const supportedTime = !interval || (milliseconds >= Date.parse(interval[0]) && milliseconds < Date.parse(interval[1]));
   const eligible = state.contextKey === contextKey && supportedTime
     && (continuous || state.requested === milliseconds);
-  return eligible ? { ...state, lagMs:milliseconds-state.requested } : { frame:null, error:null, lagMs:0 };
+  const metrics = manager.current.inspect();
+  return eligible ? { ...state, lagMs:milliseconds-state.requested, metrics } : { frame:null, error:null, lagMs:0, metrics };
 }

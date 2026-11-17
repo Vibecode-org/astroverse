@@ -20,6 +20,7 @@ export default function PhysicalScene({ frame, bodies = [], centerId, overview, 
     try {
       stage = createStage(el, { far: 1e12, maxDistance: 4e7, solarCam: [0, 8, 12] });
       const { scene, camera, renderer, controls } = stage;
+      for(const light of [stage.ambient,stage.focusLight,stage.sunLight])if(light)light.intensity=0;
       camera.near = 0.00001; camera.updateProjectionMatrix(); controls.minDistance = 0.0001;
       layer = createPhysicalLayer(scene);
       const flight=createFlight(camera,controls,el);
@@ -41,7 +42,7 @@ export default function PhysicalScene({ frame, bodies = [], centerId, overview, 
         state.cameraMs=performance.now()-start;
         state.onCameraTiming?.(state.cameraMs);
         if(rebased)state.apply?.();
-        layer.tick(camera, renderer.getPixelRatio?.() || 1); renderer.render(scene, camera);
+        layer.tick(camera, renderer.getPixelRatio?.() || 1, el.clientHeight || 600); renderer.render(scene, camera);
         if(now-lastStatus>250){lastStatus=now;statusRef.current?.(flight.inspect());}
         if (state.pendingDisplay) {
           const {frame, ready} = state.pendingDisplay;

@@ -144,7 +144,8 @@ export default function PhysicalApp() {
       <div className="controlBlock"><b>{bodies.slice(0,5).map(body => body.name).join(' · ')}{bodies.length > 5 && ` · ещё ${bodies.length-5}`}</b><p>{models.map(model => model.source).join(' · ')} · геометрические центры</p>
         <p>В каталоге: {total ?? '…'}. В реестре положений: {supportedTotal} тел.</p>
         <button className="viewBtn" onClick={() => {setFlying(false);if(profile==='synthetic-s100k')setCenterId('synthetic-origin');setOverview(value => !value);}}>{overview ? 'Окрестность тела' : 'Обзор системы'}</button>
-        <p>L0: точки; L1: кольцевые маркеры рядом и при выборе. Размеры графические, не радиусы тел. Расстояния линейные.</p>
+        <p>L0/L1: графические маркеры. L2: пять сфер с физическими радиусами при приближении. Расстояния линейные.</p>
+        <p>Вращение приближённое. Карты поверхности не подключены: сферы однотонные, цвет условный. Рельеф, затмения и столкновения не моделируются; внутри сферы поверхность скрыта.</p>
       </div>
       <input className="physicalSearch" aria-label="Поиск по всему каталогу" value={query} onChange={e => setQuery(e.target.value)} placeholder="Поиск по всему каталогу…" />
       {registryError && <p role="alert">{registryError}</p>}

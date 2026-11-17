@@ -1,7 +1,7 @@
 # Краткая история
 
-Текущее состояние — [ROADMAP](../ROADMAP.md), приёмка — [TEST_COVERAGE](TEST_COVERAGE.md).
-Полные прежние документы/отчёты доступны в Git:
+Статус — [ROADMAP](../ROADMAP.md), приёмка — [TEST_COVERAGE](TEST_COVERAGE.md).
+Прежние документы/отчёты в Git:
 [4fe4263](https://github.com/Vibecode-org/astroverse/tree/4fe426355dcb273020971308134df9a360d39282/docs).
 
 | Этап | Результат |
@@ -15,7 +15,7 @@
 | 2026-11-16 backup/restore | patched working publication восстановлена побайтно после потери test volume; иной bootstrap её не меняет |
 | Разделение модулей | schema/codecs,HTTP serialization/legacy JPL,frame validation,patch region/shared locks,LOD detail/picking |
 
-Исторические navigation camera max9.3/11ms превышали8ms; причина не установлена,
+Navigation camera max9.3/11ms превышали8ms; причина не установлена,
 порог не повышен. Повтор дал1ms. SwiftShader32×64fixture проверял2016computed/
 32null,48resource cycles; GPU/driver memory и аппаратныеfps этим не приняты.
 Прерванные/неполные S-100k runs не PASS; исходный16.667ms был провален.
@@ -23,5 +23,5 @@ Legacy resource baseline исправлен: ожидание CDN loads/errors �
 
 Пять [машинных benchmarks](reports/) сохраняют точные measured values,source hashes,
 методику/ограничения. Старый startup cold замерял2integrity scans; текущий pinned
-release использует3,новый cold timing не измерен. Последующие функциональные
-регрессии не переименовывают старые числа в новые performance измерения.
+release использует3,новый cold timing не измерен. Функциональные
+регрессии не обновляют performance измерения.
